@@ -6,7 +6,12 @@ import Loadable from 'ui-component/Loadable';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
+const Shops = Loadable(lazy(() => import('views/shop')));
+const CreateShop = Loadable(lazy(() => import('views/shop/createShop')));
+const ViewShop = Loadable(lazy(() => import('views/shop/viewShop')));
+const UpdateShop = Loadable(lazy(() => import('views/shop/updateShop')));
 
+const Products = Loadable(lazy(() => import('views/products')));
 // utilities routing
 const UtilsTypography = Loadable(lazy(() => import('views/utilities/Typography')));
 const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
@@ -84,6 +89,26 @@ const MainRoutes = {
         {
             path: 'sample-page',
             element: <SamplePage />
+        },
+        {
+            path: 'products',
+            element: <Products />
+        },
+        {
+            path: 'shops',
+            element: <Shops />
+        },
+        {
+            path: 'create-shop',
+            element: <CreateShop />
+        },
+        {
+            path: 'view-shop',
+            element: <ViewShop />
+        },
+        {
+            path: 'update-shop',
+            element: <UpdateShop />
         }
     ]
 };

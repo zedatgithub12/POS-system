@@ -23,57 +23,25 @@ const dashboard = {
             id: 'shops',
             title: 'Shops',
             type: 'item',
-            url: '/sample-page',
+            url: '/shops',
             icon: icons.IconBuildingStore,
             breadcrumbs: false
         },
         {
             id: 'products',
             title: 'Products',
-            type: 'collapse',
-            url: '/sample-page',
+            type: 'item',
+            url: '/products',
             icon: icons.IconBox,
-            breadcrumbs: false,
-            children: [
-                {
-                    id: 'listproduct',
-                    title: 'List Product',
-                    type: 'item',
-                    url: '/icons/tabler-icons',
-                    breadcrumbs: false
-                },
-                {
-                    id: 'addproduct',
-                    title: 'Add Product',
-                    type: 'item',
-                    url: '/icons/material-icons',
-                    breadcrumbs: false
-                }
-            ]
+            breadcrumbs: false
         },
         {
             id: 'category',
             title: 'Category',
-            type: 'collapse',
+            type: 'item',
             url: '/sample-page',
             icon: icons.IconCategory,
-            breadcrumbs: false,
-            children: [
-                {
-                    id: 'listcategory',
-                    title: 'List Category',
-                    type: 'item',
-                    url: '/icons/tabler-icons',
-                    breadcrumbs: false
-                },
-                {
-                    id: 'addcategory',
-                    title: 'Add Category',
-                    type: 'item',
-                    url: '/icons/material-icons',
-                    breadcrumbs: false
-                }
-            ]
+            breadcrumbs: false
         },
         {
             id: 'sales',

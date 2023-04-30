@@ -24,7 +24,7 @@ const AuthRegister = Loadable(lazy(() => import('views/pages/authentication/auth
 const App = () => {
     const customization = useSelector((state) => state.customization);
     const location = useLocation();
-    const [login, setLogin] = useState(false);
+    const [login, setLogin] = useState(true);
     useEffect(() => {
         var tokens = sessionStorage.getItem('token');
         if (tokens !== null) {
