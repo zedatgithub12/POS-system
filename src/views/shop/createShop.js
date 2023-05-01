@@ -5,7 +5,7 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const CreateShop = () => {
     const navigate = useNavigate();
@@ -76,6 +76,30 @@ const CreateShop = () => {
                         <form onSubmit={handleSubmit}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
+                                    {formData.shopProfilePreview && (
+                                        <img
+                                            src={formData.shopProfilePreview}
+                                            alt="Shop Profile Preview"
+                                            className="img-fluid border  rounded-3"
+                                            style={{ width: '100%', marginTop: 10 }}
+                                        />
+                                    )}
+
+                                    <input
+                                        type="file"
+                                        id="shopProfile"
+                                        name="shopProfile"
+                                        onChange={handleFileChange}
+                                        style={{ display: 'none' }}
+                                    />
+                                    <label htmlFor="shopProfile">
+                                        <IconButton component="span">
+                                            <AddPhotoAlternateIcon />
+                                        </IconButton>
+                                        Upload Shop Profile
+                                    </label>
+                                </Grid>
+                                <Grid item xs={12}>
                                     <TextField
                                         label="Shop Name"
                                         name="shopName"
@@ -101,7 +125,6 @@ const CreateShop = () => {
                                         name="description"
                                         onChange={handleInputChange}
                                         value={formData.description}
-                                        required
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
@@ -114,28 +137,7 @@ const CreateShop = () => {
                                         required
                                     />
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <input
-                                        type="file"
-                                        id="shopProfile"
-                                        name="shopProfile"
-                                        onChange={handleFileChange}
-                                        style={{ display: 'none' }}
-                                    />
-                                    <label htmlFor="shopProfile">
-                                        <IconButton component="span">
-                                            <AddPhotoAlternateIcon />
-                                        </IconButton>
-                                        Upload Shop Profile
-                                    </label>
-                                    {formData.shopProfilePreview && (
-                                        <img
-                                            src={formData.shopProfilePreview}
-                                            alt="Shop Profile Preview"
-                                            style={{ width: '100%', marginTop: 10 }}
-                                        />
-                                    )}
-                                </Grid>
+
                                 <Grid item xs={12}>
                                     <Button type="submit" variant="contained" color="secondary">
                                         Create Shop

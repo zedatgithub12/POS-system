@@ -5,16 +5,18 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const UpdateShop = () => {
+    const { state } = useLocation();
+
     const [formData, setFormData] = useState({
-        shopName: '',
-        address: '',
-        description: '',
-        phone: '',
-        shopProfile: null,
-        shopProfilePreview: null
+        shopName: state.name ? state.name : '',
+        address: state.address ? state.address : '',
+        description: state.description ? state.description : '',
+        phone: state.phone ? state.phone : '',
+        shopProfile: state.picture ? state.picture : null,
+        shopProfilePreview: state.picture ? state.picture : null
     });
 
     const handleSubmit = (event) => {
@@ -48,7 +50,7 @@ const UpdateShop = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Create New Shop</Typography>
+                                    <Typography variant="h3">Update Shop</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -70,6 +72,29 @@ const UpdateShop = () => {
                         <Typography variant="h4" gutterBottom gutterTop style={{ marginTop: 20 }}></Typography>
                         <form onSubmit={handleSubmit}>
                             <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    {formData.shopProfilePreview && (
+                                        <img
+                                            src={formData.shopProfilePreview}
+                                            alt="Shop Profile Preview"
+                                            className="img-fluid border  rounded-3"
+                                            style={{ width: '100%', marginTop: 10 }}
+                                        />
+                                    )}
+                                    <input
+                                        type="file"
+                                        id="shopProfile"
+                                        name="shopProfile"
+                                        onChange={handleFileChange}
+                                        style={{ display: 'none' }}
+                                    />
+                                    <label htmlFor="shopProfile" color="secondary">
+                                        <IconButton component="span">
+                                            <AddPhotoAlternateIcon />
+                                        </IconButton>
+                                        Update Shop Profile
+                                    </label>
+                                </Grid>
                                 <Grid item xs={12}>
                                     <TextField
                                         label="Shop Name"
@@ -96,7 +121,6 @@ const UpdateShop = () => {
                                         name="description"
                                         onChange={handleInputChange}
                                         value={formData.description}
-                                        required
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
@@ -109,31 +133,10 @@ const UpdateShop = () => {
                                         required
                                     />
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <input
-                                        type="file"
-                                        id="shopProfile"
-                                        name="shopProfile"
-                                        onChange={handleFileChange}
-                                        style={{ display: 'none' }}
-                                    />
-                                    <label htmlFor="shopProfile">
-                                        <IconButton component="span">
-                                            <AddPhotoAlternateIcon />
-                                        </IconButton>
-                                        Upload Shop Profile
-                                    </label>
-                                    {formData.shopProfilePreview && (
-                                        <img
-                                            src={formData.shopProfilePreview}
-                                            alt="Shop Profile Preview"
-                                            style={{ width: '100%', marginTop: 10 }}
-                                        />
-                                    )}
-                                </Grid>
+
                                 <Grid item xs={12}>
                                     <Button type="submit" variant="contained" color="secondary">
-                                        Create Shop
+                                        Update Shop
                                     </Button>
                                 </Grid>
                             </Grid>
