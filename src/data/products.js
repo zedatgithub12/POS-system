@@ -1,6 +1,6 @@
 const ProductDummy = [
     {
-        picture: 'https://example.com/product1.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Coffee Beans',
         category: 'Food & Beverage',
         brand: 'Yirgacheffe',
@@ -15,7 +15,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product2.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Honey',
         category: 'Food & Beverage',
         brand: 'Lalibela',
@@ -30,7 +30,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product3.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Leather Bag',
         category: 'Fashion',
         brand: 'Addis Ababa Leather Co.',
@@ -45,7 +45,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product4.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Spices',
         category: 'Food & Beverage',
         brand: 'Berbere',
@@ -60,7 +60,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product5.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Opal Necklace',
         category: 'Fashion',
         brand: 'Opalite',
@@ -75,7 +75,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product6.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Handwoven Basket',
         category: 'Home Decor',
         brand: 'Bahir Dar Baskets',
@@ -90,7 +90,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product7.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Teff Flour',
         category: 'Food & Beverage',
         brand: 'Teff Time',
@@ -105,7 +105,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product8.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Cotton Scarf',
         category: 'Fashion',
         brand: 'Cotton Clouds',
@@ -120,7 +120,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product9.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Black Seed Oil',
         category: 'Health & Wellness',
         brand: 'Black Seed Co.',
@@ -135,7 +135,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product10.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Handmade Pottery',
         category: 'Home Decor',
         brand: 'Addis Pottery',
@@ -150,7 +150,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product11.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Leather Shoes',
         category: 'Fashion',
         brand: 'Sheba Leather',
@@ -165,7 +165,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product12.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Sidamo Coffee',
         category: 'Food & Beverage',
         brand: 'Sidamo Roasters',
@@ -180,7 +180,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product13.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Handmade Scarf',
         category: 'Fashion',
         brand: 'Addis Scarves',
@@ -195,7 +195,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product14.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Tribal Necklace',
         category: 'Fashion',
         brand: 'Tribal Treasures',
@@ -210,7 +210,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product15.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Macchiato Mug',
         category: 'Home Decor',
         brand: 'Coffee Culture',
@@ -225,7 +225,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product16.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Cotton Tote Bag',
         category: 'Fashion',
         brand: 'Cotton Canvas',
@@ -240,7 +240,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product17.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Leather Wallet',
         category: 'Fashion',
         brand: 'Addis Wallets',
@@ -255,7 +255,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product18.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Beeswax Candle',
         category: 'Home Decor',
         brand: 'Beeswax Co.',
@@ -270,7 +270,7 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product19.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Amharic Alphabet Chart',
         category: 'Education',
         brand: 'Amharic ABCs',
@@ -285,7 +285,111 @@ const ProductDummy = [
     },
 
     {
-        picture: 'https://example.com/product20.jpg',
+        picture: 'http://placehold.it/120x120&text=image',
+        name: 'Ethiopian Handmade Pottery Bowl',
+        category: 'Home Decor',
+        brand: 'Gondar Pottery',
+        code: 'GP020',
+        cost: 300,
+        unit: '1 piece',
+        price: 500,
+        quantity: 15,
+        description: 'A beautiful and functional pottery bowl made by artisans in Gondar.',
+        shop: 'Artisanal Finds',
+        status: 'In stock'
+    },
+    {
+        picture: 'http://placehold.it/120x120&text=image',
+        name: 'Ethiopian Tribal Necklace',
+        category: 'Fashion',
+        brand: 'Tribal Treasures',
+        code: 'TT014',
+        cost: 500,
+        unit: '1 piece',
+        price: 750,
+        quantity: 8,
+        description: 'A striking necklace featuring traditional Ethiopian tribal beads.',
+        shop: 'Boho Chic',
+        status: 'In stock'
+    },
+
+    {
+        picture: 'http://placehold.it/120x120&text=image',
+        name: 'Ethiopian Macchiato Mug',
+        category: 'Home Decor',
+        brand: 'Coffee Culture',
+        code: 'CC015',
+        cost: 100,
+        unit: '1 piece',
+        price: 150,
+        quantity: 50,
+        description: 'A fun and colorful mug perfect for enjoying a macchiato.',
+        shop: 'Coffee Shop',
+        status: 'In stock'
+    },
+
+    {
+        picture: 'http://placehold.it/120x120&text=image',
+        name: 'Ethiopian Cotton Tote Bag',
+        category: 'Fashion',
+        brand: 'Cotton Canvas',
+        code: 'CC016',
+        cost: 150,
+        unit: '1 piece',
+        price: 250,
+        quantity: 30,
+        description: 'A sturdy and eco-friendly tote bag made from Ethiopian cotton.',
+        shop: 'Sustainable Living',
+        status: 'In stock'
+    },
+
+    {
+        picture: 'http://placehold.it/120x120&text=image',
+        name: 'Ethiopian Leather Wallet',
+        category: 'Fashion',
+        brand: 'Addis Wallets',
+        code: 'AW017',
+        cost: 200,
+        unit: '1 piece',
+        price: 350,
+        quantity: 25,
+        description: 'A sleek and functional leather wallet made in Addis Ababa.',
+        shop: 'Accessories Galore',
+        status: 'In stock'
+    },
+
+    {
+        picture: 'http://placehold.it/120x120&text=image',
+        name: 'Ethiopian Beeswax Candle',
+        category: 'Home Decor',
+        brand: 'Beeswax Co.',
+        code: 'BC018',
+        cost: 50,
+        unit: '1 piece',
+        price: 100,
+        quantity: 100,
+        description: 'A natural and eco-friendly candle made from Ethiopian beeswax.',
+        shop: 'Candle Corner',
+        status: 'In stock'
+    },
+
+    {
+        picture: 'http://placehold.it/120x120&text=image',
+        name: 'Ethiopian Amharic Alphabet Chart',
+        category: 'Education',
+        brand: 'Amharic ABCs',
+        code: 'ABC019',
+        cost: 75,
+        unit: '1 piece',
+        price: 120,
+        quantity: 50,
+        description: 'A colorful and educational chart featuring the Amharic alphabet.',
+        shop: 'Learning Center',
+        status: 'In stock'
+    },
+
+    {
+        picture: 'http://placehold.it/120x120&text=image',
         name: 'Ethiopian Handmade Pottery Bowl',
         category: 'Home Decor',
         brand: 'Gondar Pottery',

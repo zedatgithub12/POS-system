@@ -39,7 +39,7 @@ const dashboard = {
             id: 'category',
             title: 'Category',
             type: 'item',
-            url: '/sample-page',
+            url: '/categories',
             icon: icons.IconCategory,
             breadcrumbs: false
         },
@@ -47,7 +47,7 @@ const dashboard = {
             id: 'sales',
             title: 'Sales',
             type: 'item',
-            url: '/sample-page',
+            url: '/sales',
             icon: icons.IconTimeline,
             breadcrumbs: false
         },

@@ -39,7 +39,7 @@ const brands = ['All', 'Addis Roasters', 'Habesha Leather Co.', 'Taste of Ethiop
 const shops = ['All', 'Addis Ababa', 'Dire Dawa', 'Bahir Dar', 'Gondar', 'Hawassa'];
 const statuses = ['All', 'In stock', 'Out of stock'];
 
-const Products = () => {
+const Sales = () => {
     const [searchText, setSearchText] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('All');
     const [brandFilter, setBrandFilter] = useState('All');
@@ -114,13 +114,13 @@ const Products = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Products</Typography>
+                                    <Typography variant="h3">Sales</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
                         <Grid item>
-                            <Button component={Link} to="/add-product" variant="outlined" color="secondary" sx={{ textDecoration: 'none' }}>
-                                Add Product
+                            <Button component={Link} to="/create-sale" variant="outlined" color="secondary" sx={{ textDecoration: 'none' }}>
+                                Create Sale
                             </Button>
                         </Grid>
                     </Grid>
@@ -130,7 +130,7 @@ const Products = () => {
                     <Divider />
                 </Grid>
                 <Grid item xs={12}>
-                    <Box paddingX="2" className="shadow-1 p-4 rounded ">
+                    <Box paddingX="2" className="shadow-1 p-4 pt-2 rounded ">
                         <TextField
                             label="Search"
                             variant="outlined"
@@ -378,4 +378,4 @@ const ProductRow = ({ product }) => {
     );
 };
 
-export default Products;
+export default Sales;
