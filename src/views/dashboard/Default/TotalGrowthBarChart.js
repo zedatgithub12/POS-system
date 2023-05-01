@@ -48,8 +48,8 @@ const TotalGrowthBarChart = ({ isLoading }) => {
 
     const primary200 = theme.palette.primary[200];
     const primaryDark = theme.palette.primary.dark;
-    const secondaryMain = theme.palette.secondary.main;
-    const secondaryLight = theme.palette.secondary.light;
+    const secondaryMain = theme.palette.warning.dark;
+    const secondaryLight = theme.palette.warning.main;
 
     useEffect(() => {
         const newChartData = {
@@ -103,7 +103,7 @@ const TotalGrowthBarChart = ({ isLoading }) => {
                                             <Typography variant="subtitle2">Total Growth</Typography>
                                         </Grid>
                                         <Grid item>
-                                            <Typography variant="h3">$2,324.00</Typography>
+                                            <Typography variant="h3">ETB 2,324.00</Typography>
                                         </Grid>
                                     </Grid>
                                 </Grid>

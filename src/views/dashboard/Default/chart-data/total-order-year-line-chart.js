@@ -12,7 +12,7 @@ const chartData = {
         dataLabels: {
             enabled: false
         },
-        colors: ['#fff'],
+        colors: ['#222'],
         fill: {
             type: 'solid',
             opacity: 1

@@ -18,9 +18,10 @@ import ChartDataYear from './chart-data/total-order-year-line-chart';
 // assets
 import LocalMallOutlinedIcon from '@mui/icons-material/LocalMallOutlined';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { backgroundColor } from '@mui/system/palette';
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
-    backgroundColor: theme.palette.primary.dark,
+    backgroundColor: theme.palette.warning.light,
     color: '#fff',
     overflow: 'hidden',
     position: 'relative',
@@ -33,7 +34,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
         position: 'absolute',
         width: 210,
         height: 210,
-        background: theme.palette.primary[800],
+        background: theme.palette.warning.dark,
         borderRadius: '50%',
         zIndex: 1,
         top: -85,
@@ -49,7 +50,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
         zIndex: 1,
         width: 210,
         height: 210,
-        background: theme.palette.primary[800],
+        background: theme.palette.warning.dark,
         borderRadius: '50%',
         top: -125,
         right: -15,
@@ -87,8 +88,8 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                             sx={{
                                                 ...theme.typography.commonAvatar,
                                                 ...theme.typography.largeAvatar,
-                                                backgroundColor: theme.palette.primary[800],
-                                                color: '#fff',
+                                                backgroundColor: theme.palette.warning.dark,
+                                                color: '#222',
                                                 mt: 1
                                             }}
                                         >
@@ -100,7 +101,11 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                             disableElevation
                                             variant={timeValue ? 'contained' : 'text'}
                                             size="small"
-                                            sx={{ color: 'inherit' }}
+                                            color="inherit"
+                                            sx={{
+                                                color: '#222',
+                                                backgroundColor: !timeValue ? theme.palette.warning.main : theme.palette.warning.light
+                                            }}
                                             onClick={(e) => handleChangeTime(e, true)}
                                         >
                                             Month
@@ -109,7 +114,11 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                             disableElevation
                                             variant={!timeValue ? 'contained' : 'text'}
                                             size="small"
-                                            sx={{ color: 'inherit' }}
+                                            color="inherit"
+                                            sx={{
+                                                color: '#222',
+                                                backgroundColor: timeValue ? theme.palette.warning.dark : theme.palette.warning.main
+                                            }}
                                             onClick={(e) => handleChangeTime(e, false)}
                                         >
                                             Year
@@ -123,12 +132,30 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                         <Grid container alignItems="center">
                                             <Grid item>
                                                 {timeValue ? (
-                                                    <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>
-                                                        $108
+                                                    <Typography
+                                                        sx={{
+                                                            fontSize: '2.125rem',
+                                                            fontWeight: 500,
+                                                            mr: 1,
+                                                            mt: 1.75,
+                                                            mb: 0.75,
+                                                            color: '#222'
+                                                        }}
+                                                    >
+                                                        108
                                                     </Typography>
                                                 ) : (
-                                                    <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>
-                                                        $961
+                                                    <Typography
+                                                        sx={{
+                                                            fontSize: '2.125rem',
+                                                            fontWeight: 500,
+                                                            mr: 1,
+                                                            mt: 1.75,
+                                                            mb: 0.75,
+                                                            color: '#222'
+                                                        }}
+                                                    >
+                                                        961
                                                     </Typography>
                                                 )}
                                             </Grid>
@@ -137,8 +164,8 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                                     sx={{
                                                         ...theme.typography.smallAvatar,
                                                         cursor: 'pointer',
-                                                        backgroundColor: theme.palette.primary[200],
-                                                        color: theme.palette.primary.dark
+                                                        backgroundColor: theme.palette.warning.dark,
+                                                        color: theme.palette.dark.dark
                                                     }}
                                                 >
                                                     <ArrowDownwardIcon fontSize="inherit" sx={{ transform: 'rotate3d(1, 1, 1, 45deg)' }} />
@@ -149,10 +176,10 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                                     sx={{
                                                         fontSize: '1rem',
                                                         fontWeight: 500,
-                                                        color: theme.palette.primary[200]
+                                                        color: theme.palette.dark.main
                                                     }}
                                                 >
-                                                    Total Order
+                                                    Total Sales
                                                 </Typography>
                                             </Grid>
                                         </Grid>

@@ -9,7 +9,8 @@ import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
 
 // assets
-import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
+import { TableChartOutlinedIcon } from '@mui/icons-material';
+import { IconCategory } from '@tabler/icons';
 
 // styles
 const CardWrapper = styled(MainCard)(({ theme }) => ({
@@ -59,11 +60,11 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                                         sx={{
                                             ...theme.typography.commonAvatar,
                                             ...theme.typography.largeAvatar,
-                                            backgroundColor: theme.palette.primary[800],
+                                            backgroundColor: theme.palette.primary.main,
                                             color: '#fff'
                                         }}
                                     >
-                                        <TableChartOutlinedIcon fontSize="inherit" />
+                                        <IconCategory fontSize="inherit" />
                                     </Avatar>
                                 </ListItemAvatar>
                                 <ListItemText
@@ -74,12 +75,12 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                                     }}
                                     primary={
                                         <Typography variant="h4" sx={{ color: '#fff' }}>
-                                            $203k
+                                            18
                                         </Typography>
                                     }
                                     secondary={
                                         <Typography variant="subtitle2" sx={{ color: 'primary.light', mt: 0.25 }}>
-                                            Total Income
+                                            Categories
                                         </Typography>
                                     }
                                 />

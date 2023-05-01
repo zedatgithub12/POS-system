@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Avatar, Box, ButtonBase } from '@mui/material';
+import { Avatar, Box, ButtonBase, Typography } from '@mui/material';
 
 // project imports
 import LogoSection from '../LogoSection';
@@ -56,12 +56,12 @@ const Header = ({ handleLeftDrawerToggle }) => {
             </Box>
 
             {/* header search */}
-            <SearchSection />
+            {/* <SearchSection /> */}
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ flexGrow: 1 }} />
 
             {/* notification & profile */}
-            <NotificationSection />
+            {/* <NotificationSection /> */}
             <ProfileSection />
         </>
     );

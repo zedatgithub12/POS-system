@@ -96,11 +96,11 @@ const ProfileSection = () => {
                     borderRadius: '27px',
                     transition: 'all .2s ease-in-out',
                     borderColor: theme.palette.primary.light,
-                    backgroundColor: theme.palette.primary.light,
+                    backgroundColor: theme.palette.warning.light,
                     '&[aria-controls="menu-list-grow"], &:hover': {
-                        borderColor: theme.palette.primary.main,
-                        background: `${theme.palette.primary.main}!important`,
-                        color: theme.palette.primary.light,
+                        borderColor: theme.palette.warning.dark,
+                        background: `${theme.palette.warning.dark}!important`,
+                        color: theme.palette.warning.light,
                         '& svg': {
                             stroke: theme.palette.primary.light
                         }
@@ -123,7 +123,7 @@ const ProfileSection = () => {
                         color="inherit"
                     />
                 }
-                label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
+                label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.dark.main} />}
                 variant="outlined"
                 ref={anchorRef}
                 aria-controls={open ? 'menu-list-grow' : undefined}

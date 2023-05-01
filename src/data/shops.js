@@ -14,8 +14,8 @@ const Shoplist = [
     },
     {
         id: '2',
-        name: 'Sholla Branch',
-        address: 'Sholla',
+        name: '22 Branch',
+        address: 'Bole 22',
         description: 'It is the biggest shop',
         manager: 'Tesfahun Kebede',
         phone: '09237652378',
@@ -26,8 +26,8 @@ const Shoplist = [
     },
     {
         id: '3',
-        name: 'Sholla Branch',
-        address: 'Sholla',
+        name: 'Mexico Branch',
+        address: 'Mexico',
         description: 'It is the biggest shop',
         manager: 'Tesfahun Kebede',
         phone: '09237652378',
@@ -38,8 +38,8 @@ const Shoplist = [
     },
     {
         id: '4',
-        name: 'Sholla Branch',
-        address: 'Sholla',
+        name: 'Piassa Branch',
+        address: 'Piassa',
         description: 'It is the biggest shop',
         manager: 'Tesfahun Kebede',
         phone: '09237652378',
@@ -50,8 +50,8 @@ const Shoplist = [
     },
     {
         id: '5',
-        name: 'Sholla Branch',
-        address: 'Sholla',
+        name: 'Saris Branch',
+        address: 'Saris',
         description: 'It is the biggest shop',
         manager: 'Tesfahun Kebede',
         phone: '09237652378',
