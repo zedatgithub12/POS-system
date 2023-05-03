@@ -55,7 +55,7 @@ const dashboard = {
             id: 'customers',
             title: 'Customers',
             type: 'item',
-            url: '/sample-page',
+            url: '/customers',
             icon: icons.IconUsers,
             breadcrumbs: false
         }

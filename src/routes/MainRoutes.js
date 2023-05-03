@@ -3,10 +3,6 @@ import { lazy } from 'react';
 // project imports
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
-import Sales from 'views/sales';
-import CreateSale from 'views/sales/createSale';
-import UpdateSale from 'views/sales/updateSale';
-import ViewSale from 'views/sales/viewSale';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -21,6 +17,21 @@ const AddProduct = Loadable(lazy(() => import('views/products/addProduct')));
 const UpdateProduct = Loadable(lazy(() => import('views/products/updateProduct')));
 // Category routing
 const Category = Loadable(lazy(() => import('views/category')));
+//sales routing
+const Sales = Loadable(lazy(() => import('views/sales')));
+const CreateSale = Loadable(lazy(() => import('views/sales/createSale')));
+const UpdateSale = Loadable(lazy(() => import('views/sales/updateSale')));
+const ViewSale = Loadable(lazy(() => import('views/sales/viewSale')));
+//Customers Routing
+const Customers = Loadable(lazy(() => import('views/customers')));
+const AddCustomer = Loadable(lazy(() => import('views/customers/addCustomer')));
+const ViewCustomer = Loadable(lazy(() => import('views/customers/viewCustomer')));
+const UpdateCustomer = Loadable(lazy(() => import('views/customers/updateCustomer')));
+//User Routing
+const Users = Loadable(lazy(() => import('views/users')));
+const AddUsers = Loadable(lazy(() => import('views/users/addUser')));
+const ViewUsers = Loadable(lazy(() => import('views/users/viewUser')));
+const UpdateUsers = Loadable(lazy(() => import('views/users/updateUser')));
 // utilities routing
 const UtilsTypography = Loadable(lazy(() => import('views/utilities/Typography')));
 const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
@@ -146,6 +157,38 @@ const MainRoutes = {
         {
             path: 'view-sale',
             element: <ViewSale />
+        },
+        {
+            path: 'customers',
+            element: <Customers />
+        },
+        {
+            path: 'add-customer',
+            element: <AddCustomer />
+        },
+        {
+            path: 'view-customer',
+            element: <ViewCustomer />
+        },
+        {
+            path: 'update-customer',
+            element: <UpdateCustomer />
+        },
+        {
+            path: 'users',
+            element: <Users />
+        },
+        {
+            path: 'add-user',
+            element: <AddUsers />
+        },
+        {
+            path: 'view-user',
+            element: <ViewUsers />
+        },
+        {
+            path: 'Update-user',
+            element: <UpdateUsers />
         }
     ]
 };
