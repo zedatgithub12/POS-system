@@ -34,6 +34,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
 import ProductDummy from 'data/products';
+import CustomersData from 'data/customers';
 
 // ==============================|| CUSTOMERS PAGE ||============================== //
 
@@ -60,7 +61,7 @@ const Customers = () => {
         setPage(0);
     };
 
-    const filteredData = ProductDummy.filter((product) => {
+    const filteredData = CustomersData.filter((product) => {
         let isMatch = true;
 
         if (searchText) {
@@ -124,7 +125,7 @@ const Customers = () => {
                             <InputLabel>Shops</InputLabel>
                             <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
                                 <MenuItem value="All">All</MenuItem>
-                                {Array.from(new Set(ProductDummy.map((sale) => sale.shop))).map((shop) => (
+                                {Array.from(new Set(CustomersData.map((sale) => sale.shop))).map((shop) => (
                                     <MenuItem key={shop} value={shop}>
                                         {shop}
                                     </MenuItem>
@@ -146,8 +147,8 @@ const Customers = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {paginatedData.map((product, index) => (
-                                        <CustomerRow key={index} product={product} />
+                                    {paginatedData.map((customer, index) => (
+                                        <CustomerRow key={index} customer={customer} />
                                     ))}
                                 </TableBody>
                             </Table>
@@ -168,7 +169,7 @@ const Customers = () => {
     );
 };
 
-const CustomerRow = ({ product }) => {
+const CustomerRow = ({ customer }) => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
@@ -177,13 +178,19 @@ const CustomerRow = ({ product }) => {
     const [selectedProduct, setSelectedProduct] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
 
-    const handleTrashClick = (product) => {
-        setSelectedProduct(product);
+    const handleTrashClick = (customer) => {
+        setSelectedProduct(customer);
         setDialogOpen(true);
     };
     const handleDialogClose = () => {
         setSelectedProduct(null);
         setDialogOpen(false);
+    };
+    const DateSlice = (date) => {
+        var year = date.slice(0, 4);
+        var month = date.slice(5, 7);
+        var day = date.slice(8, 10);
+        return day + '/' + month + '/' + year;
     };
     const UpdateUser = () => {
         alert('User will be Updated');
@@ -204,16 +211,16 @@ const CustomerRow = ({ product }) => {
                     </IconButton>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                    {product.name}
+                    {customer.name}
                 </TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{product.brand}</TableCell>
-                <TableCell>{product.brand}</TableCell>
+                <TableCell>{customer.phone}</TableCell>
+                <TableCell>{customer.shop}</TableCell>
+                <TableCell>{DateSlice(customer.created_at)}</TableCell>
                 <TableCell>
                     <IconButton aria-label="Edit row" size="small" onClick={handleOpen}>
                         <IconEdit />
                     </IconButton>
-                    <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
+                    <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(customer)}>
                         <IconTrash />
                     </IconButton>
                 </TableCell>
@@ -228,10 +235,10 @@ const CustomerRow = ({ product }) => {
 
                             <Grid container gridSpacing>
                                 <Grid item xs={12} sm={3} className="ms-0">
-                                    <TextField fullWidth label="Name" color="primary" />
+                                    <TextField fullWidth placeholder="Name" color="primary" value={customer.name} />
                                 </Grid>
                                 <Grid item xs={12} sm={3} className="ms-3">
-                                    <TextField fullWidth label="Email" color="primary" />
+                                    <TextField fullWidth placeholder="phone" color="primary" value={customer.phone} />
                                 </Grid>
                             </Grid>
                             <Grid item>
@@ -256,7 +263,7 @@ const CustomerRow = ({ product }) => {
                     <Button variant="text" color="primary" onClick={handleDialogClose}>
                         Cancel
                     </Button>
-                    <Button variant="text" color="error" onClick={() => Delete(selectedProduct ? selectedProduct.code : '0')}>
+                    <Button variant="text" color="error" onClick={() => Delete(selectedProduct ? selectedProduct.name : '0')}>
                         Yes
                     </Button>
                 </DialogActions>
