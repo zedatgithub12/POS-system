@@ -14,6 +14,7 @@ import {
     IconButton,
     TextField,
     InputAdornment,
+    Menu,
     MenuItem,
     TablePagination,
     Dialog,
@@ -22,90 +23,114 @@ import {
     DialogActions,
     Button,
     Box,
-    Collapse
+    Collapse,
+    FormControl,
+    Checkbox,
+    Select,
+    InputLabel
 } from '@mui/material';
-import { KeyboardArrowDown, KeyboardArrowUp, Delete, Edit } from '@mui/icons-material';
+
+import { KeyboardArrowDown, KeyboardArrowUp, Delete, Edit, MoreVert, Search } from '@mui/icons-material';
 import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
-import ProductDummy from 'data/products';
+import salesData from 'data/sales';
 
-// ==============================|| PRODUCT PAGE ||============================== //
-
-const categories = ['All', 'Beverages', 'Accessories', 'Food & Beverage', 'Apparel'];
-const brands = ['All', 'Addis Roasters', 'Habesha Leather Co.', 'Taste of Ethiopia', 'Dashen Designs', 'Honeyland'];
-const shops = ['All', 'Addis Ababa', 'Dire Dawa', 'Bahir Dar', 'Gondar', 'Hawassa'];
-const statuses = ['All', 'In stock', 'Out of stock'];
+// ==============================|| SALES PAGE ||============================== //
 
 const Sales = () => {
-    const [searchText, setSearchText] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('All');
-    const [brandFilter, setBrandFilter] = useState('All');
-    const [shopFilter, setShopFilter] = useState('All');
-    const [statusFilter, setStatusFilter] = useState('All');
+    const navigate = useNavigate();
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [selectedRows, setSelectedRows] = useState([]);
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(12);
+    const [filterDate, setFilterDate] = useState('All');
+    const [filterShop, setFilterShop] = useState('All');
+    const [filterPaymentMethod, setFilterPaymentMethod] = useState('All');
+    const [searchText, setSearchText] = useState('');
+    const [rowsPerPage, setRowsPerPage] = useState(15);
 
-    const handleSearchTextChange = (event) => {
-        setSearchText(event.target.value);
+    const handleMenuClick = (event) => {
+        setAnchorEl(event.currentTarget);
     };
 
-    const handleCategoryFilterChange = (event) => {
-        setCategoryFilter(event.target.value);
+    const handleMenuClose = () => {
+        setAnchorEl(null);
     };
 
-    const handleBrandFilterChange = (event) => {
-        setBrandFilter(event.target.value);
+    const handleSelectAllClick = (event) => {
+        if (event.target.checked) {
+            setSelectedRows(salesData.map((sale) => sale.item_code));
+        } else {
+            setSelectedRows([]);
+        }
     };
 
-    const handleShopFilterChange = (event) => {
-        setShopFilter(event.target.value);
-    };
+    const handleRowClick = (event, item_code) => {
+        const selectedIndex = selectedRows.indexOf(item_code);
+        let newSelectedRows = [];
 
-    const handleStatusFilterChange = (event) => {
-        setStatusFilter(event.target.value);
-    };
+        if (selectedIndex === -1) {
+            newSelectedRows = newSelectedRows.concat(selectedRows, item_code);
+        } else if (selectedIndex === 0) {
+            newSelectedRows = newSelectedRows.concat(selectedRows.slice(1));
+        } else if (selectedIndex === selectedRows.length - 1) {
+            newSelectedRows = newSelectedRows.concat(selectedRows.slice(0, -1));
+        } else if (selectedIndex > 0) {
+            newSelectedRows = newSelectedRows.concat(selectedRows.slice(0, selectedIndex), selectedRows.slice(selectedIndex + 1));
+        }
 
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
+        setSelectedRows(newSelectedRows);
     };
-
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
 
-    const filteredData = ProductDummy.filter((product) => {
+    const handlePageChange = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleFilterDateChange = (event) => {
+        setFilterDate(event.target.value);
+        setPage(0);
+    };
+
+    const handleFilterShopChange = (event) => {
+        setFilterShop(event.target.value);
+        setPage(0);
+    };
+
+    const handleFilterPaymentMethodChange = (event) => {
+        setFilterPaymentMethod(event.target.value);
+        setPage(0);
+    };
+    const handleSearchTextChange = (event) => {
+        setSearchText(event.target.value);
+        setPage(0);
+    };
+    const filteredSalesData = salesData.filter((sale) => {
         let isMatch = true;
 
         if (searchText) {
             const searchRegex = new RegExp(searchText, 'i');
-            isMatch = isMatch && (searchRegex.test(product.name) || searchRegex.test(product.code));
+            isMatch = isMatch && (searchRegex.test(sale.item_name) || searchRegex.test(sale.item_code));
+        }
+        if (filterDate !== 'All') {
+            isMatch = isMatch && sale.date === filterDate;
         }
 
-        if (categoryFilter !== 'All') {
-            isMatch = isMatch && product.category === categoryFilter;
+        if (filterShop !== 'All') {
+            isMatch = isMatch && sale.shop === filterShop;
         }
-
-        if (brandFilter !== 'All') {
-            isMatch = isMatch && product.brand === brandFilter;
+        if (filterPaymentMethod !== 'All') {
+            isMatch = isMatch && sale.payment_method === filterPaymentMethod;
         }
-
-        if (shopFilter !== 'All') {
-            isMatch = isMatch && product.shop.includes(shopFilter);
-        }
-
-        if (statusFilter !== 'All') {
-            isMatch = isMatch && product.status === statusFilter;
-        }
-
         return isMatch;
     });
 
-    const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
+    const displayedSalesData = filteredSalesData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -119,7 +144,7 @@ const Sales = () => {
                             </Grid>
                         </Grid>
                         <Grid item>
-                            <Button component={Link} to="/create-sale" variant="outlined" color="secondary" sx={{ textDecoration: 'none' }}>
+                            <Button component={Link} to="/create-sale" variant="outlined" color="primary" sx={{ textDecoration: 'none' }}>
                                 Create Sale
                             </Button>
                         </Grid>
@@ -130,14 +155,14 @@ const Sales = () => {
                     <Divider />
                 </Grid>
                 <Grid item xs={12}>
-                    <Box paddingX="2" className="shadow-1 p-4 pt-2 rounded ">
+                    <Box paddingX={2} className="shadow-1 p-4 pt-2 rounded">
                         <TextField
                             label="Search"
                             variant="outlined"
-                            color="secondary"
+                            color="primary"
                             value={searchText}
                             onChange={handleSearchTextChange}
-                            className="mb-4 w-50 float-end"
+                            className="mb-4  "
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
@@ -148,100 +173,107 @@ const Sales = () => {
                                 )
                             }}
                         />
-
-                        <TextField
-                            select
-                            label="Category"
-                            variant="outlined"
-                            color="secondary"
-                            value={categoryFilter}
-                            onChange={handleCategoryFilterChange}
-                            style={{ marginRight: '1rem' }}
-                        >
-                            {categories.map((category) => (
-                                <MenuItem key={category} value={category}>
-                                    {category}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-
-                        <TextField
-                            select
-                            label="Brand"
-                            variant="outlined"
-                            color="secondary"
-                            value={brandFilter}
-                            onChange={handleBrandFilterChange}
-                            style={{ marginRight: '1rem' }}
-                        >
-                            {brands.map((brand) => (
-                                <MenuItem key={brand} value={brand}>
-                                    {brand}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-
-                        <TextField
-                            select
-                            label="Shop"
-                            variant="outlined"
-                            color="secondary"
-                            value={shopFilter}
-                            onChange={handleShopFilterChange}
-                            style={{ marginRight: '1rem' }}
-                        >
-                            {shops.map((shop) => (
-                                <MenuItem key={shop} value={shop}>
-                                    {shop}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-
-                        <TextField
-                            select
-                            label="Status"
-                            variant="outlined"
-                            color="secondary"
-                            value={statusFilter}
-                            onChange={handleStatusFilterChange}
-                            style={{ marginRight: '1rem' }}
-                        >
-                            {statuses.map((status) => (
-                                <MenuItem key={status} value={status}>
-                                    {status}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-
-                        <TableContainer component={Paper} className="shadow-sm">
-                            <Table aria-label="product table">
-                                <TableHead className="bg-light">
+                        <FormControl className="ms-2">
+                            <InputLabel>Date</InputLabel>
+                            <Select value={filterDate} onChange={handleFilterDateChange}>
+                                <MenuItem value="All">All</MenuItem>
+                                {Array.from(new Set(salesData.map((sale) => sale.date))).map((date) => (
+                                    <MenuItem key={date} value={date}>
+                                        {date}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <FormControl className="ms-2">
+                            <InputLabel>Shop</InputLabel>
+                            <Select value={filterShop} onChange={handleFilterShopChange}>
+                                <MenuItem value="All">All</MenuItem>
+                                {Array.from(new Set(salesData.map((sale) => sale.shop))).map((shop) => (
+                                    <MenuItem key={shop} value={shop}>
+                                        {shop}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <FormControl className="ms-2">
+                            <InputLabel>Payment Method</InputLabel>
+                            <Select value={filterPaymentMethod} onChange={handleFilterPaymentMethodChange}>
+                                <MenuItem value="All">All</MenuItem>
+                                {Array.from(new Set(salesData.map((sale) => sale.payment_method))).map((paymentMethod) => (
+                                    <MenuItem key={paymentMethod} value={paymentMethod}>
+                                        {paymentMethod}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <TableContainer component={Paper}>
+                            <Table className="" aria-label="Sales Table">
+                                <TableHead>
                                     <TableRow>
-                                        <TableCell></TableCell>
-                                        <TableCell>Name</TableCell>
-                                        <TableCell>Category</TableCell>
-                                        <TableCell>Brand</TableCell>
-
-                                        <TableCell>Price</TableCell>
+                                        <TableCell padding="checkbox">
+                                            <Checkbox
+                                                indeterminate={selectedRows.length > 0 && selectedRows.length < salesData.length}
+                                                checked={selectedRows.length === salesData.length}
+                                                onChange={handleSelectAllClick}
+                                            />
+                                        </TableCell>
+                                        <TableCell>Reference</TableCell>
+                                        <TableCell>Product Name</TableCell>
                                         <TableCell>Quantity</TableCell>
-
-                                        <TableCell>Status</TableCell>
-                                        <TableCell>Actions</TableCell>
+                                        <TableCell>Total Price</TableCell>
+                                        <TableCell>Shop</TableCell>
+                                        <TableCell>Date</TableCell>
+                                        <TableCell>Actions </TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {paginatedData.map((product, index) => (
-                                        <ProductRow key={index} product={product} />
+                                    {displayedSalesData.map((sale) => (
+                                        <TableRow key={sale.item_code} hover onClick={(event) => handleRowClick(event, sale.item_code)}>
+                                            <TableCell padding="checkbox">
+                                                <Checkbox checked={selectedRows.indexOf(sale.item_code) !== -1} />
+                                            </TableCell>
+                                            <TableCell>{sale.item_code}</TableCell>
+                                            <TableCell>{sale.item_name}</TableCell>
+                                            <TableCell>{sale.quantity}</TableCell>
+                                            <TableCell>{`ETB ${sale.total_amount.toFixed(2)}`}</TableCell>
+                                            <TableCell>{sale.shop}</TableCell>
+                                            <TableCell>{sale.date}</TableCell>
+                                            <TableCell>
+                                                <IconButton aria-controls="row-menu" aria-haspopup="true" onClick={handleMenuClick}>
+                                                    <MoreVert />
+                                                </IconButton>
+                                                <Menu
+                                                    id="row-menu"
+                                                    anchorEl={anchorEl}
+                                                    keepMounted
+                                                    open={Boolean(anchorEl)}
+                                                    onClose={handleMenuClose}
+                                                    className="shadow-sm"
+                                                >
+                                                    <MenuItem
+                                                        onClick={() =>
+                                                            navigate('/view-sale', {
+                                                                state: { ...sale }
+                                                            })
+                                                        }
+                                                    >
+                                                        View Sale
+                                                    </MenuItem>
+                                                    <MenuItem onClick={handleMenuClose}>Edit Sale</MenuItem>
+                                                    <MenuItem onClick={handleMenuClose}>Delete Sale</MenuItem>
+                                                </Menu>
+                                            </TableCell>
+                                        </TableRow>
                                     ))}
                                 </TableBody>
                             </Table>
                             <TablePagination
-                                rowsPerPageOptions={[15, 25, 50]}
+                                rowsPerPageOptions={[15, 25, 50, 75, 100]}
                                 component="div"
-                                count={filteredData.length}
+                                count={filteredSalesData.length}
                                 rowsPerPage={rowsPerPage}
                                 page={page}
-                                onPageChange={handleChangePage}
+                                onPageChange={handlePageChange}
                                 onRowsPerPageChange={handleChangeRowsPerPage}
                             />
                         </TableContainer>
@@ -276,7 +308,7 @@ const ProductRow = ({ product }) => {
         <>
             <TableRow
                 hover
-                className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary rounded' : 'border-0 rounded'}
+                className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-primary rounded' : 'border-0 rounded'}
             >
                 <TableCell>
                     <IconButton aria-label="expand row" size="small" onClick={handleOpen}>
@@ -325,7 +357,7 @@ const ProductRow = ({ product }) => {
                     </IconButton>
                 </TableCell>
             </TableRow>
-            <TableRow className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary' : 'border-0'}>
+            <TableRow className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-primary' : 'border-0'}>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box margin={1}>
@@ -366,7 +398,7 @@ const ProductRow = ({ product }) => {
                 <DialogTitle>Delete Product</DialogTitle>
                 <DialogContent>Do you want to delete {selectedProduct ? selectedProduct.name : ''} ?</DialogContent>
                 <DialogActions>
-                    <Button variant="text" color="secondary" onClick={handleDialogClose}>
+                    <Button variant="text" color="primary" onClick={handleDialogClose}>
                         Cancel
                     </Button>
                     <Button variant="text" color="error" onClick={() => Delete(selectedProduct ? selectedProduct.code : '0')}>

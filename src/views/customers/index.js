@@ -22,7 +22,10 @@ import {
     DialogActions,
     Button,
     Box,
-    Collapse
+    Collapse,
+    FormControl,
+    InputLabel,
+    Select
 } from '@mui/material';
 import { KeyboardArrowDown, KeyboardArrowUp, Delete, Edit } from '@mui/icons-material';
 import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
@@ -32,9 +35,7 @@ import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
 import ProductDummy from 'data/products';
 
-// ==============================|| USER PAGE ||============================== //
-
-const shops = ['All', 'Shop1', 'Shop2', 'Shop3'];
+// ==============================|| CUSTOMERS PAGE ||============================== //
 
 const Customers = () => {
     const [searchText, setSearchText] = useState('');
@@ -107,7 +108,7 @@ const Customers = () => {
                             color="primary"
                             value={searchText}
                             onChange={handleSearchTextChange}
-                            className="mb-4  "
+                            className="mb-4 "
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
@@ -119,21 +120,17 @@ const Customers = () => {
                             }}
                         />
 
-                        <TextField
-                            select
-                            label="Shops"
-                            variant="outlined"
-                            color="primary"
-                            value={categoryFilter}
-                            onChange={handleCategoryFilterChange}
-                            style={{ marginRight: '1rem', marginLeft: 6 }}
-                        >
-                            {shops.map((category) => (
-                                <MenuItem key={category} value={category}>
-                                    {category}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                        <FormControl className="ms-2">
+                            <InputLabel>Shops</InputLabel>
+                            <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
+                                <MenuItem value="All">All</MenuItem>
+                                {Array.from(new Set(ProductDummy.map((sale) => sale.shop))).map((shop) => (
+                                    <MenuItem key={shop} value={shop}>
+                                        {shop}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
 
                         <TableContainer component={Paper} className="shadow-sm">
                             <Table aria-label="product table">
@@ -207,21 +204,6 @@ const CustomerRow = ({ product }) => {
                     </IconButton>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                    {product.picture ? (
-                        <img
-                            src={product.picture}
-                            alt="product"
-                            style={{ width: 60, height: 60 }}
-                            className="img-fluid rounded m-auto me-2"
-                        />
-                    ) : (
-                        <img
-                            src="http://placehold.it/120x120&text=image"
-                            alt="product"
-                            style={{ width: 60, height: 60 }}
-                            className="img-fluid rounded m-auto me-2"
-                        />
-                    )}
                     {product.name}
                 </TableCell>
                 <TableCell>{product.category}</TableCell>

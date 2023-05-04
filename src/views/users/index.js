@@ -31,14 +31,15 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
 import ProductDummy from 'data/products';
+import UsersData from 'data/users';
 
-// ==============================|| USER PAGE ||============================== //
+// ====== ========================|| USER PAGE ||============================== //
 
-const categories = ['All', 'Admin', 'Manager', 'Sales'];
+const categories = ['All', 'admin', 'manager', 'sales'];
 
 const Users = () => {
     const [searchText, setSearchText] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('All');
+    const [roleFilter, setRoleFilter] = useState('All');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
 
@@ -47,7 +48,7 @@ const Users = () => {
     };
 
     const handleCategoryFilterChange = (event) => {
-        setCategoryFilter(event.target.value);
+        setRoleFilter(event.target.value);
     };
 
     const handleChangePage = (event, newPage) => {
@@ -59,16 +60,16 @@ const Users = () => {
         setPage(0);
     };
 
-    const filteredData = ProductDummy.filter((product) => {
+    const filteredData = UsersData.filter((user) => {
         let isMatch = true;
 
         if (searchText) {
             const searchRegex = new RegExp(searchText, 'i');
-            isMatch = isMatch && (searchRegex.test(product.name) || searchRegex.test(product.code));
+            isMatch = isMatch && (searchRegex.test(user.name) || searchRegex.test(user.email));
         }
 
-        if (categoryFilter !== 'All') {
-            isMatch = isMatch && product.category === categoryFilter;
+        if (roleFilter !== 'All') {
+            isMatch = isMatch && user.role === roleFilter;
         }
 
         return isMatch;
@@ -124,7 +125,7 @@ const Users = () => {
                             label="Role"
                             variant="outlined"
                             color="primary"
-                            value={categoryFilter}
+                            value={roleFilter}
                             onChange={handleCategoryFilterChange}
                             style={{ marginRight: '1rem', marginLeft: 6 }}
                         >
@@ -149,8 +150,8 @@ const Users = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {paginatedData.map((product, index) => (
-                                        <ProductRow key={index} product={product} />
+                                    {paginatedData.map((user, index) => (
+                                        <ProductRow key={index} user={user} />
                                     ))}
                                 </TableBody>
                             </Table>
@@ -171,7 +172,7 @@ const Users = () => {
     );
 };
 
-const ProductRow = ({ product }) => {
+const ProductRow = ({ user }) => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
@@ -188,6 +189,13 @@ const ProductRow = ({ product }) => {
         setSelectedProduct(null);
         setDialogOpen(false);
     };
+    const DateSlice = (date) => {
+        var year = date.slice(0, 4);
+        var month = date.slice(5, 7);
+        var day = date.slice(8, 10);
+        return day + '/' + month + '/' + year;
+    };
+
     const UpdateUser = () => {
         alert('User will be Updated');
     };
@@ -207,31 +215,26 @@ const ProductRow = ({ product }) => {
                     </IconButton>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                    {product.picture ? (
-                        <img
-                            src={product.picture}
-                            alt="product"
-                            style={{ width: 60, height: 60 }}
-                            className="img-fluid rounded m-auto me-2"
-                        />
+                    {user.profile ? (
+                        <img src={user.picture} alt="user" style={{ width: 60, height: 60 }} className="img-fluid rounded m-auto me-2" />
                     ) : (
                         <img
                             src="http://placehold.it/120x120&text=image"
-                            alt="product"
-                            style={{ width: 60, height: 60 }}
-                            className="img-fluid rounded m-auto me-2"
+                            alt="user"
+                            style={{ width: 40, height: 40 }}
+                            className="img-fluid rounded-circle m-auto me-2"
                         />
                     )}
-                    {product.name}
+                    {user.name}
                 </TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{product.brand}</TableCell>
-                <TableCell>{product.brand}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.role}</TableCell>
+                <TableCell>{DateSlice(user.created_at)}</TableCell>
                 <TableCell>
                     <IconButton aria-label="Edit row" size="small" onClick={handleOpen}>
                         <IconEdit />
                     </IconButton>
-                    <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
+                    <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(user)}>
                         <IconTrash />
                     </IconButton>
                 </TableCell>
@@ -246,10 +249,10 @@ const ProductRow = ({ product }) => {
 
                             <Grid container gridSpacing>
                                 <Grid item xs={12} sm={3} className="ms-0">
-                                    <TextField fullWidth label="Name" color="primary" />
+                                    <TextField fullWidth placeholder="Name" color="primary" value={user.name} />
                                 </Grid>
                                 <Grid item xs={12} sm={3} className="ms-3">
-                                    <TextField fullWidth label="Email" color="primary" />
+                                    <TextField fullWidth color="primary" placeholder="Email" value={user.email} />
                                 </Grid>
                                 <Grid item xs={12} sm={2} className="ms-3">
                                     <TextField select fullWidth label="User Role" color="primary">
@@ -281,7 +284,7 @@ const ProductRow = ({ product }) => {
                     <Button variant="text" color="primary" onClick={handleDialogClose}>
                         Cancel
                     </Button>
-                    <Button variant="text" color="error" onClick={() => Delete(selectedProduct ? selectedProduct.code : '0')}>
+                    <Button variant="text" color="error" onClick={() => Delete(selectedProduct ? selectedProduct.id : '0')}>
                         Yes
                     </Button>
                 </DialogActions>

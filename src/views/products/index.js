@@ -137,7 +137,7 @@ const Products = () => {
                             color="secondary"
                             value={searchText}
                             onChange={handleSearchTextChange}
-                            className="mb-4 w-50 float-end"
+                            className="mb-4"
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
@@ -156,7 +156,7 @@ const Products = () => {
                             color="secondary"
                             value={categoryFilter}
                             onChange={handleCategoryFilterChange}
-                            style={{ marginRight: '1rem' }}
+                            style={{ marginRight: '1rem', marginLeft: 6 }}
                         >
                             {categories.map((category) => (
                                 <MenuItem key={category} value={category}>
