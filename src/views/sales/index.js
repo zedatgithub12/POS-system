@@ -37,7 +37,8 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
 import salesData from 'data/sales';
-
+import { addItem } from 'cart/cartSlice';
+import { useDispatch, useSelector } from 'react-redux';
 // ==============================|| SALES PAGE ||============================== //
 
 const Sales = () => {
@@ -50,6 +51,15 @@ const Sales = () => {
     const [filterPaymentMethod, setFilterPaymentMethod] = useState('All');
     const [searchText, setSearchText] = useState('');
     const [rowsPerPage, setRowsPerPage] = useState(15);
+    const dispatch = useDispatch();
+
+    const handleAddToCart = (product) => {
+        dispatch(addItem({ product }));
+    };
+
+    const handleRemoveFromCart = () => {
+        dispatch(removeItem({ code: product.code }));
+    };
 
     const handleMenuClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -259,7 +269,7 @@ const Sales = () => {
                                                     >
                                                         View Sale
                                                     </MenuItem>
-                                                    <MenuItem onClick={handleMenuClose}>Edit Sale</MenuItem>
+                                                    <MenuItem onClick={() => handleAddToCart(sale)}>Edit Sale</MenuItem>
                                                     <MenuItem onClick={handleMenuClose}>Delete Sale</MenuItem>
                                                 </Menu>
                                             </TableCell>

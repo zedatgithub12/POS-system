@@ -107,7 +107,7 @@ const ViewSale = () => {
                                                     <TableRow>
                                                         <TableCell>Product Name</TableCell>
                                                         <TableCell>Product Code</TableCell>
-                                                        <TableCell align="right">Net Unit Price</TableCell>
+                                                        <TableCell align="right">Unit Price</TableCell>
                                                         <TableCell align="right">Quantity</TableCell>
                                                         <TableCell align="right">Unit Price</TableCell>
                                                         <TableCell align="right">Discount</TableCell>
@@ -119,11 +119,9 @@ const ViewSale = () => {
                                                     <TableRow>
                                                         <TableCell>{item.item_name}</TableCell>
                                                         <TableCell>{item.item_code}</TableCell>
-                                                        <TableCell align="right">${item.price_per_unit.toFixed(2)}</TableCell>
+                                                        <TableCell align="right">${item.unitPrice.toFixed(2)}</TableCell>
                                                         <TableCell align="right">{item.quantity}</TableCell>
-                                                        <TableCell align="right">
-                                                            ${item.price_per_unit * (1 - item.discount / 100)}
-                                                        </TableCell>
+                                                        <TableCell align="right">${item.unitPrice * (1 - item.discount / 100)}</TableCell>
                                                         <TableCell align="right">{item.discount.toFixed(2)}%</TableCell>
                                                         <TableCell align="right">${item.tax.toFixed(2)}</TableCell>
                                                         <TableCell align="right">${item.total_amount}</TableCell>
@@ -148,7 +146,7 @@ const ViewSale = () => {
                                                 <TableRow>
                                                     <TableCell>Total Discount</TableCell>
                                                     <TableCell align="right">
-                                                        ${((item.price_per_unit * item.quantity * item.discount) / 100).toFixed(2)}
+                                                        ${((item.unitPrice * item.quantity * item.discount) / 100).toFixed(2)}
                                                     </TableCell>
                                                 </TableRow>
                                                 <TableRow>
@@ -158,7 +156,7 @@ const ViewSale = () => {
                                                         {(
                                                             item.total_amount -
                                                             item.tax -
-                                                            (item.price_per_unit * item.quantity * item.discount) / 100
+                                                            (item.unitPrice * item.quantity * item.discount) / 100
                                                         ).toFixed(2)}
                                                     </TableCell>
                                                 </TableRow>
