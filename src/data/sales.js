@@ -86,79 +86,83 @@ const SalesData = [
         grandtotal: 8.79,
         date: '2021-10-01',
         time: '14:45:00'
+    },
+    {
+        id: 3,
+        reference: 'REF003',
+        user: {
+            id: 456,
+            name: 'Jane Doe',
+            email: 'jane.doe@example.com',
+            phone: '555-987-6543'
+        },
+        shop: 'Ethio Mart',
+        customer: {
+            name: 'John Smith',
+            email: 'johnsmith@example.com',
+            phone: '123-456-7890'
+        },
+        items: [
+            {
+                product: {
+                    id: 3,
+                    itemName: 'Ethiopian Spices',
+                    itemCode: 'ES003',
+                    brand: 'Ethiopian Farms',
+                    unit: '100g',
+                    unitPrice: 5.99
+                },
+                quantity: 1,
+                subtotal: 5.99
+            }
+        ],
+        tax: 0.6,
+        discount: 0,
+        payment_status: 'Paid',
+        payment_method: 'Credit Card',
+        note: 'Please deliver to the address on file',
+        grandtotal: 6.59,
+        date: '2021-10-02',
+        time: '10:30:00'
+    },
+    {
+        id: 4,
+        reference: 'REF004',
+        user: {
+            id: 456,
+            name: 'Jane Doe',
+            email: 'jane.doe@example.com',
+            phone: '555-987-6543'
+        },
+        shop: 'Ethio Mart',
+        customer: {
+            name: 'John Smith',
+            email: 'johnsmith@example.com',
+            phone: '123-456-7890'
+        },
+        items: [
+            {
+                product: {
+                    id: 4,
+                    itemName: 'Ethiopian Tea',
+                    itemCode: 'ET004',
+                    brand: 'Ethiopian Tea Co.',
+                    unit: '50g',
+                    unitPrice: 3.99
+                },
+                quantity: 1,
+                subtotal: 3.99
+            }
+        ],
+        tax: 0.4,
+        discount: 0,
+        payment_status: 'Paid',
+        payment_method: 'Credit Card',
+        note: 'Please deliver to the address on file',
+        grandtotal: 4.39,
+        date: '2021-10-02',
+        time: '11:00:00'
     }
-    // {
-    //     id: 3,
-    //     reference: 'REF003',
-    //     user: {
-    //         id: 456,
-    //         name: 'Jane Doe',
-    //         email: 'jane.doe@example.com',
-    //         phone: '555-987-6543'
-    //     },
-    //     shop: 'Ethio Mart',
-    //     customer: {
-    //         name: 'John Smith',
-    //         email: 'johnsmith@example.com',
-    //         phone: '123-456-7890'
-    //     },
-    //     item: {
-    //         product: {
-    //             id: 3,
-    //             itemName: 'Ethiopian Spices',
-    //             itemCode: 'ES003',
-    //             brand: 'Ethiopian Farms',
-    //             unit: '100g',
-    //             unitPrice: 5.99
-    //         },
-    //         quantity: 1,
-    //         subtotal: 5.99
-    //     },
-    //     tax: 0.6,
-    //     discount: 0,
-    //     payment_status: 'Paid',
-    //     payment_method: 'Credit Card',
-    //     note: 'Please deliver to the address on file',
-    //     grandtotal: 6.59,
-    //     date: '2021-10-02',
-    //     time: '10:30:00'
-    // },
-    // {
-    //     id: 4,
-    //     reference: 'REF004',
-    //     user: {
-    //         id: 456,
-    //         name: 'Jane Doe',
-    //         email: 'jane.doe@example.com',
-    //         phone: '555-987-6543'
-    //     },
-    //     shop: 'Ethio Mart',
-    //     customer: {
-    //         name: 'John Smith',
-    //         email: 'johnsmith@example.com',
-    //         phone: '123-456-7890'
-    //     },
-    //     item: {
-    //         product: {
-    //             id: 4,
-    //             itemName: 'Ethiopian Tea',
-    //             itemCode: 'ET004',
-    //             brand: 'Ethiopian Tea Co.',
-    //             unit: '50g',
-    //             unitPrice: 3.99
-    //         },
-    //         quantity: 1,
-    //         subtotal: 3.99
-    //     },
-    //     tax: 0.4,
-    //     discount: 0,
-    //     payment_status: 'Paid',
-    //     payment_method: 'Credit Card',
-    //     note: 'Please deliver to the address on file',
-    //     grandtotal: 4.39,
-    //     date: '2021-10-02',
-    //     time: '11:00:00'
-    // },
     // {
     //     id: 5,
     //     reference: 'REF005',

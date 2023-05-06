@@ -17,21 +17,16 @@ import {
     Menu,
     MenuItem,
     TablePagination,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
     Button,
     Box,
-    Collapse,
     FormControl,
     Checkbox,
     Select,
     InputLabel
 } from '@mui/material';
 
-import { KeyboardArrowDown, KeyboardArrowUp, MoreVert } from '@mui/icons-material';
-import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
+import { MoreVert } from '@mui/icons-material';
+import { IconEye, IconTrash, IconEdit, IconSearch } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
@@ -61,18 +56,18 @@ const Sales = () => {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            setSelectedRows(salesData.map((sale) => sale.item_code));
+            setSelectedRows(salesData.map((sale) => sale.id));
         } else {
             setSelectedRows([]);
         }
     };
 
-    const handleRowClick = (event, item_code) => {
-        const selectedIndex = selectedRows.indexOf(item_code);
+    const handleRowClick = (event, id) => {
+        const selectedIndex = selectedRows.indexOf(id);
         let newSelectedRows = [];
 
         if (selectedIndex === -1) {
-            newSelectedRows = newSelectedRows.concat(selectedRows, item_code);
+            newSelectedRows = newSelectedRows.concat(selectedRows, id);
         } else if (selectedIndex === 0) {
             newSelectedRows = newSelectedRows.concat(selectedRows.slice(1));
         } else if (selectedIndex === selectedRows.length - 1) {
@@ -110,12 +105,17 @@ const Sales = () => {
         setSearchText(event.target.value);
         setPage(0);
     };
+
+    const handleViewClick = (soldItem) => {
+        navigate('/view-sale', { state: { ...soldItem } });
+    };
+
     const filteredSalesData = salesData.filter((sale) => {
         let isMatch = true;
 
         if (searchText) {
             const searchRegex = new RegExp(searchText, 'i');
-            isMatch = isMatch && (searchRegex.test(sale.item_name) || searchRegex.test(sale.item_code));
+            isMatch = isMatch && (searchRegex.test(sale.reference) || searchRegex.test(sale.shop));
         }
         if (filterDate !== 'All') {
             isMatch = isMatch && sale.date === filterDate;
@@ -236,34 +236,24 @@ const Sales = () => {
                                             <TableCell>{soldItem.reference}</TableCell>
                                             <TableCell>{soldItem.customer.name}</TableCell>
                                             <TableCell>{soldItem.shop}</TableCell>
-                                            <TableCell>{`ETB ${soldItem.grandtotal.toFixed(2)}`}</TableCell>
+                                            <TableCell>{soldItem.grandtotal.toFixed(2)}</TableCell>
                                             <TableCell>{soldItem.payment_status}</TableCell>
                                             <TableCell>{soldItem.payment_method}</TableCell>
                                             <TableCell>{soldItem.date}</TableCell>
                                             <TableCell>
-                                                <IconButton aria-controls="row-menu" aria-haspopup="true" onClick={handleMenuClick}>
-                                                    <MoreVert />
-                                                </IconButton>
-                                                <Menu
-                                                    id="row-menu"
-                                                    anchorEl={anchorEl}
-                                                    keepMounted
-                                                    open={Boolean(anchorEl)}
-                                                    onClose={handleMenuClose}
-                                                    className="shadow-sm"
+                                                <IconButton
+                                                    aria-controls="row-menu"
+                                                    aria-haspopup="true"
+                                                    onClick={() => navigate('/view-sale', { state: { ...soldItem } })}
                                                 >
-                                                    <MenuItem
-                                                        onClick={() =>
-                                                            navigate('/view-sale', {
-                                                                state: { ...soldItem }
-                                                            })
-                                                        }
-                                                    >
-                                                        View Sale
-                                                    </MenuItem>
-                                                    <MenuItem onClick={handleMenuClose}>Edit Sale</MenuItem>
-                                                    <MenuItem onClick={handleMenuClose}>Delete Sale</MenuItem>
-                                                </Menu>
+                                                    <IconEye />
+                                                </IconButton>
+                                                <IconButton aria-label="Edit row" size="small" onClick={() => alert(soldItem.reference)}>
+                                                    <IconEdit />
+                                                </IconButton>
+                                                <IconButton aria-label="Trash row" size="small" onClick={handleMenuClose}>
+                                                    <IconTrash />
+                                                </IconButton>
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -283,132 +273,6 @@ const Sales = () => {
                 </Grid>
             </Grid>
         </MainCard>
-    );
-};
-
-const ProductRow = ({ product }) => {
-    const navigate = useNavigate();
-    const [open, setOpen] = useState(false);
-    const handleOpen = () => {
-        setOpen(!open);
-    };
-    const [selectedProduct, setSelectedProduct] = useState([]);
-    const [dialogOpen, setDialogOpen] = useState(false);
-
-    const handleTrashClick = (product) => {
-        setSelectedProduct(product);
-        setDialogOpen(true);
-    };
-    const handleDialogClose = () => {
-        setSelectedProduct(null);
-        setDialogOpen(false);
-    };
-    const Delete = (id) => {
-        alert(id + 'will be deleted');
-    };
-    return (
-        <>
-            <TableRow
-                hover
-                className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-primary rounded' : 'border-0 rounded'}
-            >
-                <TableCell>
-                    <IconButton aria-label="expand row" size="small" onClick={handleOpen}>
-                        {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-                    </IconButton>
-                </TableCell>
-                <TableCell component="th" scope="row">
-                    {product.picture ? (
-                        <img
-                            src={product.picture}
-                            alt="product"
-                            style={{ width: 60, height: 60 }}
-                            className="img-fluid rounded m-auto me-2"
-                        />
-                    ) : (
-                        <img
-                            src="http://placehold.it/120x120&text=image"
-                            alt="product"
-                            style={{ width: 60, height: 60 }}
-                            className="img-fluid rounded m-auto me-2"
-                        />
-                    )}
-                    {product.name}
-                </TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{product.brand}</TableCell>
-
-                <TableCell>{product.price} Birr</TableCell>
-                <TableCell>{product.quantity}</TableCell>
-
-                <TableCell>{product.status}</TableCell>
-                <TableCell>
-                    <IconButton
-                        aria-label="Edit row"
-                        size="small"
-                        onClick={() =>
-                            navigate('/update-product', {
-                                state: { ...product }
-                            })
-                        }
-                    >
-                        <IconEdit />
-                    </IconButton>
-                    <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
-                        <IconTrash />
-                    </IconButton>
-                </TableCell>
-            </TableRow>
-            <TableRow className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-primary' : 'border-0'}>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box margin={1}>
-                            <Typography variant="h6" gutterBottom component="div">
-                                Product details
-                            </Typography>
-                            <Table size="small" aria-label="product details">
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell>Code</TableCell>
-                                        <TableCell>{product.code}</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>Cost</TableCell>
-                                        <TableCell>{product.cost}</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>Unit</TableCell>
-                                        <TableCell>{product.unit}</TableCell>
-                                    </TableRow>
-
-                                    <TableRow>
-                                        <TableCell>Shop</TableCell>
-                                        <TableCell>{product.shop}</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="border-0">Description</TableCell>
-                                        <TableCell className="border-0">{product.description}</TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </Box>
-                    </Collapse>
-                </TableCell>
-            </TableRow>
-
-            <Dialog open={dialogOpen} onClose={handleDialogClose}>
-                <DialogTitle>Delete Product</DialogTitle>
-                <DialogContent>Do you want to delete {selectedProduct ? selectedProduct.name : ''} ?</DialogContent>
-                <DialogActions>
-                    <Button variant="text" color="primary" onClick={handleDialogClose}>
-                        Cancel
-                    </Button>
-                    <Button variant="text" color="error" onClick={() => Delete(selectedProduct ? selectedProduct.code : '0')}>
-                        Yes
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </>
     );
 };
 

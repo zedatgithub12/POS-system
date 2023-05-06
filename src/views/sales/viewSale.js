@@ -15,22 +15,24 @@ import {
     Typography,
     Button
 } from '@mui/material';
-import { blue, blueGrey } from '@mui/material/colors';
 import { AccountCircleOutlined, ReceiptOutlined, CreditCardOutlined, InfoOutlined } from '@mui/icons-material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { gridSpacing } from 'store/constant';
+
 // ==============================|| VIEW SALE PAGE ||============================== //
 
 const ViewSale = () => {
     const navigate = useNavigate();
     const { state } = useLocation();
+
     const item = state ? state : {};
     const GoBack = () => {
         navigate(-1);
     };
+
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
