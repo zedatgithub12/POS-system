@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 // material-ui
 import {
     Grid,
@@ -30,15 +30,14 @@ import {
     InputLabel
 } from '@mui/material';
 
-import { KeyboardArrowDown, KeyboardArrowUp, Delete, Edit, MoreVert, Search } from '@mui/icons-material';
+import { KeyboardArrowDown, KeyboardArrowUp, MoreVert } from '@mui/icons-material';
 import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
 import salesData from 'data/sales';
-import { addItem } from 'cart/cartSlice';
-import { useDispatch, useSelector } from 'react-redux';
+
 // ==============================|| SALES PAGE ||============================== //
 
 const Sales = () => {
@@ -51,15 +50,6 @@ const Sales = () => {
     const [filterPaymentMethod, setFilterPaymentMethod] = useState('All');
     const [searchText, setSearchText] = useState('');
     const [rowsPerPage, setRowsPerPage] = useState(15);
-    const dispatch = useDispatch();
-
-    const handleAddToCart = (product) => {
-        dispatch(addItem({ product }));
-    };
-
-    const handleRemoveFromCart = () => {
-        dispatch(removeItem({ code: product.code }));
-    };
 
     const handleMenuClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -228,26 +218,28 @@ const Sales = () => {
                                             />
                                         </TableCell>
                                         <TableCell>Reference</TableCell>
-                                        <TableCell>Product Name</TableCell>
-                                        <TableCell>Quantity</TableCell>
-                                        <TableCell>Total Price</TableCell>
+                                        <TableCell>Customer</TableCell>
                                         <TableCell>Shop</TableCell>
-                                        <TableCell>Date</TableCell>
+                                        <TableCell>Total Price</TableCell>
+                                        <TableCell>Payment Status</TableCell>
+                                        <TableCell>Payment Method</TableCell>
+                                        <TableCell>Sold On</TableCell>
                                         <TableCell>Actions </TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {displayedSalesData.map((sale) => (
-                                        <TableRow key={sale.item_code} hover onClick={(event) => handleRowClick(event, sale.item_code)}>
+                                    {displayedSalesData.map((soldItem) => (
+                                        <TableRow key={soldItem.id} hover onClick={(event) => handleRowClick(event, soldItem.id)}>
                                             <TableCell padding="checkbox">
-                                                <Checkbox checked={selectedRows.indexOf(sale.item_code) !== -1} />
+                                                <Checkbox checked={selectedRows.indexOf(soldItem.id) !== -1} />
                                             </TableCell>
-                                            <TableCell>{sale.item_code}</TableCell>
-                                            <TableCell>{sale.item_name}</TableCell>
-                                            <TableCell>{sale.quantity}</TableCell>
-                                            <TableCell>{`ETB ${sale.total_amount.toFixed(2)}`}</TableCell>
-                                            <TableCell>{sale.shop}</TableCell>
-                                            <TableCell>{sale.date}</TableCell>
+                                            <TableCell>{soldItem.reference}</TableCell>
+                                            <TableCell>{soldItem.customer.name}</TableCell>
+                                            <TableCell>{soldItem.shop}</TableCell>
+                                            <TableCell>{`ETB ${soldItem.grandtotal.toFixed(2)}`}</TableCell>
+                                            <TableCell>{soldItem.payment_status}</TableCell>
+                                            <TableCell>{soldItem.payment_method}</TableCell>
+                                            <TableCell>{soldItem.date}</TableCell>
                                             <TableCell>
                                                 <IconButton aria-controls="row-menu" aria-haspopup="true" onClick={handleMenuClick}>
                                                     <MoreVert />
@@ -263,13 +255,13 @@ const Sales = () => {
                                                     <MenuItem
                                                         onClick={() =>
                                                             navigate('/view-sale', {
-                                                                state: { ...sale }
+                                                                state: { ...soldItem }
                                                             })
                                                         }
                                                     >
                                                         View Sale
                                                     </MenuItem>
-                                                    <MenuItem onClick={() => handleAddToCart(sale)}>Edit Sale</MenuItem>
+                                                    <MenuItem onClick={handleMenuClose}>Edit Sale</MenuItem>
                                                     <MenuItem onClick={handleMenuClose}>Delete Sale</MenuItem>
                                                 </Menu>
                                             </TableCell>

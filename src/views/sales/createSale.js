@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 // material-ui
 import {
@@ -15,7 +15,6 @@ import {
     Box,
     Typography,
     Select,
-    Menu,
     MenuItem,
     InputLabel,
     FormControl,
@@ -27,11 +26,12 @@ import {
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Delete } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { addItem, removeItem, incrementQuantity, decrementQuantity } from 'cart/cartSlice';
 import forSale from 'data/itemsfosale';
+import Connections from 'api';
 
 // ==============================|| CREATE SALE PAGE ||============================== //
 const dummyNames = [{ customer: 'John Doe' }, { customer: 'Jane Doe' }, { customer: 'Bob Smith' }, { customer: 'Mary Johnson' }];
@@ -43,62 +43,20 @@ const CreateSale = () => {
     };
     const items = useSelector((state) => state.cart.items);
     const grandTotal = useSelector((state) => state.cart.grandTotal);
-    const [orderTax, setOrderTax] = useState(0);
+    const [saleTax, setSaleTax] = useState(0);
     const [discount, setDiscount] = useState(0);
     const [paymentStatus, setPaymentStatus] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('');
-    const [notes, setNotes] = useState('');
     const [customerName, setCustomerName] = useState(null);
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [suggestedNames, setSuggestedNames] = useState(dummyNames);
-    const [value, setValue] = useState(null);
+    const [note, setNote] = useState('');
+
     const dispatch = useDispatch();
-    const handleCustomerNameChange = (event) => {
-        const value = event.target.value;
-        setCustomerName(value);
-        const filteredNames = dummyNames.filter((name) => name.toLowerCase().startsWith(value.toLowerCase()));
 
-        // Set suggested names based on the filtered names
-        setSuggestedNames(filteredNames);
-    };
-
-    const handleMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handleSuggestedNameClick = (name) => {
-        setCustomerName(name);
-        setSuggestedNames([]);
-        setAnchorEl(null);
-    };
     const handleStatusChange = (event) => {
         setPaymentStatus(event.target.value);
     };
     const handleMethodChange = (event) => {
         setPaymentMethod(event.target.value);
-    };
-    const handleProductSearch = (event) => {
-        // Add product to orderItems
-    };
-
-    const handleQuantityChange = (event, index) => {
-        // Update quantity of product in orderItems
-    };
-
-    const handleDeleteProduct = (index) => {
-        // Remove product from orderItems
-    };
-
-    const handleSave = () => {
-        // Save sale to database
-    };
-
-    const handleCancel = () => {
-        // Clear form inputs
     };
 
     const handleAddToCart = (product) => {
@@ -115,20 +73,45 @@ const CreateSale = () => {
     const handleDecrement = (id) => {
         dispatch(decrementQuantity({ id }));
     };
-    React.useEffect(() => {
-        // Add event listener to document to close menu when clicking away
-        const handleDocumentClick = (event) => {
-            if (anchorEl && !anchorEl.contains(event.target)) {
-                setAnchorEl(null);
-            }
+    const handleNoteChange = (event) => {
+        setNote(event.target.value);
+    };
+
+    const handleSave = () => {
+        // Save sale to database
+        // alert('you make a sale');
+
+        var Api = Connections.url + Connections.createSale;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
         };
 
-        document.addEventListener('click', handleDocumentClick);
-        console.log(items);
-        return () => {
-            document.removeEventListener('click', handleDocumentClick);
+        var Data = {
+            userid: 12, //this will be a value featched from session storage user.id
+            shop: 'shop', //this will be a shop salling user assigned as manager featched from session storage user.shop
+            customer: 'Kebede Nanno',
+            products: items,
+            tax: saleTax,
+            discount: discount,
+            grandTotal: grandTotal,
+            payment_status: paymentStatus,
+            payment_method: paymentMethod,
+            note: note
         };
-    }, [anchorEl]);
+        fetch(Api, {
+            method: POST,
+            headers: headers,
+            body: JSON.stringify(Data)
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                console.log('Created sale', items);
+            })
+            .catch((e) => {
+                console.log(e);
+            });
+    };
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -173,7 +156,6 @@ const CreateSale = () => {
                                 getOptionLabel={(option) => option.itemName}
                                 onChange={(event, value) => {
                                     if (value) {
-                                        setValue(value);
                                         handleAddToCart(value);
                                     }
                                 }}
@@ -230,11 +212,11 @@ const CreateSale = () => {
                                         <TableBody>
                                             <TableRow>
                                                 <TableCell>Tax</TableCell>
-                                                <TableCell>{orderTax}</TableCell>
+                                                <TableCell>{saleTax}%</TableCell>
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell>Discount</TableCell>
-                                                <TableCell>{discount}</TableCell>
+                                                <TableCell>{discount} ETB</TableCell>
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell>Grand Total</TableCell>
@@ -250,7 +232,7 @@ const CreateSale = () => {
                             <Box mt={2}>
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={6}>
-                                        <TextField label="Sale Tax (%)" onChange={(event) => setOrderTax(event.target.value)} fullWidth />
+                                        <TextField label="Sale Tax (%)" onChange={(event) => setSaleTax(event.target.value)} fullWidth />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <TextField label="Discount (ETB)" onChange={(event) => setDiscount(event.target.value)} fullWidth />
@@ -280,7 +262,7 @@ const CreateSale = () => {
                                                     value={paymentMethod}
                                                     onChange={handleMethodChange}
                                                 >
-                                                    <MenuItem value="cash">With Cash</MenuItem>
+                                                    <MenuItem value="Cash">With Cash</MenuItem>
                                                     <MenuItem value="Mobile Banking">Mobile Banking</MenuItem>
                                                     <MenuItem value="POS">POS</MenuItem>
                                                 </Select>
@@ -296,6 +278,8 @@ const CreateSale = () => {
                                             rows={4}
                                             variant="outlined"
                                             fullWidth
+                                            value={note}
+                                            onChange={handleNoteChange}
                                         />
                                     </Grid>
                                 </Grid>
@@ -304,11 +288,11 @@ const CreateSale = () => {
 
                         <Grid item xs={12}>
                             <Box mt={2} display="flex" justifyContent="flex-end">
-                                <Button variant="contained" color="primary" onClick={handleSave}>
+                                <Button variant="contained" color="primary" onClick={() => handleSave()}>
                                     Save
                                 </Button>
                                 <Box ml={1}>
-                                    <Button variant="contained" color="secondary" onClick={handleCancel}>
+                                    <Button variant="contained" color="secondary" onClick={GoBack}>
                                         Cancel
                                     </Button>
                                 </Box>

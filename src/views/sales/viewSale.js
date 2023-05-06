@@ -16,7 +16,7 @@ import {
     Button
 } from '@mui/material';
 import { blue, blueGrey } from '@mui/material/colors';
-import { AccountCircleOutlined, ReceiptOutlined, CreditCardOutlined, Warning } from '@mui/icons-material';
+import { AccountCircleOutlined, ReceiptOutlined, CreditCardOutlined, InfoOutlined } from '@mui/icons-material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -39,7 +39,7 @@ const ViewSale = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Sale Detail</Typography>
+                                    <Typography variant="h3">Sale Detail </Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -55,27 +55,32 @@ const ViewSale = () => {
                     <Divider />
                 </Grid>
                 <Grid item xs={12}>
-                    <Box p={2}>
+                    <Box>
+                        <Grid item xs={12} className="">
+                            <Typography className="p-2 py-2 fs-6 fw-semibold fst-italic mx-auto" alignSelf="center">
+                                Sale Detail : {item.reference}
+                            </Typography>
+                        </Grid>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
                                 <Paper variant="outlined">
-                                    <Typography className="px-3 py-2 fs-6 bg-light rounded-3 m-1 ">Customer Information</Typography>
+                                    <Typography className="px-3 py-2 fs-6 fw-semibold">Customer Information</Typography>
                                     <Box p={2} display="flex" alignItems="center">
-                                        <Avatar>
+                                        <Avatar className="bg-light">
                                             <AccountCircleOutlined />
                                         </Avatar>
                                         <Box ml={2}>
-                                            <Typography variant="h6">{item.customer_name}</Typography>
-                                            <Typography color="text.secondary">{item.customer_phone}</Typography>
+                                            <Typography variant="h6">{item.customer.name}</Typography>
+                                            <Typography color="text.secondary">{item.customer.phone}</Typography>
                                         </Box>
                                     </Box>
                                 </Paper>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <Paper variant="outlined">
-                                    <Typography className="px-3 py-2 fs-6 bg-light rounded-3 m-1 ">Invoice Info</Typography>
-                                    <Box p={2} display="flex" alignItems="center">
-                                        <Avatar>
+                                    <Typography className="px-3 py-2 fs-6  fw-semibold">Invoice Info</Typography>
+                                    <Box p={1} ml={2} display="flex" alignItems="center">
+                                        <Avatar className="bg-light">
                                             <ReceiptOutlined />
                                         </Avatar>
                                         <Box ml={2}>
@@ -85,15 +90,26 @@ const ViewSale = () => {
                                             <Typography color="text.secondary">{item.shop}</Typography>
                                         </Box>
                                     </Box>
-                                    <Box p={2} display="flex" alignItems="center">
-                                        <Avatar>
-                                            <CreditCardOutlined />
+                                    <Box p={1} ml={2} display="flex" alignItems="center">
+                                        <Avatar className="bg-light">
+                                            <InfoOutlined />
                                         </Avatar>
                                         <Box ml={2}>
-                                            <Typography variant="h6">Paid with</Typography>
-                                            <Typography color="text.secondary">{item.payment_method}</Typography>
+                                            <Typography variant="h6">Payment Status</Typography>
+                                            <Typography color="text.secondary">{item.payment_status}</Typography>
                                         </Box>
                                     </Box>
+                                    {item.payment_status === 'Paid' && (
+                                        <Box p={1} ml={2} display="flex" alignItems="center">
+                                            <Avatar className="bg-light">
+                                                <CreditCardOutlined />
+                                            </Avatar>
+                                            <Box ml={2}>
+                                                <Typography variant="h6">Payment Method</Typography>
+                                                <Typography color="text.secondary">{item.payment_method}</Typography>
+                                            </Box>
+                                        </Box>
+                                    )}
                                 </Paper>
                             </Grid>
                             <Grid item xs={12}>
@@ -105,27 +121,27 @@ const ViewSale = () => {
                                             <Table size="small">
                                                 <TableHead>
                                                     <TableRow>
-                                                        <TableCell>Product Name</TableCell>
-                                                        <TableCell>Product Code</TableCell>
+                                                        <TableCell>Item Name</TableCell>
+                                                        <TableCell>Item Code</TableCell>
+                                                        <TableCell>Item Brand</TableCell>
+                                                        <TableCell align="right">Unit</TableCell>
                                                         <TableCell align="right">Unit Price</TableCell>
                                                         <TableCell align="right">Quantity</TableCell>
-                                                        <TableCell align="right">Unit Price</TableCell>
-                                                        <TableCell align="right">Discount</TableCell>
-                                                        <TableCell align="right">Tax</TableCell>
-                                                        <TableCell align="right">Subtotal</TableCell>
+                                                        <TableCell align="right">SubTotal</TableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    <TableRow>
-                                                        <TableCell>{item.item_name}</TableCell>
-                                                        <TableCell>{item.item_code}</TableCell>
-                                                        <TableCell align="right">${item.unitPrice.toFixed(2)}</TableCell>
-                                                        <TableCell align="right">{item.quantity}</TableCell>
-                                                        <TableCell align="right">${item.unitPrice * (1 - item.discount / 100)}</TableCell>
-                                                        <TableCell align="right">{item.discount.toFixed(2)}%</TableCell>
-                                                        <TableCell align="right">${item.tax.toFixed(2)}</TableCell>
-                                                        <TableCell align="right">${item.total_amount}</TableCell>
-                                                    </TableRow>
+                                                    {item.items.map((soldItem, index) => (
+                                                        <TableRow key={index}>
+                                                            <TableCell>{soldItem.product.itemName}</TableCell>
+                                                            <TableCell>{soldItem.product.itemCode}</TableCell>
+                                                            <TableCell>{soldItem.product.brand}</TableCell>
+                                                            <TableCell align="right">{soldItem.product.unit}</TableCell>
+                                                            <TableCell align="right">{soldItem.product.unitPrice.toFixed(2)}</TableCell>
+                                                            <TableCell align="right">{soldItem.quantity}</TableCell>
+                                                            <TableCell align="right">{soldItem.subtotal.toFixed(2)}</TableCell>
+                                                        </TableRow>
+                                                    ))}
                                                 </TableBody>
                                             </Table>
                                         </TableContainer>
@@ -141,23 +157,16 @@ const ViewSale = () => {
                                             <TableBody>
                                                 <TableRow>
                                                     <TableCell>Total Tax</TableCell>
-                                                    <TableCell align="right">${item.tax.toFixed(2)}</TableCell>
+                                                    <TableCell align="right">{item.tax.toFixed(2)}%</TableCell>
                                                 </TableRow>
                                                 <TableRow>
                                                     <TableCell>Total Discount</TableCell>
-                                                    <TableCell align="right">
-                                                        ${((item.unitPrice * item.quantity * item.discount) / 100).toFixed(2)}
-                                                    </TableCell>
+                                                    <TableCell align="right">ETB {item.discount.toFixed(2)}</TableCell>
                                                 </TableRow>
                                                 <TableRow>
-                                                    <TableCell>Grand Total</TableCell>
-                                                    <TableCell align="right">
-                                                        $
-                                                        {(
-                                                            item.total_amount -
-                                                            item.tax -
-                                                            (item.unitPrice * item.quantity * item.discount) / 100
-                                                        ).toFixed(2)}
+                                                    <TableCell className="border-bottom-0 fw-semibold">Grand Total</TableCell>
+                                                    <TableCell align="right" className="border-bottom-0 fw-semibold fs-5">
+                                                        ETB {item.grandtotal.toFixed(2)}
                                                     </TableCell>
                                                 </TableRow>
                                             </TableBody>
@@ -171,7 +180,7 @@ const ViewSale = () => {
                                     <Box p={2}>
                                         <Typography variant="h6">Additional Note</Typography>
                                         <Divider />
-                                        <Typography>{item.additional_note}</Typography>
+                                        <Typography className="py-3">{item.note}</Typography>
                                     </Box>
                                 </Paper>
                             </Grid>
