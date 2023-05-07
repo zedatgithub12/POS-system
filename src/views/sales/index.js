@@ -39,6 +39,7 @@ const Sales = () => {
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
+    const [selectedItem, setSelectedItems] = useState();
     const [page, setPage] = useState(0);
     const [filterDate, setFilterDate] = useState('All');
     const [filterShop, setFilterShop] = useState('All');
@@ -53,7 +54,10 @@ const Sales = () => {
     const handleMenuClose = () => {
         setAnchorEl(null);
     };
-
+    const handleSelectItem = (event, item) => {
+        handleMenuClick(event);
+        setSelectedItems({ ...item });
+    };
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
             setSelectedRows(salesData.map((sale) => sale.id));
@@ -244,16 +248,24 @@ const Sales = () => {
                                                 <IconButton
                                                     aria-controls="row-menu"
                                                     aria-haspopup="true"
-                                                    onClick={() => navigate('/view-sale', { state: { ...soldItem } })}
+                                                    onClick={(event) => handleSelectItem(event, soldItem)}
                                                 >
-                                                    <IconEye />
+                                                    <MoreVert />
                                                 </IconButton>
-                                                <IconButton aria-label="Edit row" size="small" onClick={() => alert(soldItem.reference)}>
-                                                    <IconEdit />
-                                                </IconButton>
-                                                <IconButton aria-label="Trash row" size="small" onClick={handleMenuClose}>
-                                                    <IconTrash />
-                                                </IconButton>
+                                                <Menu
+                                                    id="row-menu"
+                                                    anchorEl={anchorEl}
+                                                    keepMounted
+                                                    open={Boolean(anchorEl)}
+                                                    onClose={handleMenuClose}
+                                                    className="shadow-sm"
+                                                >
+                                                    <MenuItem onClick={() => navigate('/view-sale', { state: { ...selectedItem } })}>
+                                                        View Sale
+                                                    </MenuItem>
+                                                    <MenuItem onClick={handleMenuClose}>Edit Sale</MenuItem>
+                                                    <MenuItem onClick={handleMenuClose}>Delete Sale</MenuItem>
+                                                </Menu>
                                             </TableCell>
                                         </TableRow>
                                     ))}
