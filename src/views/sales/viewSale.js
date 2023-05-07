@@ -46,7 +46,7 @@ const ViewSale = () => {
                             </Grid>
                         </Grid>
                         <Grid item>
-                            <Button onClick={GoBack} variant="outlined" color="secondary" sx={{ textDecoration: 'none' }}>
+                            <Button onClick={GoBack} variant="outlined" color="primary" sx={{ textDecoration: 'none' }}>
                                 Back
                             </Button>
                         </Grid>

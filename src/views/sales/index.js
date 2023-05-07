@@ -263,7 +263,9 @@ const Sales = () => {
                                                     <MenuItem onClick={() => navigate('/view-sale', { state: { ...selectedItem } })}>
                                                         View Sale
                                                     </MenuItem>
-                                                    <MenuItem onClick={handleMenuClose}>Edit Sale</MenuItem>
+                                                    <MenuItem onClick={() => navigate('/update-sale', { state: { ...selectedItem } })}>
+                                                        Edit Sale
+                                                    </MenuItem>
                                                     <MenuItem onClick={handleMenuClose}>Delete Sale</MenuItem>
                                                 </Menu>
                                             </TableCell>
