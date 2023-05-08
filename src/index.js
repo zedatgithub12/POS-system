@@ -8,7 +8,6 @@ import { Provider } from 'react-redux';
 import * as serviceWorker from 'serviceWorker';
 import App from 'App';
 import { store } from 'store';
-import stores from 'cart';
 import 'bootstrap/dist/css/bootstrap.min.css';
 // style + assets
 import 'assets/scss/style.scss';

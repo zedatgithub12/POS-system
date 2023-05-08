@@ -47,7 +47,7 @@ const CreateSale = () => {
     const [discount, setDiscount] = useState(0);
     const [paymentStatus, setPaymentStatus] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('');
-    const [customerName, setCustomerName] = useState(null);
+    const [customerName, setCustomerName] = useState('');
     const [note, setNote] = useState('');
 
     const dispatch = useDispatch();
@@ -107,6 +107,7 @@ const CreateSale = () => {
             .then((response) => response.json())
             .then((response) => {
                 console.log('Created sale', items);
+                console.log(response);
             })
             .catch((e) => {
                 console.log(e);
@@ -147,6 +148,7 @@ const CreateSale = () => {
                                 onInputChange={(event, newValue) => {
                                     setCustomerName(newValue);
                                 }}
+                                defaultValue={{ customer: customerName }}
                                 renderInput={(params) => <TextField {...params} label="Customer" variant="outlined" />}
                             />
                         </Grid>

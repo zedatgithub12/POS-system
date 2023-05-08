@@ -26,7 +26,7 @@ import {
 } from '@mui/material';
 
 import { MoreVert } from '@mui/icons-material';
-import { IconEye, IconTrash, IconEdit, IconSearch } from '@tabler/icons';
+import { IconSearch } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
@@ -110,9 +110,9 @@ const Sales = () => {
         setPage(0);
     };
 
-    const handleViewClick = (soldItem) => {
-        navigate('/view-sale', { state: { ...soldItem } });
-    };
+    // const handleViewClick = (soldItem) => {
+    //     navigate('/view-sale', { state: { ...soldItem } });
+    // };
 
     const filteredSalesData = salesData.filter((sale) => {
         let isMatch = true;

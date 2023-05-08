@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Avatar, Button, CardActions, CardContent, Divider, Grid, Menu, MenuItem, Typography } from '@mui/material';
+import { Button, CardActions, CardContent, Grid, Menu, MenuItem, Typography } from '@mui/material';
 
 // project imports
 import BajajAreaChartCard from './BajajAreaChartCard';
@@ -14,8 +14,8 @@ import { gridSpacing } from 'store/constant';
 // assets
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
-import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
+// import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
+// import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 
 // ==============================|| DASHBOARD DEFAULT - POPULAR CARD ||============================== //
 
@@ -82,7 +82,7 @@ const PopularCard = ({ isLoading }) => {
                             <Grid item xs={12} sx={{ pt: '16px !important' }}>
                                 <BajajAreaChartCard />
                             </Grid>
-                            <Grid item xs={12}>
+                            {/* <Grid item xs={12}>
                                 <Grid container direction="column">
                                     <Grid item>
                                         <Grid container alignItems="center" justifyContent="space-between">
@@ -287,7 +287,7 @@ const PopularCard = ({ isLoading }) => {
                                         </Typography>
                                     </Grid>
                                 </Grid>
-                            </Grid>
+                            </Grid> */}
                         </Grid>
                     </CardContent>
                     <CardActions sx={{ p: 1.25, pt: 0, justifyContent: 'center' }}>

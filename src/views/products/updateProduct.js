@@ -4,7 +4,7 @@ import { Grid, Typography, Button, Divider, TextField, Container, MenuItem } fro
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate, useLocation } from 'react-router-dom';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 // ==============================|| UPDATE PRODUCT PAGE ||============================== //
 

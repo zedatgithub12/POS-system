@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 // material-ui
 import {
     Grid,
@@ -27,15 +27,14 @@ import {
     InputLabel,
     Select
 } from '@mui/material';
-import { KeyboardArrowDown, KeyboardArrowUp, Delete, Edit } from '@mui/icons-material';
+import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { Link, useNavigate } from 'react-router-dom';
-import ProductDummy from 'data/products';
+import { Link } from 'react-router-dom';
 import CustomersData from 'data/customers';
-
+import PropTypes from 'prop-types';
 // ==============================|| CUSTOMERS PAGE ||============================== //
 
 const Customers = () => {
@@ -170,7 +169,7 @@ const Customers = () => {
 };
 
 const CustomerRow = ({ customer }) => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(!open);
@@ -271,5 +270,12 @@ const CustomerRow = ({ customer }) => {
         </>
     );
 };
-
+CustomerRow.propTypes = {
+    customer: PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        phone: PropTypes.string.isRequired,
+        shop: PropTypes.string.isRequired,
+        created_at: PropTypes.string.isRequired
+    }).isRequired
+};
 export default Customers;

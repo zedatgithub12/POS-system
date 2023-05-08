@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 // material-ui
 import {
     Grid,
@@ -24,14 +24,14 @@ import {
     Box,
     Collapse
 } from '@mui/material';
-import { KeyboardArrowDown, KeyboardArrowUp, Delete, Edit } from '@mui/icons-material';
+import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
 import ProductDummy from 'data/products';
-
+import PropTypes from 'prop-types';
 // ==============================|| PRODUCT PAGE ||============================== //
 
 const categories = ['All', 'Beverages', 'Accessories', 'Food & Beverage', 'Apparel'];
@@ -378,4 +378,20 @@ const ProductRow = ({ product }) => {
     );
 };
 
+ProductRow.propTypes = {
+    product: PropTypes.shape({
+        picture: PropTypes.string,
+        name: PropTypes.string.isRequired,
+        category: PropTypes.string.isRequired,
+        brand: PropTypes.string.isRequired,
+        price: PropTypes.number.isRequired,
+        quantity: PropTypes.number.isRequired,
+        status: PropTypes.string.isRequired,
+        code: PropTypes.string.isRequired,
+        cost: PropTypes.number.isRequired,
+        unit: PropTypes.string.isRequired,
+        shop: PropTypes.string.isRequired,
+        description: PropTypes.string.isRequired
+    }).isRequired
+};
 export default Products;
