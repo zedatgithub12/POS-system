@@ -65,7 +65,7 @@ const ViewShop = () => {
                                 </Grid>
                             </Grid>
                             <Grid item>
-                                <Button onClick={GoBack} variant="outlined" color="secondary" sx={{ textDecoration: 'none' }}>
+                                <Button onClick={GoBack} variant="outlined" color="primary" sx={{ textDecoration: 'none' }}>
                                     Back
                                 </Button>
                             </Grid>
@@ -231,7 +231,7 @@ const ViewShop = () => {
                         >
                             <Button
                                 variant="outlined"
-                                color="secondary"
+                                color="primary"
                                 className="me-3 w-25"
                                 onClick={() =>
                                     navigate('/update-shop', {
@@ -242,7 +242,7 @@ const ViewShop = () => {
                                 Update
                             </Button>
                             {shop.status === 'close' ? (
-                                <Button variant="text" color="secondary" className="me-3" onClick={() => handleClickOpen('open')}>
+                                <Button variant="text" color="primary" className="me-3" onClick={() => handleClickOpen('open')}>
                                     Open
                                 </Button>
                             ) : (

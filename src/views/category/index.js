@@ -115,7 +115,7 @@ const Category = () => {
                             <Grid item>
                                 <Button
                                     variant="outlined"
-                                    color="secondary"
+                                    color="primary"
                                     sx={{ textDecoration: 'none' }}
                                     onClick={() => handleAddDialogOpen()}
                                 >
@@ -132,7 +132,7 @@ const Category = () => {
                         <Box className="shadow-1 p-4 pt-1 rounded ">
                             <TextField
                                 label="Search Categories"
-                                color="secondary"
+                                color="primary"
                                 className="ms-2"
                                 value={searchTerm}
                                 onChange={handleSearchTermChange}
@@ -179,7 +179,7 @@ const Category = () => {
                     <TextField
                         margin="dense"
                         label="Category Name"
-                        color="secondary"
+                        color="primary"
                         value={addCategory}
                         onChange={(e) => setAddCategory(e.target.value)}
                         fullWidth
@@ -190,7 +190,7 @@ const Category = () => {
                     <Button onClick={handleAddDialogClose} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={() => addNewCategory()} color="secondary">
+                    <Button onClick={() => addNewCategory()} color="primary">
                         Save
                     </Button>
                 </DialogActions>
@@ -202,7 +202,7 @@ const Category = () => {
                     <TextField
                         margin="dense"
                         label="Category Name"
-                        color="secondary"
+                        color="primary"
                         value={newCategoryName}
                         onChange={(e) => setNewCategoryName(e.target.value)}
                         fullWidth
@@ -212,7 +212,7 @@ const Category = () => {
                     <Button onClick={handleEditDialogClose} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={handleEditCategory} color="secondary">
+                    <Button onClick={handleEditCategory} color="primary">
                         Save
                     </Button>
                 </DialogActions>

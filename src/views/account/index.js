@@ -6,10 +6,10 @@ import MainCard from 'ui-component/cards/MainCard';
 
 // ==============================|| SAMPLE PAGE ||============================== //
 
-const AddUsers = () => (
-    <MainCard title="Add Users">
-        <Typography variant="body2">The form to add new user to the system will be implemented here</Typography>
+const Account = () => (
+    <MainCard title="Your Profile">
+        <Typography variant="body2">Everything related to your profile will be available here!</Typography>
     </MainCard>
 );
 
-export default AddUsers;
+export default Account;

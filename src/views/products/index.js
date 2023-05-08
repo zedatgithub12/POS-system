@@ -119,7 +119,7 @@ const Products = () => {
                             </Grid>
                         </Grid>
                         <Grid item>
-                            <Button component={Link} to="/add-product" variant="outlined" color="secondary" sx={{ textDecoration: 'none' }}>
+                            <Button component={Link} to="/add-product" variant="outlined" color="primary" sx={{ textDecoration: 'none' }}>
                                 Add Product
                             </Button>
                         </Grid>
@@ -134,7 +134,7 @@ const Products = () => {
                         <TextField
                             label="Search"
                             variant="outlined"
-                            color="secondary"
+                            color="primary"
                             value={searchText}
                             onChange={handleSearchTextChange}
                             className="mb-4"
@@ -153,7 +153,7 @@ const Products = () => {
                             select
                             label="Category"
                             variant="outlined"
-                            color="secondary"
+                            color="primary"
                             value={categoryFilter}
                             onChange={handleCategoryFilterChange}
                             style={{ marginRight: '1rem', marginLeft: 6 }}
@@ -169,7 +169,7 @@ const Products = () => {
                             select
                             label="Brand"
                             variant="outlined"
-                            color="secondary"
+                            color="primary"
                             value={brandFilter}
                             onChange={handleBrandFilterChange}
                             style={{ marginRight: '1rem' }}
@@ -185,7 +185,7 @@ const Products = () => {
                             select
                             label="Shop"
                             variant="outlined"
-                            color="secondary"
+                            color="primary"
                             value={shopFilter}
                             onChange={handleShopFilterChange}
                             style={{ marginRight: '1rem' }}
@@ -201,7 +201,7 @@ const Products = () => {
                             select
                             label="Status"
                             variant="outlined"
-                            color="secondary"
+                            color="primary"
                             value={statusFilter}
                             onChange={handleStatusFilterChange}
                             style={{ marginRight: '1rem' }}
@@ -366,7 +366,7 @@ const ProductRow = ({ product }) => {
                 <DialogTitle>Delete Product</DialogTitle>
                 <DialogContent>Do you want to delete {selectedProduct ? selectedProduct.name : ''} ?</DialogContent>
                 <DialogActions>
-                    <Button variant="text" color="secondary" onClick={handleDialogClose}>
+                    <Button variant="text" color="primary" onClick={handleDialogClose}>
                         Cancel
                     </Button>
                     <Button variant="text" color="error" onClick={() => Delete(selectedProduct ? selectedProduct.code : '0')}>

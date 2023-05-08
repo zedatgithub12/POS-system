@@ -55,7 +55,7 @@ const UpdateShop = () => {
                             </Grid>
                         </Grid>
                         <Grid item>
-                            <Button component={Link} to="/shops" variant="outlined" color="secondary" sx={{ textDecoration: 'none' }}>
+                            <Button component={Link} to="/shops" variant="outlined" color="primary" sx={{ textDecoration: 'none' }}>
                                 Back
                             </Button>
                         </Grid>
@@ -88,7 +88,7 @@ const UpdateShop = () => {
                                         onChange={handleFileChange}
                                         style={{ display: 'none' }}
                                     />
-                                    <label htmlFor="shopProfile" color="secondary">
+                                    <label htmlFor="shopProfile" color="primary">
                                         <IconButton component="span">
                                             <AddPhotoAlternateIcon />
                                         </IconButton>
@@ -135,7 +135,7 @@ const UpdateShop = () => {
                                 </Grid>
 
                                 <Grid item xs={12}>
-                                    <Button type="submit" variant="contained" color="secondary">
+                                    <Button type="submit" variant="contained" color="primary">
                                         Update Shop
                                     </Button>
                                 </Grid>
