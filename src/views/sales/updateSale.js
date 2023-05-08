@@ -28,8 +28,8 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Delete } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { addItem, removeItem, incrementQuantity, decrementQuantity } from 'cart/cartSlice';
+// import { useDispatch } from 'react-redux';
+// import { addItem, removeItem, incrementQuantity, decrementQuantity } from 'cart/cartSlice';
 import forSale from 'data/itemsfosale';
 import Connections from 'api';
 
@@ -45,16 +45,16 @@ const UpdateSale = () => {
         navigate(-1);
     };
     const [salesData, setSalesData] = useState(item);
-    const [grandTotal, setGrandTotal] = useState(item.grandtotal);
+    const [grandTotal] = useState(item.grandtotal);
     const [saleTax, setSaleTax] = useState(item.tax);
     const [discount, setDiscount] = useState(item.discount);
     const [paymentStatus, setPaymentStatus] = useState(item.payment_status);
     const [paymentMethod, setPaymentMethod] = useState(item.payment_method);
-    const [shop, setShop] = useState(item.shop);
+    const [shop] = useState(item.shop);
     const [customerName, setCustomerName] = useState(item.customer.name);
     const [note, setNote] = useState(item.note);
 
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
 
     const handleStatusChange = (event) => {
         setPaymentStatus(event.target.value);
@@ -64,7 +64,8 @@ const UpdateSale = () => {
     };
 
     const handleAddToCart = (product) => {
-        dispatch(addItem({ product }));
+        // dispatch(addItem({ product }));
+        console.log(product);
     };
 
     const handleIncrement = (itemId) => {
@@ -156,7 +157,7 @@ const UpdateSale = () => {
         })
             .then((response) => response.json())
             .then((response) => {
-                console.log('Created sale', items);
+                console.log('Created sale', response);
             })
             .catch((e) => {
                 console.log(e);

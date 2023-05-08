@@ -6,19 +6,19 @@ import {
     Divider,
     TextField,
     Container,
-    Box,
-    FormControlLabel,
-    Checkbox,
-    InputLabel,
-    Select,
-    MenuItem,
-    FormHelperText
+    // Box,
+    // FormControlLabel,
+    // Checkbox,
+    // InputLabel,
+    // Select,
+    MenuItem
+    // FormHelperText
 } from '@mui/material';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import { useState } from 'react';
 // ==============================|| Add Product PAGE ||============================== //
 
 const AddProduct = () => {

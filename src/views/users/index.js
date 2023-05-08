@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 // material-ui
 import {
     Grid,
@@ -24,18 +24,19 @@ import {
     Box,
     Collapse
 } from '@mui/material';
-import { KeyboardArrowDown, KeyboardArrowUp, Delete, Edit } from '@mui/icons-material';
+import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
+import PropTypes from 'prop-types';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { Link, useNavigate } from 'react-router-dom';
-import ProductDummy from 'data/products';
+import { Link } from 'react-router-dom';
+// import ProductDummy from 'data/products';
 import UsersData from 'data/users';
 
-// ====== ========================|| USER PAGE ||============================== //
+// ==============================|| USERS PAGE ||============================== //
 
-const categories = ['All', 'admin', 'manager', 'sales'];
+const categories = ['All', 'admin', 'manager'];
 
 const Users = () => {
     const [searchText, setSearchText] = useState('');
@@ -173,7 +174,7 @@ const Users = () => {
 };
 
 const ProductRow = ({ user }) => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(!open);
@@ -292,5 +293,14 @@ const ProductRow = ({ user }) => {
         </>
     );
 };
-
+ProductRow.propTypes = {
+    user: PropTypes.shape({
+        profile: PropTypes.bool,
+        picture: PropTypes.string,
+        name: PropTypes.string.isRequired,
+        email: PropTypes.string.isRequired,
+        role: PropTypes.string.isRequired,
+        created_at: PropTypes.string.isRequired
+    }).isRequired
+};
 export default Users;

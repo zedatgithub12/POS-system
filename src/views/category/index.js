@@ -18,12 +18,11 @@ import {
     DialogActions,
     TablePagination
 } from '@mui/material';
-import { Edit, Delete, Search } from '@mui/icons-material';
-import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
+import { Search } from '@mui/icons-material';
+import { IconTrash, IconEdit } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import CategoryData from 'data/category';
-import { Link } from 'react-router-dom';
 import { gridSpacing } from 'store/constant';
 
 // ==============================|| CATEGORY PAGE ||============================== //
@@ -39,7 +38,7 @@ const Category = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [searchTerm, setSearchTerm] = useState('');
 
-    const handleAddDialogOpen = (category) => {
+    const handleAddDialogOpen = () => {
         setAddDialogOpen(true);
     };
 
