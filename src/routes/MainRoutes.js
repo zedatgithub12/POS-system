@@ -6,6 +6,8 @@ import Loadable from 'ui-component/Loadable';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
+// user profile routes
+const Account = Loadable(lazy(() => import('views/account')));
 // Shop routing
 const Shops = Loadable(lazy(() => import('views/shop')));
 const CreateShop = Loadable(lazy(() => import('views/shop/createShop')));
@@ -109,6 +111,10 @@ const MainRoutes = {
         {
             path: 'sample-page',
             element: <SamplePage />
+        },
+        {
+            path: 'account',
+            element: <Account />
         },
         {
             path: 'shops',

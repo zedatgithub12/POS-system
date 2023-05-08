@@ -55,7 +55,7 @@ const UpdateProduct = () => {
                             </Grid>
                         </Grid>
                         <Grid item>
-                            <Button onClick={GoBack} variant="outlined" color="secondary" sx={{ textDecoration: 'none' }}>
+                            <Button onClick={GoBack} variant="outlined" color="primary" sx={{ textDecoration: 'none' }}>
                                 Back
                             </Button>
                         </Grid>
@@ -79,7 +79,7 @@ const UpdateProduct = () => {
                                 id="product-picture"
                             />
                             <label htmlFor="product-picture">
-                                <Button variant="contained" color="secondary" component="span" fullWidth style={{ height: '100%' }}>
+                                <Button variant="contained" color="primary" component="span" fullWidth style={{ height: '100%' }}>
                                     {productPicture ? (
                                         <img
                                             src={productPicture}
@@ -95,7 +95,7 @@ const UpdateProduct = () => {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
-                                color="secondary"
+                                color="primary"
                                 fullWidth
                                 label="Product Name"
                                 value={productName}
@@ -108,7 +108,7 @@ const UpdateProduct = () => {
                                 select
                                 fullWidth
                                 label="Product Category"
-                                color="secondary"
+                                color="primary"
                                 value={productCategory}
                                 onChange={(event) => setProductCategory(event.target.value)}
                                 required
@@ -122,7 +122,7 @@ const UpdateProduct = () => {
                             <TextField
                                 fullWidth
                                 label="Brand"
-                                color="secondary"
+                                color="primary"
                                 value={brand}
                                 onChange={(event) => setBrand(event.target.value)}
                                 required
@@ -133,7 +133,7 @@ const UpdateProduct = () => {
                                 fullWidth
                                 label="Product Code"
                                 value={productCode}
-                                color="secondary"
+                                color="primary"
                                 onChange={(event) => setProductCode(event.target.value)}
                             />
                         </Grid>
@@ -141,7 +141,7 @@ const UpdateProduct = () => {
                             <TextField
                                 fullWidth
                                 label="Product Cost"
-                                color="secondary"
+                                color="primary"
                                 value={productCost}
                                 onChange={(event) => setProductCost(event.target.value)}
                                 required
@@ -151,7 +151,7 @@ const UpdateProduct = () => {
                             <TextField
                                 fullWidth
                                 label="Product Unit"
-                                color="secondary"
+                                color="primary"
                                 value={productUnit}
                                 onChange={(event) => setProductUnit(event.target.value)}
                                 required
@@ -161,7 +161,7 @@ const UpdateProduct = () => {
                             <TextField
                                 fullWidth
                                 label="Product Price"
-                                color="secondary"
+                                color="primary"
                                 value={productPrice}
                                 onChange={(event) => setProductPrice(event.target.value)}
                                 required
@@ -171,7 +171,7 @@ const UpdateProduct = () => {
                             <TextField
                                 fullWidth
                                 label="Product Quantity"
-                                color="secondary"
+                                color="primary"
                                 value={productQuantity}
                                 onChange={(event) => setProductQuantity(event.target.value)}
                                 required
@@ -181,7 +181,7 @@ const UpdateProduct = () => {
                             <TextField
                                 fullWidth
                                 label="Product Description"
-                                color="secondary"
+                                color="primary"
                                 value={productDescription}
                                 onChange={(event) => setProductDescription(event.target.value)}
                             />
@@ -191,7 +191,7 @@ const UpdateProduct = () => {
                                 select
                                 fullWidth
                                 label="Add to Shop"
-                                color="secondary"
+                                color="primary"
                                 value={warehouses}
                                 onChange={(event) => setWarehouses(event.target.value)}
                             >
@@ -205,7 +205,7 @@ const UpdateProduct = () => {
                                 select
                                 fullWidth
                                 label="Status"
-                                color="secondary"
+                                color="primary"
                                 value={status}
                                 onChange={(event) => setStatus(event.target.value)}
                             >
@@ -214,7 +214,7 @@ const UpdateProduct = () => {
                             </TextField>
                         </Grid>
                     </Grid>
-                    <Button type="submit" fullWidth variant="contained" color="secondary" style={{ margin: '1rem 0' }}>
+                    <Button type="submit" fullWidth variant="contained" color="primary" style={{ margin: '1rem 0' }}>
                         Submit
                     </Button>
                 </form>

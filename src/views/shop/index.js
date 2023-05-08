@@ -23,7 +23,7 @@ const Shops = () => {
                             </Grid>
                         </Grid>
                         <Grid item>
-                            <Button component={Link} to="/create-shop" variant="outlined" color="secondary" sx={{ textDecoration: 'none' }}>
+                            <Button component={Link} to="/create-shop" variant="outlined" color="primary" sx={{ textDecoration: 'none' }}>
                                 Create Shop
                             </Button>
                         </Grid>

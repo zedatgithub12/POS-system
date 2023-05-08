@@ -58,7 +58,7 @@ const CreateShop = () => {
                             </Grid>
                         </Grid>
                         <Grid item>
-                            <Button onClick={GoBack} variant="outlined" color="secondary" sx={{ textDecoration: 'none' }}>
+                            <Button onClick={GoBack} variant="outlined" color="primary" sx={{ textDecoration: 'none' }}>
                                 Back
                             </Button>
                         </Grid>
@@ -139,7 +139,7 @@ const CreateShop = () => {
                                 </Grid>
 
                                 <Grid item xs={12}>
-                                    <Button type="submit" variant="contained" color="secondary">
+                                    <Button type="submit" variant="contained" color="primary">
                                         Create Shop
                                     </Button>
                                 </Grid>
