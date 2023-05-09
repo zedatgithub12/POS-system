@@ -63,67 +63,63 @@ const UpdateSale = () => {
         setPaymentMethod(event.target.value);
     };
 
-    const handleAddToCart = (product) => {
-        // dispatch(addItem({ product }));
-        console.log(product);
-    };
-
-    const handleIncrement = (itemId) => {
-        const updatedSalesData = salesData.map((sale) => {
-            const updatedItems = sale.items.map((item) => {
-                if (item.product.id === itemId) {
-                    return {
-                        ...item,
-                        quantity: item.quantity + 1,
-                        subtotal: (item.quantity + 1) * item.product.unitPrice
-                    };
-                }
-                return item;
-            });
-            const updatedGrandtotal = updatedItems.reduce((total, item) => total + item.subtotal, 0);
-            return {
-                ...sale,
-                items: updatedItems,
-                grandtotal: updatedGrandtotal
-            };
-        });
+    function handleAddToCart(itemToAdd) {
+        let newItem = {
+            id: itemToAdd.id,
+            itemName: itemToAdd.itemName,
+            itemCode: itemToAdd.itemCode,
+            brand: itemToAdd.brand,
+            unit: itemToAdd.unit,
+            unitPrice: itemToAdd.unitPrice,
+            quantity: 1,
+            subtotal: itemToAdd.unitPrice
+        };
+        let updatedSalesData = {
+            ...salesData,
+            items: [...salesData.items, newItem],
+            grandtotal:
+                salesData.items.reduce((total, item) => total + item.subtotal, 0) + itemToAdd.unitPrice + salesData.tax - salesData.discount
+        };
         setSalesData(updatedSalesData);
-    };
+    }
 
-    const handleDecrement = (itemId) => {
-        const updatedSalesData = salesData.map((sale) => {
-            const updatedItems = sale.items.map((item) => {
-                if (item.product.id === itemId && item.quantity > 1) {
-                    return {
-                        ...item,
-                        quantity: item.quantity - 1,
-                        subtotal: (item.quantity - 1) * item.product.unitPrice
-                    };
-                }
-                return item;
-            });
-            const updatedGrandtotal = updatedItems.reduce((total, item) => total + item.subtotal, 0);
-            return {
-                ...sale,
-                items: updatedItems,
-                grandtotal: updatedGrandtotal
-            };
-        });
+    // Handle incrementing item quantity
+    function handleIncrement(itemId) {
+        let itemToUpdate = salesData.items.find((item) => item.id === itemId);
+        itemToUpdate.quantity++;
+        itemToUpdate.subtotal = itemToUpdate.unitPrice * itemToUpdate.quantity;
+        let updatedSalesData = {
+            ...salesData,
+            items: salesData.items.map((item) => (item.id === itemId ? itemToUpdate : item)),
+            grandtotal: salesData.items.reduce((total, item) => total + item.subtotal, 0) + salesData.tax - salesData.discount
+        };
         setSalesData(updatedSalesData);
-    };
+    }
 
-    const handleRemoveFromCart = (productToRemove) => {
-        const updatedSalesData = salesData.map((sale) => {
-            const updatedItems = sale.items.filter((item) => item.product.id !== productToRemove.id);
-            const updatedGrandtotal = updatedItems.reduce((total, item) => total + item.subtotal, 0);
-            return {
-                ...sale,
-                items: updatedItems,
-                grandtotal: updatedGrandtotal
+    // Handle decrementing item quantity
+    function handleDecrement(itemId) {
+        let itemToUpdate = salesData.items.find((item) => item.id === itemId);
+        if (itemToUpdate.quantity > 1) {
+            itemToUpdate.quantity--;
+            itemToUpdate.subtotal = itemToUpdate.unitPrice * itemToUpdate.quantity;
+            let updatedSalesData = {
+                ...salesData,
+                items: salesData.items.map((item) => (item.id === itemId ? itemToUpdate : item)),
+                grandtotal: salesData.items.reduce((total, item) => total + item.subtotal, 0) + -salesData.discount
             };
-        });
+            setSalesData(updatedSalesData);
+        }
+    }
+
+    // Handle removing item from cart
+    function handleRemoveFromCart(itemToRemove) {
+        let updatedSalesData = {
+            ...salesData,
+            items: salesData.items.filter((item) => item.id !== itemToRemove.id),
+            grandtotal: salesData.items.reduce((total, item) => total + item.subtotal, 0)
+        };
         setSalesData(updatedSalesData);
-    };
+    }
     const handleNoteChange = (event) => {
         setNote(event.target.value);
     };
@@ -131,18 +127,16 @@ const UpdateSale = () => {
     const handleSave = () => {
         // Save sale to database
         // alert('you make a sale');
-
         var Api = Connections.url + Connections.createSale;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
         };
-
         var Data = {
             userid: 12, //this will be a value featched from session storage user.id
             shop: 'shop', //this will be a shop salling user assigned as manager featched from session storage user.shop
             customer: 'Kebede Nanno',
-            products: items,
+            products: salesData.items,
             tax: saleTax,
             discount: discount,
             grandTotal: grandTotal,
@@ -151,7 +145,7 @@ const UpdateSale = () => {
             note: note
         };
         fetch(Api, {
-            method: POST,
+            method: 'POST',
             headers: headers,
             body: JSON.stringify(Data)
         })
@@ -230,24 +224,24 @@ const UpdateSale = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {item.items.map((item, index) => (
+                                        {salesData.items.map((item, index) => (
                                             <TableRow key={index}>
-                                                <TableCell>{item.product.itemName}</TableCell>
-                                                <TableCell>{item.product.itemCode}</TableCell>
+                                                <TableCell>{item.itemName}</TableCell>
+                                                <TableCell>{item.itemCode}</TableCell>
 
-                                                <TableCell>{item.product.brand}</TableCell>
+                                                <TableCell>{item.brand}</TableCell>
                                                 <TableCell>
                                                     <Box display="flex" alignItems="center">
-                                                        <Button onClick={() => handleDecrement(item.product.id)}>-</Button>
+                                                        <Button onClick={() => handleDecrement(item.id)}>-</Button>
                                                         <Typography>{item.quantity}</Typography>
-                                                        <Button onClick={() => handleIncrement(item.product.id)}>+</Button>
+                                                        <Button onClick={() => handleIncrement(item.id)}>+</Button>
                                                     </Box>
                                                 </TableCell>
-                                                <TableCell>{item.product.unit}</TableCell>
-                                                <TableCell>{item.product.unitPrice}</TableCell>
+                                                <TableCell>{item.unit}</TableCell>
+                                                <TableCell>{item.unitPrice}</TableCell>
                                                 <TableCell>{item.subtotal.toFixed(2)}</TableCell>
                                                 <TableCell>
-                                                    <IconButton onClick={() => handleRemoveFromCart(item.product)}>
+                                                    <IconButton onClick={() => handleRemoveFromCart(item)}>
                                                         <Delete />
                                                     </IconButton>
                                                 </TableCell>
@@ -272,7 +266,7 @@ const UpdateSale = () => {
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell>Grand Total</TableCell>
-                                                <TableCell className="fw-semibold fs-4">{item.grandtotal.toFixed(2)} ETB</TableCell>
+                                                <TableCell className="fw-semibold fs-4">{salesData.grandtotal.toFixed(2)} ETB</TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>

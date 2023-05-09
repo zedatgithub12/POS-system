@@ -16,14 +16,12 @@ const SalesData = [
         },
         items: [
             {
-                product: {
-                    id: 1,
-                    itemName: 'Ethiopian Coffee',
-                    itemCode: 'EC001',
-                    brand: 'Ethiopian Beans',
-                    unit: '1lb',
-                    unitPrice: 10.99
-                },
+                id: 1,
+                itemName: 'Ethiopian Coffee',
+                itemCode: 'EC001',
+                brand: 'Ethiopian Beans',
+                unit: '1lb',
+                unitPrice: 10.99,
                 quantity: 1,
                 subtotal: 10.99
             }
@@ -54,26 +52,22 @@ const SalesData = [
         },
         items: [
             {
-                product: {
-                    id: 2,
-                    itemName: 'Ethiopian Honey',
-                    itemCode: 'EH002',
-                    brand: 'Ethiopian Farms',
-                    unit: '500g',
-                    unitPrice: 7.99
-                },
+                id: 2,
+                itemName: 'Ethiopian Honey',
+                itemCode: 'EH002',
+                brand: 'Ethiopian Farms',
+                unit: '500g',
+                unitPrice: 7.99,
                 quantity: 1,
                 subtotal: 7.99
             },
             {
-                product: {
-                    id: 3,
-                    itemName: 'Ethiopian Honey',
-                    itemCode: 'EH002',
-                    brand: 'Ethiopian Farms',
-                    unit: '500g',
-                    unitPrice: 7.99
-                },
+                id: 3,
+                itemName: 'Ethiopian Honey',
+                itemCode: 'EH002',
+                brand: 'Ethiopian Farms',
+                unit: '500g',
+                unitPrice: 7.99,
                 quantity: 1,
                 subtotal: 7.99
             }
@@ -104,14 +98,12 @@ const SalesData = [
         },
         items: [
             {
-                product: {
-                    id: 3,
-                    itemName: 'Ethiopian Spices',
-                    itemCode: 'ES003',
-                    brand: 'Ethiopian Farms',
-                    unit: '100g',
-                    unitPrice: 5.99
-                },
+                id: 3,
+                itemName: 'Ethiopian Spices',
+                itemCode: 'ES003',
+                brand: 'Ethiopian Farms',
+                unit: '100g',
+                unitPrice: 5.99,
                 quantity: 1,
                 subtotal: 5.99
             }
@@ -142,14 +134,12 @@ const SalesData = [
         },
         items: [
             {
-                product: {
-                    id: 4,
-                    itemName: 'Ethiopian Tea',
-                    itemCode: 'ET004',
-                    brand: 'Ethiopian Tea Co.',
-                    unit: '50g',
-                    unitPrice: 3.99
-                },
+                id: 4,
+                itemName: 'Ethiopian Tea',
+                itemCode: 'ET004',
+                brand: 'Ethiopian Tea Co.',
+                unit: '50g',
+                unitPrice: 3.99,
                 quantity: 1,
                 subtotal: 3.99
             }

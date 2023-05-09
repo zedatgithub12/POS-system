@@ -182,19 +182,19 @@ const CreateSale = () => {
                                     <TableBody>
                                         {items.map((item, index) => (
                                             <TableRow key={index}>
-                                                <TableCell>{item.product.itemName}</TableCell>
-                                                <TableCell>{item.product.itemCode}</TableCell>
+                                                <TableCell>{item.itemName}</TableCell>
+                                                <TableCell>{item.itemCode}</TableCell>
 
-                                                <TableCell>{item.product.brand}</TableCell>
+                                                <TableCell>{item.brand}</TableCell>
                                                 <TableCell>
                                                     <Box display="flex" alignItems="center">
-                                                        <Button onClick={() => handleDecrement(item.product.id)}>-</Button>
+                                                        <Button onClick={() => handleDecrement(item.id)}>-</Button>
                                                         <Typography>{item.quantity}</Typography>
-                                                        <Button onClick={() => handleIncrement(item.product.id)}>+</Button>
+                                                        <Button onClick={() => handleIncrement(item.id)}>+</Button>
                                                     </Box>
                                                 </TableCell>
-                                                <TableCell>{item.product.unit}</TableCell>
-                                                <TableCell>{item.product.unitPrice}</TableCell>
+                                                <TableCell>{item.unit}</TableCell>
+                                                <TableCell>{item.unitPrice}</TableCell>
                                                 <TableCell>{item.subtotal.toFixed(2)}</TableCell>
                                                 <TableCell>
                                                     <IconButton onClick={() => handleRemoveFromCart(item.product)}>

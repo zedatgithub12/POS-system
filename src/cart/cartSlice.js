@@ -9,14 +9,19 @@ const cartSlice = createSlice({
     reducers: {
         addItem: (state, action) => {
             const { product } = action.payload;
-            const existingItem = state.items.find((item) => item.product.id === product.id);
+            const existingItem = state.items.find((item) => item.id === product.id);
 
             if (existingItem) {
                 existingItem.quantity += 1;
                 existingItem.subtotal = existingItem.quantity * existingItem.product.unitPrice;
             } else {
                 state.items.push({
-                    product,
+                    id: product.id,
+                    itemName: product.itemName,
+                    itemCode: product.itemName,
+                    brand: product.brand,
+                    unit: product.unit,
+                    unitPrice: product.unitPrice,
                     quantity: 1,
                     subtotal: product.unitPrice
                 });
@@ -25,28 +30,28 @@ const cartSlice = createSlice({
         },
         removeItem: (state, action) => {
             const { id } = action.payload;
-            const existingItem = state.items.find((item) => item.product.id === id);
+            const existingItem = state.items.find((item) => item.id === id);
 
             if (existingItem) {
-                state.items = state.items.filter((item) => item.product.id !== id);
+                state.items = state.items.filter((item) => item.id !== id);
                 // state.grandTotal = state.grandTotal -= state.items.subtotal;
                 state.grandTotal = state.items.reduce((total, item) => (total += item.subtotal), 0);
             }
         },
         incrementQuantity: (state, action) => {
             const { id } = action.payload;
-            const index = state.items.findIndex((item) => item.product.id === id);
+            const index = state.items.findIndex((item) => item.id === id);
             state.items[index].quantity++;
-            state.items[index].subtotal = state.items[index].product.unitPrice * state.items[index].quantity;
+            state.items[index].subtotal = state.items[index].unitPrice * state.items[index].quantity;
             state.grandTotal = state.items.reduce((total, item) => total + item.subtotal, 0);
         },
 
         decrementQuantity: (state, action) => {
             const { id } = action.payload;
-            const index = state.items.findIndex((item) => item.product.id === id);
+            const index = state.items.findIndex((item) => item.id === id);
             if (state.items[index].quantity > 1) {
                 state.items[index].quantity--;
-                state.items[index].subtotal = state.items[index].product.unitPrice * state.items[index].quantity;
+                state.items[index].subtotal = state.items[index].unitPrice * state.items[index].quantity;
                 state.grandTotal = state.items.reduce((total, item) => total + item.subtotal, 0);
             }
         }

@@ -135,11 +135,11 @@ const ViewSale = () => {
                                                 <TableBody>
                                                     {item.items.map((soldItem, index) => (
                                                         <TableRow key={index}>
-                                                            <TableCell>{soldItem.product.itemName}</TableCell>
-                                                            <TableCell>{soldItem.product.itemCode}</TableCell>
-                                                            <TableCell>{soldItem.product.brand}</TableCell>
-                                                            <TableCell align="right">{soldItem.product.unit}</TableCell>
-                                                            <TableCell align="right">{soldItem.product.unitPrice.toFixed(2)}</TableCell>
+                                                            <TableCell>{soldItem.itemName}</TableCell>
+                                                            <TableCell>{soldItem.itemCode}</TableCell>
+                                                            <TableCell>{soldItem.brand}</TableCell>
+                                                            <TableCell align="right">{soldItem.unit}</TableCell>
+                                                            <TableCell align="right">{soldItem.unitPrice.toFixed(2)}</TableCell>
                                                             <TableCell align="right">{soldItem.quantity}</TableCell>
                                                             <TableCell align="right">{soldItem.subtotal.toFixed(2)}</TableCell>
                                                         </TableRow>
