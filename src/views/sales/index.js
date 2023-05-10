@@ -22,7 +22,11 @@ import {
     FormControl,
     Checkbox,
     Select,
-    InputLabel
+    InputLabel,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions
 } from '@mui/material';
 
 import { MoreVert } from '@mui/icons-material';
@@ -135,6 +139,19 @@ const Sales = () => {
     });
 
     const displayedSalesData = filteredSalesData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+    const handleTrashClick = () => {
+        setDialogOpen(true);
+    };
+    const handleDialogClose = () => {
+        setDialogOpen(false);
+    };
+    const handleDelete = (id) => {
+        alert(id + 'will be deleted');
+    };
+
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -266,7 +283,7 @@ const Sales = () => {
                                                     <MenuItem onClick={() => navigate('/update-sale', { state: { ...selectedItem } })}>
                                                         Edit Sale
                                                     </MenuItem>
-                                                    <MenuItem onClick={handleMenuClose}>Delete Sale</MenuItem>
+                                                    <MenuItem onClick={() => handleTrashClick(selectedItem)}>Delete Sale</MenuItem>
                                                 </Menu>
                                             </TableCell>
                                         </TableRow>
@@ -286,6 +303,18 @@ const Sales = () => {
                     </Box>
                 </Grid>
             </Grid>
+            <Dialog open={dialogOpen} onClose={handleDialogClose}>
+                <DialogTitle>Delete Sale</DialogTitle>
+                <DialogContent>Do you want to delete {selectedItem ? selectedItem.reference : ''} ?</DialogContent>
+                <DialogActions>
+                    <Button variant="text" color="primary" onClick={handleDialogClose}>
+                        Cancel
+                    </Button>
+                    <Button variant="text" color="error" onClick={() => handleDelete(selectedItem ? selectedItem.id : '0')}>
+                        Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </MainCard>
     );
 };

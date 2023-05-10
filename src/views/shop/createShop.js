@@ -21,8 +21,14 @@ const CreateShop = () => {
         shopProfile: null,
         shopProfilePreview: null
     });
+    // const Data = new FormData();
+    // formData.append('name', formData.shopName);
+    // formData.append('address', formData.address);
+    // formData.append('description', formData.description);
+    // formData.append('phone', formData.phone);
+    // formData.append('profile_image', fileInput.files[0]);
 
-    const handleSubmit = (event) => {
+    const handleSubmit = (event, Data) => {
         event.preventDefault();
         console.log(formData);
         // Handle form submission here

@@ -266,7 +266,9 @@ const UpdateSale = () => {
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell>Grand Total</TableCell>
-                                                <TableCell className="fw-semibold fs-4">{salesData.grandtotal.toFixed(2)} ETB</TableCell>
+                                                <TableCell className="fw-semibold fs-4">
+                                                    {salesData.grandtotal.toFixed(2) - discount} ETB
+                                                </TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>

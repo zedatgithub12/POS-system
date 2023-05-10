@@ -8,7 +8,15 @@ const SalesData = [
             email: 'john.smith@example.com',
             phone: '555-123-4567'
         },
-        shop: 'Ethio Mart',
+        shop: {
+            name: 'Sholla Branch',
+            address: 'Sholla',
+            description: 'It is the biggest shop',
+            manager: 'Tesfahun Kebede',
+            phone: '09237652378',
+            picture: store,
+            status: 'open'
+        },
         customer: {
             name: 'Jane Doe',
             email: 'janedoe@example.com',

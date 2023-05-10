@@ -152,7 +152,7 @@ const Users = () => {
                                 </TableHead>
                                 <TableBody>
                                     {paginatedData.map((user, index) => (
-                                        <ProductRow key={index} user={user} />
+                                        <UserRow key={index} user={user} />
                                     ))}
                                 </TableBody>
                             </Table>
@@ -173,7 +173,7 @@ const Users = () => {
     );
 };
 
-const ProductRow = ({ user }) => {
+const UserRow = ({ user }) => {
     // const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
@@ -256,7 +256,7 @@ const ProductRow = ({ user }) => {
                                     <TextField fullWidth color="primary" placeholder="Email" value={user.email} />
                                 </Grid>
                                 <Grid item xs={12} sm={2} className="ms-3">
-                                    <TextField select fullWidth label="User Role" color="primary">
+                                    <TextField select fullWidth label="User Role" color="primary" defaultValue={user.role}>
                                         <MenuItem value="Admin">Admin</MenuItem>
                                         <MenuItem value="Manager">Manager</MenuItem>
                                         <MenuItem value="Sales">Sales</MenuItem>
@@ -293,7 +293,7 @@ const ProductRow = ({ user }) => {
         </>
     );
 };
-ProductRow.propTypes = {
+UserRow.propTypes = {
     user: PropTypes.shape({
         profile: PropTypes.bool,
         picture: PropTypes.string,
