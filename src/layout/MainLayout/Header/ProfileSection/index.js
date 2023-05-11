@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -38,6 +38,8 @@ import User1 from 'assets/images/users/user-round.svg';
 
 // assets
 import { IconLogout, IconSettings } from '@tabler/icons';
+import { AuthContext } from 'context/context';
+// other imports
 
 // ==============================|| PROFILE MENU ||============================== //
 
@@ -45,7 +47,13 @@ const ProfileSection = () => {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
     const navigate = useNavigate();
-
+    const { SignOut } = useContext(AuthContext);
+    const LogOut = (status) => {
+        SignOut(status);
+        navigate('/');
+    };
+    const userString = sessionStorage.getItem('user');
+    const user = JSON.parse(userString);
     // const [sdm, setSdm] = useState(true);
     // const [value, setValue] = useState('');
     // const [notification, setNotification] = useState(false);
@@ -55,10 +63,6 @@ const ProfileSection = () => {
      * anchorRef is used on different componets and specifying one type leads to other components throwing an error
      * */
     const anchorRef = useRef(null);
-    const handleLogout = async () => {
-        console.log('Logout');
-    };
-
     const handleClose = (event) => {
         if (anchorRef.current && anchorRef.current.contains(event.target)) {
             return;
@@ -159,7 +163,7 @@ const ProfileSection = () => {
                                             <Stack direction="row" spacing={0.5} alignItems="center">
                                                 <Typography variant="h4">Howdy,</Typography>
                                                 <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                                                    Abel Daniel
+                                                    {user.name}
                                                 </Typography>
                                             </Stack>
                                             <Typography variant="subtitle2">Admin</Typography>
@@ -286,7 +290,7 @@ const ProfileSection = () => {
                                             <ListItemButton
                                                 sx={{ borderRadius: `${customization.borderRadius}px` }}
                                                 selected={selectedIndex === 4}
-                                                onClick={handleLogout}
+                                                onClick={() => LogOut('Signout')}
                                             >
                                                 <ListItemIcon>
                                                     <IconLogout stroke={1.5} size="1.3rem" />

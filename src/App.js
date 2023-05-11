@@ -24,7 +24,7 @@ const AuthRegister = Loadable(lazy(() => import('views/pages/authentication/auth
 const App = () => {
     const customization = useSelector((state) => state.customization);
     const location = useLocation();
-    const [login, setLogin] = useState(true);
+    const [login, setLogin] = useState(false);
     useEffect(() => {
         var tokens = sessionStorage.getItem('token');
         if (tokens !== null) {
@@ -39,20 +39,19 @@ const App = () => {
                     sessionStorage.setItem('user', JSON.stringify(users));
                     sessionStorage.setItem('token', JSON.stringify(users.fname));
 
-                    setLoged(true);
+                    setLogin(true);
                 } else {
-                    setLoged(false);
+                    setLogin(false);
                 }
             },
 
             SignOut: async (status) => {
                 if (status === 'Signout') {
                     sessionStorage.clear();
-
-                    setLoged(false);
+                    setLogin(false);
                 }
                 {
-                    setLoged(false);
+                    setLogin(false);
                 }
             },
 

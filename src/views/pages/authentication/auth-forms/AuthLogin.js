@@ -48,7 +48,7 @@ const FirebaseLogin = ({ ...others }) => {
     // const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     // const customization = useSelector((state) => state.customization);
     const [checked, setChecked] = useState(true);
-
+    const [logSpinner, setLogSpinner] = useState(false);
     // const googleHandler = async () => {
     //     console.error('Login');
     // };
@@ -147,7 +147,8 @@ const FirebaseLogin = ({ ...others }) => {
                             setSubmitting(false);
                         }
                     }
-                    var Api = Connections.url + Connections.login;
+                    setLogSpinner(true);
+                    var Api = Connections.api + Connections.login;
                     var headers = {
                         accept: 'application/json',
                         'Content-Type': 'application/json'
@@ -165,18 +166,16 @@ const FirebaseLogin = ({ ...others }) => {
                     })
                         .then((response) => response.json())
                         .then((response) => {
-                            if (!(response == '83')) {
+                            if (response.message === 'Login successful') {
                                 setStatus({ success: true });
                                 setSubmitting(false);
-                                Sign('Signed', response);
-                            } else if (response.status == '83') {
-                                setStatus({ success: false });
-                                setErrors({ submit: err.message });
-                                setSubmitting(false);
+                                Sign('Signed', response.user);
+                                setLogSpinner(false);
                             } else {
                                 setStatus({ success: false });
                                 setErrors({ submit: err.message });
                                 setSubmitting(false);
+                                setLogSpinner(false);
                             }
                         })
                         .catch((err) => {
@@ -184,6 +183,7 @@ const FirebaseLogin = ({ ...others }) => {
                             setStatus({ success: false });
                             setErrors({ submit: err.message });
                             setSubmitting(false);
+                            setLogSpinner(false);
                         });
                 }}
             >
@@ -276,7 +276,13 @@ const FirebaseLogin = ({ ...others }) => {
                                     variant="contained"
                                     color="primary"
                                 >
-                                    Sign in
+                                    {logSpinner ? (
+                                        <div className="spinner-border spinner-border-sm text-light " role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    ) : (
+                                        'Sign in'
+                                    )}
                                 </Button>
                             </AnimateButton>
                         </Box>

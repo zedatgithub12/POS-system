@@ -1,6 +1,7 @@
 const Connections = {
-    url: 'http://localhost:3000',
+    // url: 'http://localhost:3000',
     api: 'http://localhost:8000/api',
+    images: 'http://localhost:8000/api/images/',
     login: '/login',
 
     //stores api
