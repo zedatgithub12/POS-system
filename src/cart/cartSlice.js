@@ -17,13 +17,13 @@ const cartSlice = createSlice({
             } else {
                 state.items.push({
                     id: product.id,
-                    itemName: product.itemName,
-                    itemCode: product.itemName,
+                    itemName: product.name,
+                    itemCode: product.code,
                     brand: product.brand,
                     unit: product.unit,
-                    unitPrice: product.unitPrice,
+                    unitPrice: product.price,
                     quantity: 1,
-                    subtotal: product.unitPrice
+                    subtotal: product.price
                 });
                 state.grandTotal = state.items.reduce((total, item) => total + item.subtotal, 0);
             }

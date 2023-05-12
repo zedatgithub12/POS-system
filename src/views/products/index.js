@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // material-ui
 import {
     Grid,
@@ -22,16 +22,22 @@ import {
     DialogActions,
     Button,
     Box,
-    Collapse
+    Collapse,
+    FormControl,
+    Select,
+    InputLabel
 } from '@mui/material';
+import Stack from '@mui/material/Stack';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
-import ProductDummy from 'data/products';
 import PropTypes from 'prop-types';
+import Connections from 'api';
 // ==============================|| PRODUCT PAGE ||============================== //
 
 const categories = ['All', 'Beverages', 'Accessories', 'Food & Beverage', 'Apparel'];
@@ -39,6 +45,9 @@ const brands = ['All', 'Addis Roasters', 'Habesha Leather Co.', 'Taste of Ethiop
 const shops = ['All', 'Addis Ababa', 'Dire Dawa', 'Bahir Dar', 'Gondar', 'Hawassa'];
 const statuses = ['All', 'In stock', 'Out of stock'];
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const Products = () => {
     const [searchText, setSearchText] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('All');
@@ -47,6 +56,7 @@ const Products = () => {
     const [statusFilter, setStatusFilter] = useState('All');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
+    const [productData, setProductData] = useState([]);
 
     const handleSearchTextChange = (event) => {
         setSearchText(event.target.value);
@@ -77,7 +87,7 @@ const Products = () => {
         setPage(0);
     };
 
-    const filteredData = ProductDummy.filter((product) => {
+    const filteredData = productData.filter((product) => {
         let isMatch = true;
 
         if (searchText) {
@@ -104,6 +114,38 @@ const Products = () => {
         return isMatch;
     });
 
+    useEffect(() => {
+        const getProducts = () => {
+            var Api = Connections.api + Connections.viewproduct;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setProductData(response.data);
+                    } else {
+                        setProductData(productData);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error fetching product!'
+                    });
+                });
+        };
+        getProducts();
+        return () => {};
+    }, []);
     const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
     return (
@@ -149,70 +191,53 @@ const Products = () => {
                             }}
                         />
 
-                        <TextField
-                            select
-                            label="Category"
-                            variant="outlined"
-                            color="primary"
-                            value={categoryFilter}
-                            onChange={handleCategoryFilterChange}
-                            style={{ marginRight: '1rem', marginLeft: 6 }}
-                        >
-                            {categories.map((category) => (
-                                <MenuItem key={category} value={category}>
-                                    {category}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                        <FormControl className="ms-2">
+                            <InputLabel>Category</InputLabel>
+                            <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
+                                <MenuItem value="All">All</MenuItem>
+                                {Array.from(new Set(productData.map((product) => product.category))).map((category) => (
+                                    <MenuItem key={category} value={category}>
+                                        {category}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
 
-                        <TextField
-                            select
-                            label="Brand"
-                            variant="outlined"
-                            color="primary"
-                            value={brandFilter}
-                            onChange={handleBrandFilterChange}
-                            style={{ marginRight: '1rem' }}
-                        >
-                            {brands.map((brand) => (
-                                <MenuItem key={brand} value={brand}>
-                                    {brand}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                        <FormControl className="ms-2">
+                            <InputLabel>Brand</InputLabel>
+                            <Select value={brandFilter} onChange={handleBrandFilterChange}>
+                                <MenuItem value="All">All</MenuItem>
+                                {Array.from(new Set(productData.map((product) => product.brand))).map((brand) => (
+                                    <MenuItem key={brand} value={brand}>
+                                        {brand}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
 
-                        <TextField
-                            select
-                            label="Shop"
-                            variant="outlined"
-                            color="primary"
-                            value={shopFilter}
-                            onChange={handleShopFilterChange}
-                            style={{ marginRight: '1rem' }}
-                        >
-                            {shops.map((shop) => (
-                                <MenuItem key={shop} value={shop}>
-                                    {shop}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                        <FormControl className="ms-2">
+                            <InputLabel>Shop</InputLabel>
+                            <Select value={shopFilter} onChange={handleShopFilterChange}>
+                                <MenuItem value="All">All</MenuItem>
+                                {Array.from(new Set(productData.map((product) => product.shop))).map((shop) => (
+                                    <MenuItem key={shop} value={shop}>
+                                        {shop}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
 
-                        <TextField
-                            select
-                            label="Status"
-                            variant="outlined"
-                            color="primary"
-                            value={statusFilter}
-                            onChange={handleStatusFilterChange}
-                            style={{ marginRight: '1rem' }}
-                        >
-                            {statuses.map((status) => (
-                                <MenuItem key={status} value={status}>
-                                    {status}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-
+                        <FormControl className="ms-2">
+                            <InputLabel>Status</InputLabel>
+                            <Select value={statusFilter} onChange={handleStatusFilterChange}>
+                                <MenuItem value="All">All</MenuItem>
+                                {Array.from(new Set(productData.map((product) => product.status))).map((status) => (
+                                    <MenuItem key={status} value={status}>
+                                        {status}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                         <TableContainer component={Paper} className="shadow-sm">
                             <Table aria-label="product table">
                                 <TableHead className="bg-light">
@@ -258,6 +283,22 @@ const ProductRow = ({ product }) => {
     const handleOpen = () => {
         setOpen(!open);
     };
+    const [spinner, setSpinner] = useState(false);
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
     const [selectedProduct, setSelectedProduct] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -269,9 +310,54 @@ const ProductRow = ({ product }) => {
         setSelectedProduct(null);
         setDialogOpen(false);
     };
-    const Delete = (id) => {
-        alert(id + 'will be deleted');
+
+    const Delete = () => {
+        // Do something with the deleted category
+        setSpinner(true);
+        var Api = Connections.api + Connections.deleteproduct + selectedProduct.id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'DELETE',
+            headers: headers
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setProductData(productData);
+                    setSpinner(false);
+                    handleDialogClose();
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error deleting product!'
+                });
+                setSpinner(false);
+            });
     };
+
     return (
         <>
             <TableRow
@@ -286,7 +372,7 @@ const ProductRow = ({ product }) => {
                 <TableCell component="th" scope="row">
                     {product.picture ? (
                         <img
-                            src={product.picture}
+                            src={Connections.images + product.picture}
                             alt="product"
                             style={{ width: 60, height: 60 }}
                             className="img-fluid rounded m-auto me-2"
@@ -369,11 +455,22 @@ const ProductRow = ({ product }) => {
                     <Button variant="text" color="primary" onClick={handleDialogClose}>
                         Cancel
                     </Button>
-                    <Button variant="text" color="error" onClick={() => Delete(selectedProduct ? selectedProduct.code : '0')}>
-                        Yes
+                    <Button variant="text" color="error" onClick={() => Delete(selectedProduct.id)}>
+                        {spinner ? (
+                            <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        ) : (
+                            'Yes'
+                        )}
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 };

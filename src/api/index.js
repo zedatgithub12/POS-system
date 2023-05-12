@@ -7,26 +7,26 @@ const Connections = {
     //stores api
     createstore: '/createstore',
     viewstore: '/viewstore',
-    editstore: '/editstore',
-    deletestore: '/deletestore',
+    updatestore: '/updatestore/',
+    deletestore: '/deletestore/',
 
     //product api's
     addproduct: '/addproduct',
     viewproduct: '/viewproduct',
-    editproduct: '/editproduct',
-    deleteproduct: '/deleteproduct',
+    updateproduct: '/updateproduct/',
+    deleteproduct: '/deleteproduct/',
 
     //category api's
     addcategory: '/addcategory',
     viewcategory: '/viewcategory',
-    editcategory: '/editcategory',
-    deletecategory: '/deletecategory',
+    editcategory: '/editcategory/',
+    deletecategory: '/deletecategory/',
 
     //sales api
     createsale: '/createsale',
     viewsale: '/viewsale',
     editsale: '/editsale',
-    deletesale: 'deletesale',
+    deletesale: '/deletesale',
 
     //customer api
     addcustomer: '/addcustomer',

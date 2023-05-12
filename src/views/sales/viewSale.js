@@ -72,8 +72,7 @@ const ViewSale = () => {
                                             <AccountCircleOutlined />
                                         </Avatar>
                                         <Box ml={2}>
-                                            <Typography variant="h6">{item.customer.name}</Typography>
-                                            <Typography color="text.secondary">{item.customer.phone}</Typography>
+                                            <Typography variant="h6">{item.customer}</Typography>
                                         </Box>
                                     </Box>
                                 </Paper>
@@ -87,7 +86,7 @@ const ViewSale = () => {
                                         </Avatar>
                                         <Box ml={2}>
                                             <Typography variant="h6">
-                                                Sold #{item.date}-{item.time}
+                                                Sold #{item.date} || {item.time}
                                             </Typography>
                                             <Typography color="text.secondary">{item.shop}</Typography>
                                         </Box>
@@ -133,15 +132,15 @@ const ViewSale = () => {
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {item.items.map((soldItem, index) => (
+                                                    {JSON.parse(item.items).map((soldItem, index) => (
                                                         <TableRow key={index}>
                                                             <TableCell>{soldItem.itemName}</TableCell>
                                                             <TableCell>{soldItem.itemCode}</TableCell>
                                                             <TableCell>{soldItem.brand}</TableCell>
                                                             <TableCell align="right">{soldItem.unit}</TableCell>
-                                                            <TableCell align="right">{soldItem.unitPrice.toFixed(2)}</TableCell>
+                                                            <TableCell align="right">{parseInt(soldItem.unitPrice).toFixed(2)}</TableCell>
                                                             <TableCell align="right">{soldItem.quantity}</TableCell>
-                                                            <TableCell align="right">{soldItem.subtotal.toFixed(2)}</TableCell>
+                                                            <TableCell align="right">{parseInt(soldItem.subtotal).toFixed(2)}</TableCell>
                                                         </TableRow>
                                                     ))}
                                                 </TableBody>
@@ -159,16 +158,16 @@ const ViewSale = () => {
                                             <TableBody>
                                                 <TableRow>
                                                     <TableCell>Total Tax</TableCell>
-                                                    <TableCell align="right">{item.tax.toFixed(2)}%</TableCell>
+                                                    <TableCell align="right">{parseInt(item.tax).toFixed(2)}%</TableCell>
                                                 </TableRow>
                                                 <TableRow>
                                                     <TableCell>Total Discount</TableCell>
-                                                    <TableCell align="right">ETB {item.discount.toFixed(2)}</TableCell>
+                                                    <TableCell align="right">ETB {parseInt(item.discount).toFixed(2)}</TableCell>
                                                 </TableRow>
                                                 <TableRow>
                                                     <TableCell className="border-bottom-0 fw-semibold">Grand Total</TableCell>
                                                     <TableCell align="right" className="border-bottom-0 fw-semibold fs-5">
-                                                        ETB {item.grandtotal.toFixed(2)}
+                                                        ETB {parseInt(item.grandtotal).toFixed(2)}
                                                     </TableCell>
                                                 </TableRow>
                                             </TableBody>

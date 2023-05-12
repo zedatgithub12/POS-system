@@ -1,7 +1,9 @@
-import { useState, forwardRef } from 'react';
+import React, { useState, forwardRef } from 'react';
 // material-ui
 import { Grid, Typography, Button, Divider } from '@mui/material';
-
+import Stack from '@mui/material/Stack';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -12,12 +14,16 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
+import Connections from 'api';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 // ==============================|| SHOP DETAIL PAGE ||============================== //
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const ViewShop = () => {
     const { state } = useLocation();
     const shop = state;
@@ -26,7 +32,22 @@ const ViewShop = () => {
     const GoBack = () => {
         navigate(-1);
     };
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
 
+    const handleSnackClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
     const [open, setOpen] = useState(false);
     const [alerttype, setAlertType] = useState('close');
 
@@ -49,7 +70,47 @@ const ViewShop = () => {
     };
     const DeleteShop = () => {
         setOpen(false);
-        console.log('Deleted');
+
+        // Handle form submission here
+        // Declare the data to be sent to the API
+        var Api = Connections.api + Connections.deletestore + shop.id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'DELETE',
+            headers: headers
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    GoBack();
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                }
+            })
+            .catch((error) => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error deleting shop!'
+                });
+            });
     };
     return (
         <>
@@ -97,7 +158,7 @@ const ViewShop = () => {
                         >
                             <Grid item>
                                 <img
-                                    src={shop.picture}
+                                    src={Connections.images + shop.profile_image}
                                     alt="Shop Profile Preview"
                                     style={{ width: '100%', marginTop: 10, marginBottom: 10, borderRadius: 8 }}
                                 />
@@ -134,7 +195,7 @@ const ViewShop = () => {
                                 <Typography variant="body2">Shop Manager</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h4">{shop.manager}</Typography>
+                                <Typography variant="h4">{shop.manager ? shop.manager : 'Not assigned yet!'}</Typography>
                             </Grid>
                         </Grid>
 
@@ -215,7 +276,7 @@ const ViewShop = () => {
                         >
                             <Typography variant="body2">Status</Typography>
                             <Typography variant="h4" style={{ marginLeft: 5, textTransform: 'capitalize' }}>
-                                {shop.status}
+                                {shop.status === '0' ? 'Open' : 'Closed'}
                             </Typography>
                         </Grid>
 
@@ -241,7 +302,7 @@ const ViewShop = () => {
                             >
                                 Update
                             </Button>
-                            {shop.status === 'close' ? (
+                            {shop.status === '1' ? (
                                 <Button variant="text" color="primary" className="me-3" onClick={() => handleClickOpen('open')}>
                                     Open
                                 </Button>
@@ -268,7 +329,7 @@ const ViewShop = () => {
                         {alerttype === 'open'
                             ? 'Do you want to reopen ' + shop.name + ' ?'
                             : alerttype === 'delete'
-                            ? 'Do you want to delete this Shop?'
+                            ? 'Do you want to delete ' + shop.name + ' Shop?'
                             : 'Do you want to close this Shop?'}
                     </DialogContentText>
                 </DialogContent>
@@ -276,12 +337,17 @@ const ViewShop = () => {
                     {alerttype === 'open' ? (
                         <Button onClick={OpenShop}>Yes</Button>
                     ) : alerttype === 'delete' ? (
-                        <Button onClick={DeleteShop}>Yes</Button>
+                        <Button onClick={() => DeleteShop()}>Yes</Button>
                     ) : (
                         <Button onClick={CloseShop}>Yes</Button>
                     )}
                 </DialogActions>
             </Dialog>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleSnackClose}>
+                <Alert onClose={handleSnackClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 };

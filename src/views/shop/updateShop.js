@@ -1,28 +1,101 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 // material-ui
 import { Grid, Typography, Button, Divider, Box, TextField, IconButton } from '@mui/material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import Stack from '@mui/material/Stack';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link, useLocation } from 'react-router-dom';
+import Connections from 'api';
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const UpdateShop = () => {
     const { state } = useLocation();
+
+    const [spinner, setSpinner] = useState(false);
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
 
     const [formData, setFormData] = useState({
         shopName: state.name ? state.name : '',
         address: state.address ? state.address : '',
         description: state.description ? state.description : '',
         phone: state.phone ? state.phone : '',
-        shopProfile: state.picture ? state.picture : null,
-        shopProfilePreview: state.picture ? state.picture : null
+        shopProfile: state.profile_image ? state.profile_image : null,
+        shopProfilePreview: state.profile_image ? state.profile_image : null
     });
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(formData);
         // Handle form submission here
+        // Declare the data to be sent to the API
+        setSpinner(true);
+        var Api = Connections.api + Connections.updatestore + state.id;
+        var headers = {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+        };
+
+        const data = new FormData();
+        data.append('name', formData.shopName);
+        data.append('address', formData.address);
+        data.append('description', formData.description);
+        data.append('phone', formData.phone);
+        data.append('profile_image', formData.shopProfile);
+
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'POST',
+            body: data
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch((error) => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error updating shop!'
+                });
+                setSpinner(false);
+            });
     };
 
     const handleInputChange = (event) => {
@@ -69,13 +142,17 @@ const UpdateShop = () => {
 
                 <Grid container spacing={gridSpacing} alignItems="center" justifyContent="center">
                     <Box sx={{ maxWidth: 500 }}>
-                        <Typography variant="h4" gutterBottom gutterTop style={{ marginTop: 20 }}></Typography>
+                        <Typography variant="h4" gutterBottom guttertop style={{ marginTop: 20 }}></Typography>
                         <form onSubmit={handleSubmit}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
                                     {formData.shopProfilePreview && (
                                         <img
-                                            src={formData.shopProfilePreview}
+                                            src={
+                                                Connections.images + formData.shopProfile
+                                                    ? Connections.images + formData.shopProfile
+                                                    : formData.shopProfile
+                                            }
                                             alt="Shop Profile Preview"
                                             className="img-fluid border  rounded-3"
                                             style={{ width: '100%', marginTop: 10 }}
@@ -136,7 +213,13 @@ const UpdateShop = () => {
 
                                 <Grid item xs={12}>
                                     <Button type="submit" variant="contained" color="primary">
-                                        Update Shop
+                                        {spinner ? (
+                                            <div className="spinner-border spinner-border-sm text-light " role="status">
+                                                <span className="visually-hidden">Loading...</span>
+                                            </div>
+                                        ) : (
+                                            'Update Shop'
+                                        )}
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -144,6 +227,11 @@ const UpdateShop = () => {
                     </Box>
                 </Grid>
             </Grid>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </MainCard>
     );
 };

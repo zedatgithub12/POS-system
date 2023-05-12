@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // material-ui
 import {
     Grid,
@@ -35,7 +35,7 @@ import { IconSearch } from '@tabler/icons';
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
-import salesData from 'data/sales';
+import Connections from 'api';
 
 // ==============================|| SALES PAGE ||============================== //
 
@@ -50,6 +50,9 @@ const Sales = () => {
     const [filterPaymentMethod, setFilterPaymentMethod] = useState('All');
     const [searchText, setSearchText] = useState('');
     const [rowsPerPage, setRowsPerPage] = useState(15);
+
+    // sales data fetched from database
+    const [salesData, setSalesData] = useState([]);
 
     const handleMenuClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -151,7 +154,38 @@ const Sales = () => {
     const handleDelete = (id) => {
         alert(id + 'will be deleted');
     };
-
+    useEffect(() => {
+        const getSales = () => {
+            var Api = Connections.api + Connections.viewsale;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setSalesData(response.data);
+                    } else {
+                        setSalesData(salesData);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error fetching product!'
+                    });
+                });
+        };
+        getSales();
+        return () => {};
+    }, []);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -255,9 +289,9 @@ const Sales = () => {
                                                 <Checkbox checked={selectedRows.indexOf(soldItem.id) !== -1} />
                                             </TableCell>
                                             <TableCell>{soldItem.reference}</TableCell>
-                                            <TableCell>{soldItem.customer.name}</TableCell>
+                                            <TableCell>{soldItem.customer}</TableCell>
                                             <TableCell>{soldItem.shop}</TableCell>
-                                            <TableCell>{soldItem.grandtotal.toFixed(2)}</TableCell>
+                                            <TableCell>{parseInt(soldItem.grandtotal).toFixed(2)}</TableCell>
                                             <TableCell>{soldItem.payment_status}</TableCell>
                                             <TableCell>{soldItem.payment_method}</TableCell>
                                             <TableCell>{soldItem.date}</TableCell>
