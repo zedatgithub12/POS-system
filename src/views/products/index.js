@@ -358,6 +358,9 @@ const ProductRow = ({ product }) => {
             });
     };
 
+    useEffect(() => {
+        return () => {};
+    }, [spinner]);
     return (
         <>
             <TableRow

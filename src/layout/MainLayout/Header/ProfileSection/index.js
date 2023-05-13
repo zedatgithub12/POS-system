@@ -39,6 +39,7 @@ import User1 from 'assets/images/users/user-round.svg';
 // assets
 import { IconLogout, IconSettings } from '@tabler/icons';
 import { AuthContext } from 'context/context';
+import Connections from 'api';
 // other imports
 
 // ==============================|| PROFILE MENU ||============================== //
@@ -115,7 +116,7 @@ const ProfileSection = () => {
                 }}
                 icon={
                     <Avatar
-                        src={User1}
+                        src={Connections.images + user.profile}
                         sx={{
                             ...theme.typography.mediumAvatar,
                             margin: '8px 0 8px 8px !important',
@@ -166,7 +167,7 @@ const ProfileSection = () => {
                                                     {user.name}
                                                 </Typography>
                                             </Stack>
-                                            <Typography variant="subtitle2">Admin</Typography>
+                                            <Typography variant="subtitle2">{user.role}</Typography>
                                         </Stack>
                                         {/* <OutlinedInput
                                             sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}

@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // material-ui
-import { Grid, Typography, Divider, Button, TextField, MenuItem } from '@mui/material';
-
+import { Grid, Typography, Divider, Button, TextField, MenuItem, IconButton, InputAdornment } from '@mui/material';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 //other imports
 import { useNavigate } from 'react-router-dom';
 
@@ -11,65 +13,145 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import 'views/styles/pages.css';
 import { Container } from 'react-bootstrap';
-
+import Connections from 'api';
 // ==============================|| ADD USER PAGE ||============================== //
 const roles = [
     {
-        value: 'admin',
+        value: 'Admin',
         label: 'Admin'
     },
     {
-        value: 'user',
-        label: 'User'
+        value: 'Manager',
+        label: 'Manager'
+    },
+    {
+        value: 'Sales',
+        label: 'Sales'
     }
 ];
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const AddUsers = () => {
     const navigate = useNavigate();
     const GoBack = () => {
         navigate(-1);
     };
 
-    const [profile, setProfile] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordError, setPasswordError] = useState(false);
+    const [confirmPasswordError, setConfirmPasswordError] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [profileImage, setProfileImage] = useState(null);
+    const [picturePreview, setPicturePreview] = useState(null);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [role, setRole] = useState('');
-    const [profileImage, setProfileImage] = useState(null);
     const [profileError, setProfileError] = useState(false);
     const [nameError, setNameError] = useState(false);
     const [emailError, setEmailError] = useState(false);
     const [roleError, setRoleError] = useState(false);
+    const [spinner, setSpinner] = useState(false);
 
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
     const handleSubmit = (event) => {
         event.preventDefault();
-        if (profile && name && email && role) {
-            console.log({ profile, name, email, role });
-            setProfile('');
-            setName('');
-            setEmail('');
-            setRole('');
-            setProfileError(false);
-            setNameError(false);
-            setEmailError(false);
-            setRoleError(false);
+        if (password !== confirmPassword) {
+            setConfirmPasswordError(true);
+            return;
         } else {
-            if (!profile) {
-                setProfileError(true);
-            }
-            if (!name) {
-                setNameError(true);
-            }
-            if (!email) {
-                setEmailError(true);
-            }
-            if (!role) {
-                setRoleError(true);
-            }
+            setSpinner(true);
+            // Handle form submission here
+            // Declare the data to be sent to the API
+            var Api = Connections.api + Connections.adduser;
+            // var headers = {
+            //     accept: 'application/json',
+            //     'Content-Type': 'application/json'
+            // };
+
+            const data = new FormData();
+            data.append('profile', profileImage);
+            data.append('name', name);
+            data.append('email', email);
+            data.append('password', email);
+            data.append('role', role);
+
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'POST',
+                body: data
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    }
+                })
+                .catch((error) => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error creatng shop!'
+                    });
+                    setSpinner(false);
+                });
         }
+    };
+    const handlePasswordChange = (event) => {
+        setPassword(event.target.value);
+        setPasswordError(event.target.value.length < 4);
+    };
+
+    const handleConfirmPasswordChange = (event) => {
+        setConfirmPassword(event.target.value);
+        setConfirmPasswordError(event.target.value !== password);
+    };
+
+    const handleShowConfirmPasswordClick = () => {
+        setShowConfirmPassword(!showConfirmPassword);
     };
 
     const handleProfileImageChange = (event) => {
-        setProfileImage(event.target.files[0]);
+        const file = event.target.files[0];
+        setProfileImage(file);
+        if (file) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                setPicturePreview(reader.result);
+            };
+        }
     };
 
     return (
@@ -102,8 +184,8 @@ const AddUsers = () => {
                                 <div className="form-group shadow-sm rounded text-center p-3">
                                     <div className="d-flex align-items-center ">
                                         <div className="profile-image">
-                                            {profileImage ? (
-                                                <img src={URL.createObjectURL(profileImage)} alt="Profile" />
+                                            {picturePreview ? (
+                                                <img src={picturePreview} alt="Profile" />
                                             ) : (
                                                 <div className="profile-placeholder">
                                                     <i className="fas fa-camera"></i>
@@ -151,7 +233,37 @@ const AddUsers = () => {
                                     error={emailError}
                                     helperText={emailError ? 'Please enter a valid email' : ''}
                                 />
-
+                                <TextField
+                                    id="password"
+                                    label="Password"
+                                    type={showConfirmPassword ? 'text' : 'password'}
+                                    value={password}
+                                    onChange={handlePasswordChange}
+                                    error={passwordError}
+                                    helperText={passwordError && 'Password must be at least 4 characters long'}
+                                    fullWidth
+                                    margin="normal"
+                                />
+                                <TextField
+                                    id="confirm-password"
+                                    label="Confirm Password"
+                                    type={showConfirmPassword ? 'text' : 'password'}
+                                    value={confirmPassword}
+                                    onChange={handleConfirmPasswordChange}
+                                    error={confirmPasswordError}
+                                    helperText={confirmPasswordError && 'Passwords do not match'}
+                                    fullWidth
+                                    margin="normal"
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton onClick={handleShowConfirmPasswordClick}>
+                                                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
                                 <TextField
                                     required
                                     fullWidth
@@ -170,14 +282,25 @@ const AddUsers = () => {
                                     ))}
                                 </TextField>
 
-                                <Button variant="contained" className="mt-3 w-100" color="primary" type="submit">
-                                    Add User
+                                <Button type="submit" variant="contained" className="mt-3 w-100" color="primary">
+                                    {spinner ? (
+                                        <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    ) : (
+                                        'Add User'
+                                    )}
                                 </Button>
                             </Grid>
                         </Grid>
                     </form>
                 </Container>
             </Grid>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </MainCard>
     );
 };

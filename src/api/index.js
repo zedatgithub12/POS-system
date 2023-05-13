@@ -25,20 +25,20 @@ const Connections = {
     //sales api
     createsale: '/createsale',
     viewsale: '/viewsale',
-    editsale: '/editsale',
-    deletesale: '/deletesale',
+    updatesale: '/updatesale/',
+    deletesale: '/deletesale/',
 
     //customer api
     addcustomer: '/addcustomer',
     viewcustomer: '/viewcustomer',
-    editcustomer: '/editcustomer',
-    deletecustomer: '/deletecustomer',
+    updatecustomer: '/updatecustomer/',
+    deletecustomer: '/deletecustomer/',
 
     //users api
     adduser: '/adduser',
     viewuser: '/viewuser',
-    edituser: '/edituser',
-    deleteuser: '/deleteuser'
+    updateuser: '/updateuser/',
+    deleteuser: '/deleteuser/'
 };
 
 export default Connections;

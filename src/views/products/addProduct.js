@@ -15,7 +15,6 @@ import {
     Autocomplete
     // FormHelperText
 } from '@mui/material';
-import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -363,7 +362,6 @@ const AddProduct = () => {
                                 value={status}
                                 onChange={(event) => setStatus(event.target.value)}
                             >
-                                <MenuItem value="Market">Market</MenuItem>
                                 <MenuItem value="Store">Store</MenuItem>
                             </TextField>
                         </Grid>

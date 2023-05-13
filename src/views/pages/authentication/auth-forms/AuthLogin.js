@@ -166,7 +166,7 @@ const FirebaseLogin = ({ ...others }) => {
                     })
                         .then((response) => response.json())
                         .then((response) => {
-                            if (response.message === 'Login successful') {
+                            if (response.success) {
                                 setStatus({ success: true });
                                 setSubmitting(false);
                                 Sign('Signed', response.user);

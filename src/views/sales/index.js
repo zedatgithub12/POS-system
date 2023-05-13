@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 // material-ui
 import {
     Grid,
@@ -28,7 +28,9 @@ import {
     DialogContent,
     DialogActions
 } from '@mui/material';
-
+import Stack from '@mui/material/Stack';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import { MoreVert } from '@mui/icons-material';
 import { IconSearch } from '@tabler/icons';
 // project imports
@@ -38,7 +40,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import Connections from 'api';
 
 // ==============================|| SALES PAGE ||============================== //
-
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const Sales = () => {
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
@@ -50,10 +54,24 @@ const Sales = () => {
     const [filterPaymentMethod, setFilterPaymentMethod] = useState('All');
     const [searchText, setSearchText] = useState('');
     const [rowsPerPage, setRowsPerPage] = useState(15);
-
+    const [spinner, setSpinner] = useState(false);
     // sales data fetched from database
     const [salesData, setSalesData] = useState([]);
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
 
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
     const handleMenuClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -149,10 +167,57 @@ const Sales = () => {
         setDialogOpen(true);
     };
     const handleDialogClose = () => {
+        if (reason === 'clickaway') {
+            return;
+        }
         setDialogOpen(false);
     };
+
     const handleDelete = (id) => {
-        alert(id + 'will be deleted');
+        // Do something with the deleted category
+        setSpinner(true);
+        var Api = Connections.api + Connections.deletesale + id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'DELETE',
+            headers: headers
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                    handleDialogClose();
+                    handleMenuClose();
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error deleting product!'
+                });
+                setSpinner(false);
+            });
     };
     useEffect(() => {
         const getSales = () => {
@@ -185,7 +250,7 @@ const Sales = () => {
         };
         getSales();
         return () => {};
-    }, []);
+    }, [spinner]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -344,11 +409,22 @@ const Sales = () => {
                     <Button variant="text" color="primary" onClick={handleDialogClose}>
                         Cancel
                     </Button>
-                    <Button variant="text" color="error" onClick={() => handleDelete(selectedItem ? selectedItem.id : '0')}>
-                        Yes
+                    <Button variant="text" color="error" onClick={() => handleDelete(selectedItem.id)}>
+                        {spinner ? (
+                            <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        ) : (
+                            'Yes'
+                        )}
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </MainCard>
     );
 };

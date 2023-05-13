@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // material-ui
 import { Grid, Typography, Divider, Button, TextField, MenuItem } from '@mui/material';
-
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 //other imports
 import { useNavigate } from 'react-router-dom';
 
@@ -11,67 +12,124 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import 'views/styles/pages.css';
 import { Container } from 'react-bootstrap';
+import Connections from 'api';
 
-// ==============================|| ADD USER PAGE ||============================== //
-const shop = [
-    {
-        value: 'admin',
-        label: 'Admin'
-    },
-    {
-        value: 'user',
-        label: 'User'
-    }
-];
-
+// ==============================|| ADD CUSTOMER PAGE ||============================== //
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const AddCustomer = () => {
     const navigate = useNavigate();
     const GoBack = () => {
         navigate(-1);
     };
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
 
-    const [profile, setProfile] = useState('');
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
+    const [shop, setShops] = useState([]);
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [role, setRole] = useState('');
-    const [profileImage, setProfileImage] = useState(null);
-    const [profileError, setProfileError] = useState(false);
+    const [phone, setPhone] = useState('');
+    const [shopName, setShopName] = useState('');
     const [nameError, setNameError] = useState(false);
     const [emailError, setEmailError] = useState(false);
     const [roleError, setRoleError] = useState(false);
-
+    const [spinner, setSpinner] = useState(false);
     const handleSubmit = (event) => {
         event.preventDefault();
-        if (profile && name && email && role) {
-            console.log({ profile, name, email, role });
-            setProfile('');
-            setName('');
-            setEmail('');
-            setRole('');
-            setProfileError(false);
-            setNameError(false);
-            setEmailError(false);
-            setRoleError(false);
-        } else {
-            if (!profile) {
-                setProfileError(true);
-            }
-            if (!name) {
-                setNameError(true);
-            }
-            if (!email) {
-                setEmailError(true);
-            }
-            if (!role) {
-                setRoleError(true);
-            }
-        }
+        setSpinner(true);
+        var Api = Connections.api + Connections.addcustomer;
+        const data = { name: name, phone: phone, shop: shopName };
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        };
+        fetch(Api, requestOptions)
+            .then((response) => response.json())
+            .then((response) => {
+                // show success message
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                    // clear form
+                    setName('');
+                    setPhone('');
+                    setShopName('');
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                    // clear form
+                    setName('');
+                    setPhone('');
+                    setShopName('');
+                }
+            })
+            .catch(() => {
+                // show error message
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: response.message
+                });
+                setSpinner(false);
+            });
     };
 
-    const handleProfileImageChange = (event) => {
-        setProfileImage(event.target.files[0]);
-    };
-
+    useEffect(() => {
+        const getShops = () => {
+            var Api = Connections.api + Connections.viewstore;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setShops(response.data);
+                    } else {
+                        setShops([]);
+                    }
+                })
+                .catch((error) => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error creatng shop!'
+                    });
+                });
+        };
+        getShops();
+        return () => {};
+    }, []);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -118,10 +176,10 @@ const AddCustomer = () => {
                                     label="Phone"
                                     type="phone"
                                     className="mt-3"
-                                    value={email}
-                                    onChange={(event) => setEmail(event.target.value)}
+                                    value={phone}
+                                    onChange={(event) => setPhone(event.target.value)}
                                     error={emailError}
-                                    helperText={emailError ? 'Please enter a valid email' : ''}
+                                    helperText={emailError ? 'Please enter a valid phne' : ''}
                                 />
 
                                 <TextField
@@ -130,26 +188,37 @@ const AddCustomer = () => {
                                     select
                                     label="Shop"
                                     className="mt-3"
-                                    value={role}
-                                    onChange={(event) => setRole(event.target.value)}
+                                    value={shopName}
+                                    onChange={(event) => setShopName(event.target.value)}
                                     error={roleError}
                                     helperText={roleError ? 'Please select a role' : ''}
                                 >
                                     {shop.map((option) => (
-                                        <MenuItem key={option.value} value={option.value}>
-                                            {option.label}
+                                        <MenuItem key={option.id} value={option.name}>
+                                            {option.name}
                                         </MenuItem>
                                     ))}
                                 </TextField>
 
                                 <Button variant="contained" className="mt-3 w-100" color="primary" type="submit">
-                                    Add Customer
+                                    {spinner ? (
+                                        <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    ) : (
+                                        'Add Customer'
+                                    )}
                                 </Button>
                             </Grid>
                         </Grid>
                     </form>
                 </Container>
             </Grid>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </MainCard>
     );
 };
