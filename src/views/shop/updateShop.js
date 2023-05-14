@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // material-ui
-import { Grid, Typography, Button, Divider, Box, TextField, IconButton } from '@mui/material';
+import { Grid, Typography, Button, Divider, Box, TextField, IconButton, MenuItem } from '@mui/material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -18,6 +17,8 @@ const UpdateShop = () => {
     const { state } = useLocation();
 
     const [spinner, setSpinner] = useState(false);
+    const [users, setUsers] = useState([]);
+    const [managername, setManagerName] = useState(state.manager ? state.manager : '');
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -37,6 +38,7 @@ const UpdateShop = () => {
 
     const [formData, setFormData] = useState({
         shopName: state.name ? state.name : '',
+
         address: state.address ? state.address : '',
         description: state.description ? state.description : '',
         phone: state.phone ? state.phone : '',
@@ -50,13 +52,10 @@ const UpdateShop = () => {
         // Declare the data to be sent to the API
         setSpinner(true);
         var Api = Connections.api + Connections.updatestore + state.id;
-        var headers = {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-        };
 
         const data = new FormData();
         data.append('name', formData.shopName);
+        data.append('manager', managername);
         data.append('address', formData.address);
         data.append('description', formData.description);
         data.append('phone', formData.phone);
@@ -87,7 +86,7 @@ const UpdateShop = () => {
                     setSpinner(false);
                 }
             })
-            .catch((error) => {
+            .catch(() => {
                 setPopup({
                     ...popup,
                     status: true,
@@ -115,6 +114,38 @@ const UpdateShop = () => {
         };
     };
 
+    useEffect(() => {
+        const getUsers = () => {
+            var Api = Connections.api + Connections.viewuser;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setUsers(response.data);
+                    } else {
+                        setUsers(userData);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error featching  users!'
+                    });
+                });
+        };
+        getUsers();
+        return () => {};
+    }, [spinner, popup]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -180,6 +211,23 @@ const UpdateShop = () => {
                                         value={formData.shopName}
                                         required
                                     />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        select
+                                        label="Manager"
+                                        className="mt-3"
+                                        value={managername}
+                                        onChange={(event) => setManagerName(event.target.value)}
+                                    >
+                                        {users.map((option) => (
+                                            <MenuItem key={option.id} value={option.name}>
+                                                {option.name}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField

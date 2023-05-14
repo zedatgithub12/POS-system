@@ -1,6 +1,5 @@
 // material-ui
 import { Grid, Typography, Button, Divider, TextField, Container, MenuItem, Autocomplete } from '@mui/material';
-import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -108,7 +107,7 @@ const UpdateProduct = () => {
                     setSpinner(false);
                 }
             })
-            .catch((error) => {
+            .catch(() => {
                 setPopup({
                     ...popup,
                     status: true,
@@ -148,7 +147,7 @@ const UpdateProduct = () => {
                         setCategoryData(response.data);
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
@@ -176,7 +175,7 @@ const UpdateProduct = () => {
                         setShops(shops);
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
@@ -188,7 +187,7 @@ const UpdateProduct = () => {
         getShops();
         getCatgeory();
         return () => {};
-    }, []);
+    }, [popup, shops]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -353,7 +352,6 @@ const UpdateProduct = () => {
                                 value={status}
                                 onChange={(event) => setStatus(event.target.value)}
                             >
-                                <MenuItem value="Market">Market</MenuItem>
                                 <MenuItem value="Store">Store</MenuItem>
                             </TextField>
                         </Grid>

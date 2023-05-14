@@ -22,7 +22,6 @@ import {
     Divider,
     Autocomplete
 } from '@mui/material';
-import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -151,7 +150,7 @@ const CreateSale = () => {
                     setSpinner(false);
                 }
             })
-            .catch((error) => {
+            .catch(() => {
                 setPopup({
                     ...popup,
                     status: true,
@@ -182,7 +181,7 @@ const CreateSale = () => {
                         setShops(shops);
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
@@ -222,7 +221,7 @@ const CreateSale = () => {
         getProducts();
         getShops();
         return () => {};
-    }, []);
+    }, [popup, shops, productData]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -266,7 +265,6 @@ const CreateSale = () => {
                                 getOptionLabel={(option) => option.name}
                                 onInputChange={(event, value) => {
                                     setCustomerName(value);
-                                    console.log(value);
                                 }}
                                 renderInput={(params) => <TextField {...params} label="Customer" variant="outlined" />}
                             />

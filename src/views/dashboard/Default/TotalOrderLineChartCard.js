@@ -17,7 +17,7 @@ import ChartDataYear from './chart-data/total-order-year-line-chart';
 
 // assets
 import LocalMallOutlinedIcon from '@mui/icons-material/LocalMallOutlined';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 // import { backgroundColor } from '@mui/system/palette';
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
@@ -64,7 +64,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 // ==============================|| DASHBOARD - TOTAL ORDER LINE CHART CARD ||============================== //
 
-const TotalOrderLineChartCard = ({ isLoading }) => {
+const TotalOrderLineChartCard = ({ isLoading, monthlysales, anualsales }) => {
     const theme = useTheme();
 
     const [timeValue, setTimeValue] = useState(false);
@@ -142,7 +142,7 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                                             color: '#222'
                                                         }}
                                                     >
-                                                        108
+                                                        {monthlysales}
                                                     </Typography>
                                                 ) : (
                                                     <Typography
@@ -155,7 +155,7 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                                             color: '#222'
                                                         }}
                                                     >
-                                                        961
+                                                        {anualsales}
                                                     </Typography>
                                                 )}
                                             </Grid>
@@ -168,7 +168,7 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                                         color: theme.palette.dark.dark
                                                     }}
                                                 >
-                                                    <ArrowDownwardIcon fontSize="inherit" sx={{ transform: 'rotate3d(1, 1, 1, 45deg)' }} />
+                                                    <ArrowUpwardIcon fontSize="inherit" sx={{ transform: 'rotate3d(1, 1, 1, 45deg)' }} />
                                                 </Avatar>
                                             </Grid>
                                             <Grid item xs={12}>
@@ -198,7 +198,9 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
 };
 
 TotalOrderLineChartCard.propTypes = {
-    isLoading: PropTypes.bool
+    isLoading: PropTypes.bool,
+    monthlysales: PropTypes.number,
+    anualsales: PropTypes.number
 };
 
 export default TotalOrderLineChartCard;

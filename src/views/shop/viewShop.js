@@ -1,7 +1,6 @@
-import React, { useState, forwardRef } from 'react';
+import React, { useState, forwardRef, useEffect } from 'react';
 // material-ui
-import { Grid, Typography, Button, Divider } from '@mui/material';
-import Stack from '@mui/material/Stack';
+import { Grid, Typography, Button, Divider, TextField, MenuItem } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -14,6 +13,11 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
+import PopularCard from 'views/dashboard/Default/PopularCard';
+import EarningCard from 'views/dashboard/Default/EarningCard';
+import TotalOrderLineChartCard from 'views/dashboard/Default/TotalOrderLineChartCard';
+import TotalIncomeDarkCard from 'views/dashboard/Default/TotalIncomeDarkCard';
+import TotalIncomeLightCard from 'views/dashboard/Default/TotalIncomeLightCard';
 import Connections from 'api';
 
 const Transition = forwardRef(function Transition(props, ref) {
@@ -27,17 +31,33 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const ViewShop = () => {
     const { state } = useLocation();
     const shop = state;
-
     const navigate = useNavigate();
     const GoBack = () => {
         navigate(-1);
     };
+    const [isLoading, setLoading] = useState(true);
+    const [stat, setStat] = useState([]);
+    const [month] = useState('');
+    const [year] = useState('');
+    const [users, setUsers] = useState([]);
+    const [managername, setManagerName] = useState('');
+    const [addDialogOpen, setAddDialogOpen] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [alerttype, setAlertType] = useState('close');
+    const [spinner, setSpinner] = useState(false);
+
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
         message: ''
     });
+    const handleAddDialogOpen = () => {
+        setAddDialogOpen(true);
+    };
 
+    const handleAddDialogClose = () => {
+        setAddDialogOpen(false);
+    };
     const handleSnackClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -48,8 +68,6 @@ const ViewShop = () => {
             status: false
         });
     };
-    const [open, setOpen] = useState(false);
-    const [alerttype, setAlertType] = useState('close');
 
     const handleClickOpen = (type) => {
         setOpen(true);
@@ -62,11 +80,65 @@ const ViewShop = () => {
 
     const OpenShop = () => {
         setOpen(false);
-        console.log('Opened');
     };
     const CloseShop = () => {
         setOpen(false);
-        console.log('Closed');
+    };
+    const DateSlice = (date) => {
+        var year = date.slice(0, 4);
+        var month = date.slice(5, 7);
+        var day = date.slice(8, 10);
+        return day + '/' + month + '/' + year;
+    };
+
+    const AddManager = () => {
+        setSpinner(true);
+        var Api = Connections.api + Connections.addmanager + shop.id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        const data = {
+            manager: managername
+        };
+
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(data)
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                    handleAddDialogClose();
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error adding manager!'
+                });
+                setSpinner(false);
+            });
     };
     const DeleteShop = () => {
         setOpen(false);
@@ -103,7 +175,7 @@ const ViewShop = () => {
                     });
                 }
             })
-            .catch((error) => {
+            .catch(() => {
                 setPopup({
                     ...popup,
                     status: true,
@@ -112,6 +184,48 @@ const ViewShop = () => {
                 });
             });
     };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await fetch(Connections.api + Connections.shopstat + `?shop=${shop.name}&month=${month}&year=${year}`);
+            const data = await response.json();
+            if (data.success) {
+                setStat(data.data);
+            }
+        };
+        const getUsers = () => {
+            var Api = Connections.api + Connections.viewuser;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setUsers(response.data);
+                    } else {
+                        setUsers(userData);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error featching  users!'
+                    });
+                });
+        };
+        getUsers();
+        fetchData();
+        setLoading(false);
+    }, [month, year, spinner, popup, shop]);
+
     return (
         <>
             <MainCard>
@@ -142,6 +256,84 @@ const ViewShop = () => {
                 <Grid container justifyContent="center">
                     <Grid item lg={7} md={6} sm={6} xs={12}>
                         <Grid
+                            item
+                            xs={12}
+                            style={{
+                                marginTop: 14,
+                                borderRadius: 6,
+                                padding: 6,
+                                paddingRight: 20,
+                                paddingLeft: 14
+                            }}
+                        >
+                            <Grid container spacing={gridSpacing}>
+                                <Grid item lg={5} md={6} sm={6} xs={12}>
+                                    <EarningCard isLoading={isLoading} earnings={stat.monthlyEarnings ? stat.monthlyEarnings : 0} />
+                                </Grid>
+
+                                <Grid item lg={4} md={6} sm={6} xs={12}>
+                                    <TotalOrderLineChartCard
+                                        isLoading={isLoading}
+                                        monthlysales={stat.monthlySales ? stat.monthlySales : 0}
+                                        anualsales={stat.annualSales ? stat.annualSales : 0}
+                                    />
+                                </Grid>
+                                <Grid item lg={3} md={12} sm={12} xs={12}>
+                                    <Grid container spacing={gridSpacing}>
+                                        <Grid item sm={6} xs={12} md={6} lg={12}>
+                                            <TotalIncomeDarkCard
+                                                isLoading={isLoading}
+                                                totalcategories={stat.totalCategories ? stat.totalCategories : 0}
+                                            />
+                                        </Grid>
+                                        <Grid item sm={6} xs={12} md={6} lg={12}>
+                                            <TotalIncomeLightCard
+                                                isLoading={isLoading}
+                                                totalcustomers={stat.totalCustomers ? stat.totalCustomers : 0}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            item
+                            xs={12}
+                            style={{
+                                marginTop: 4,
+                                marginLeft: 4,
+                                borderRadius: 6,
+                                padding: 6,
+                                paddingRight: 18,
+                                paddingLeft: 10
+                            }}
+                        >
+                            <Grid container spacing={gridSpacing}>
+                                <Grid item xs={12} md={12}>
+                                    <PopularCard isLoading={isLoading} topProducts={stat.topProducts} />
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <Grid
+                        item
+                        container
+                        direction="column"
+                        lg={4}
+                        md={6}
+                        sm={6}
+                        xs={12}
+                        style={{
+                            marginTop: 4,
+                            marginLeft: 4,
+                            borderRadius: 6,
+                            padding: 6,
+                            paddingRight: 20,
+                            paddingLeft: 20
+                        }}
+                    >
+                        <Grid
                             container
                             direction="row"
                             alignItems="center"
@@ -149,18 +341,18 @@ const ViewShop = () => {
                             spacing={1}
                             className="bg-light"
                             style={{
-                                marginTop: 10,
+                                marginTop: 2,
                                 borderRadius: 6,
                                 padding: 6,
-                                paddingRight: 20,
-                                paddingLeft: 14
+                                paddingRight: 10,
+                                paddingLeft: 8
                             }}
                         >
                             <Grid item>
                                 <img
                                     src={Connections.images + shop.profile_image}
                                     alt="Shop Profile Preview"
-                                    style={{ width: '100%', marginTop: 10, marginBottom: 10, borderRadius: 8 }}
+                                    style={{ width: '100%', borderRadius: 8 }}
                                 />
                             </Grid>
                         </Grid>
@@ -195,7 +387,9 @@ const ViewShop = () => {
                                 <Typography variant="body2">Shop Manager</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h4">{shop.manager ? shop.manager : 'Not assigned yet!'}</Typography>
+                                <Typography variant="h4">
+                                    {shop.manager ? shop.manager : <Button onClick={() => handleAddDialogOpen()}>Add</Button>}
+                                </Typography>
                             </Grid>
                         </Grid>
 
@@ -229,7 +423,7 @@ const ViewShop = () => {
                                 <Typography variant="body2">Created at</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h4">{shop.created_at}</Typography>
+                                <Typography variant="h4">{DateSlice(shop.created_at)}</Typography>
                             </Grid>
                         </Grid>
 
@@ -241,80 +435,70 @@ const ViewShop = () => {
                             style={{ marginTop: 10, borderRadius: 6, paddingRight: 20 }}
                         >
                             <Grid item>
+                                <Button
+                                    variant="outlined"
+                                    color="primary"
+                                    className="me-3 w-25"
+                                    onClick={() =>
+                                        navigate('/update-shop', {
+                                            state: { ...shop }
+                                        })
+                                    }
+                                >
+                                    {spinner ? (
+                                        <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    ) : (
+                                        'Update'
+                                    )}
+                                </Button>
+                            </Grid>
+                            <Grid item>
                                 <Button variant="text" color="error" className="me-3 w-25 " onClick={() => handleClickOpen('delete')}>
                                     Delete
                                 </Button>
                             </Grid>
                         </Grid>
                     </Grid>
-                    <Grid
-                        item
-                        container
-                        direction="column"
-                        lg={4}
-                        md={6}
-                        sm={6}
-                        xs={12}
-                        style={{
-                            marginTop: 10,
-                            marginLeft: 10,
-                            borderRadius: 6,
-                            padding: 6,
-                            paddingRight: 20,
-                            paddingLeft: 20
-                        }}
-                    >
-                        <Grid
-                            item
-                            container
-                            direction="row"
-                            className="bg-light p-2 ps-3 rounded"
-                            style={{
-                                borderRadius: 6,
-                                padding: 6
-                            }}
-                        >
-                            <Typography variant="body2">Status</Typography>
-                            <Typography variant="h4" style={{ marginLeft: 5, textTransform: 'capitalize' }}>
-                                {shop.status === '0' ? 'Open' : 'Closed'}
-                            </Typography>
-                        </Grid>
-
-                        <Grid
-                            item
-                            container
-                            direction="row"
-                            justifyContent=""
-                            className=" pt-3 rounded"
-                            style={{
-                                borderRadius: 6
-                            }}
-                        >
-                            <Button
-                                variant="outlined"
-                                color="primary"
-                                className="me-3 w-25"
-                                onClick={() =>
-                                    navigate('/update-shop', {
-                                        state: { ...shop }
-                                    })
-                                }
-                            >
-                                Update
-                            </Button>
-                            {shop.status === '1' ? (
-                                <Button variant="text" color="primary" className="me-3" onClick={() => handleClickOpen('open')}>
-                                    Open
-                                </Button>
-                            ) : (
-                                <Button variant="text" color="secondary" className="me-3" onClick={() => handleClickOpen('close')}>
-                                    Close
-                                </Button>
-                            )}
-                        </Grid>
-                    </Grid>
                 </Grid>
             </MainCard>
+
+            <Dialog open={addDialogOpen} onClose={handleAddDialogClose}>
+                <DialogTitle>Add Manager</DialogTitle>
+
+                <DialogContent>
+                    <TextField
+                        required
+                        fullWidth
+                        select
+                        label="Manager"
+                        className="mt-3"
+                        value={managername}
+                        onChange={(event) => setManagerName(event.target.value)}
+                    >
+                        {users.map((option) => (
+                            <MenuItem key={option.id} value={option.name}>
+                                {option.name}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleAddDialogClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={() => AddManager()} color="primary" variant="container">
+                        {spinner ? (
+                            <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        ) : (
+                            'Save'
+                        )}
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <Dialog
                 open={open}

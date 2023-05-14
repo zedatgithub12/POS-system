@@ -24,7 +24,7 @@ import {
     Box,
     Collapse
 } from '@mui/material';
-import Stack from '@mui/material/Stack';
+
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
@@ -42,7 +42,7 @@ import Connections from 'api';
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-const categories = ['All', 'Admin', 'Manager', 'Sales'];
+const categories = ['All', 'Admin', 'Sales'];
 
 const Users = () => {
     const [userData, setUserData] = useState([]);
@@ -50,7 +50,6 @@ const Users = () => {
     const [roleFilter, setRoleFilter] = useState('All');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
-    const [spinner, setSpinner] = useState(false);
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -130,7 +129,7 @@ const Users = () => {
         };
         getUsers();
         return () => {};
-    }, [spinner]);
+    }, [popup, userData]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -444,7 +443,6 @@ const UserRow = ({ user }) => {
                                         onChange={(event) => setRole(event.target.value)}
                                     >
                                         <MenuItem value="Admin">Admin</MenuItem>
-                                        <MenuItem value="Manager">Manager</MenuItem>
                                         <MenuItem value="Sales">Sales</MenuItem>
                                     </TextField>
                                 </Grid>
@@ -471,7 +469,7 @@ const UserRow = ({ user }) => {
             </TableRow>
 
             <Dialog open={dialogOpen} onClose={handleDialogClose}>
-                <DialogTitle>Delete Product</DialogTitle>
+                <DialogTitle>Delete User</DialogTitle>
                 <DialogContent>Do you want to delete {selectedProduct ? selectedProduct.name : ''} ?</DialogContent>
                 <DialogActions>
                     <Button variant="text" color="primary" onClick={handleDialogClose}>
@@ -501,6 +499,7 @@ UserRow.propTypes = {
     user: PropTypes.shape({
         profile: PropTypes.bool,
         picture: PropTypes.string,
+        id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
         email: PropTypes.string.isRequired,
         role: PropTypes.string.isRequired,

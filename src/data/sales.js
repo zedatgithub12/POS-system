@@ -2,18 +2,10 @@ const SalesData = [
     {
         id: 1,
         reference: 'REF001',
-        user: {
-            id: 123,
-            name: 'John Smith',
-            email: 'john.smith@example.com',
-            phone: '555-123-4567'
-        },
+        user: 'John Smith',
         shop: 'Ethio Mart',
-        customer: {
-            name: 'Jane Doe',
-            email: 'janedoe@example.com',
-            phone: '123-456-7890'
-        },
+        customer: 'Jane Doe',
+
         items: [
             {
                 id: 1,

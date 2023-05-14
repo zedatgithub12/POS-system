@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 // material-ui
 import { Grid, Typography, Divider, Button, TextField, MenuItem, IconButton, InputAdornment } from '@mui/material';
@@ -19,10 +19,6 @@ const roles = [
     {
         value: 'Admin',
         label: 'Admin'
-    },
-    {
-        value: 'Manager',
-        label: 'Manager'
     },
     {
         value: 'Sales',
@@ -49,10 +45,9 @@ const AddUsers = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [role, setRole] = useState('');
-    const [profileError, setProfileError] = useState(false);
-    const [nameError, setNameError] = useState(false);
-    const [emailError, setEmailError] = useState(false);
-    const [roleError, setRoleError] = useState(false);
+    const [nameError] = useState(false);
+    const [emailError] = useState(false);
+    const [roleError] = useState(false);
     const [spinner, setSpinner] = useState(false);
 
     const [popup, setPopup] = useState({
@@ -89,7 +84,7 @@ const AddUsers = () => {
             data.append('profile', profileImage);
             data.append('name', name);
             data.append('email', email);
-            data.append('password', email);
+            data.append('password', password);
             data.append('role', role);
 
             // Make the API call using fetch()
@@ -117,7 +112,7 @@ const AddUsers = () => {
                         setSpinner(false);
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,

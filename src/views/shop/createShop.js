@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 // material-ui
 import { Grid, Typography, Button, Divider, Box, TextField, IconButton } from '@mui/material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -19,7 +18,7 @@ const CreateShop = () => {
     const GoBack = () => {
         navigate(-1);
     };
-
+    const [spinner, setSpinner] = useState(false);
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -63,14 +62,10 @@ const CreateShop = () => {
     };
     const handleSubmit = (event) => {
         event.preventDefault();
+        setSpinner(true);
         // Handle form submission here
         // Declare the data to be sent to the API
         var Api = Connections.api + Connections.createstore;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
-
         const data = new FormData();
         data.append('name', formData.shopName);
         data.append('address', formData.address);
@@ -92,6 +87,7 @@ const CreateShop = () => {
                         severity: 'success',
                         message: response.message
                     });
+                    setSpinner(false);
                 } else {
                     setPopup({
                         ...popup,
@@ -99,15 +95,17 @@ const CreateShop = () => {
                         severity: 'error',
                         message: response.message
                     });
+                    setSpinner(false);
                 }
             })
-            .catch((error) => {
+            .catch(() => {
                 setPopup({
                     ...popup,
                     status: true,
                     severity: 'error',
                     message: 'There is error creatng shop!'
                 });
+                setSpinner(false);
             });
     };
     return (
@@ -206,7 +204,13 @@ const CreateShop = () => {
 
                                     <Grid item xs={12}>
                                         <Button type="submit" variant="contained" color="primary">
-                                            Create Shop
+                                            {spinner ? (
+                                                <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                                    <span className="visually-hidden">Loading...</span>
+                                                </div>
+                                            ) : (
+                                                'Create Shop'
+                                            )}
                                         </Button>
                                     </Grid>
                                 </Grid>

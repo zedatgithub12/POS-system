@@ -4,11 +4,15 @@ const Connections = {
     images: 'http://localhost:8000/api/images/',
     login: '/login',
 
+    //stats api
+    adminstat: '/adminstat',
+    shopstat: '/shopstat',
     //stores api
     createstore: '/createstore',
     viewstore: '/viewstore',
     updatestore: '/updatestore/',
     deletestore: '/deletestore/',
+    addmanager: '/addmanager/',
 
     //product api's
     addproduct: '/addproduct',

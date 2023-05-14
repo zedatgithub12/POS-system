@@ -28,7 +28,6 @@ import {
     DialogContent,
     DialogActions
 } from '@mui/material';
-import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { MoreVert } from '@mui/icons-material';
@@ -166,11 +165,12 @@ const Sales = () => {
     const handleTrashClick = () => {
         setDialogOpen(true);
     };
-    const handleDialogClose = () => {
+    const handleDialogClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
         setDialogOpen(false);
+        handleMenuClose();
     };
 
     const handleDelete = (id) => {
@@ -198,7 +198,6 @@ const Sales = () => {
                     });
                     setSpinner(false);
                     handleDialogClose();
-                    handleMenuClose();
                 } else {
                     setPopup({
                         ...popup,
@@ -214,7 +213,7 @@ const Sales = () => {
                     ...popup,
                     status: true,
                     severity: 'error',
-                    message: 'There is error deleting product!'
+                    message: 'There is error deleting sale!'
                 });
                 setSpinner(false);
             });
@@ -250,7 +249,7 @@ const Sales = () => {
         };
         getSales();
         return () => {};
-    }, [spinner]);
+    }, [spinner, popup, salesData]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
