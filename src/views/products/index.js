@@ -27,7 +27,6 @@ import {
     Select,
     InputLabel
 } from '@mui/material';
-import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
@@ -39,11 +38,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Connections from 'api';
 // ==============================|| PRODUCT PAGE ||============================== //
-
-const categories = ['All', 'Beverages', 'Accessories', 'Food & Beverage', 'Apparel'];
-const brands = ['All', 'Addis Roasters', 'Habesha Leather Co.', 'Taste of Ethiopia', 'Dashen Designs', 'Honeyland'];
-const shops = ['All', 'Addis Ababa', 'Dire Dawa', 'Bahir Dar', 'Gondar', 'Hawassa'];
-const statuses = ['All', 'In stock', 'Out of stock'];
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;

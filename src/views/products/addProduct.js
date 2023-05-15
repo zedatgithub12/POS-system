@@ -118,7 +118,7 @@ const AddProduct = () => {
                     setSpinner(false);
                 }
             })
-            .catch((error) => {
+            .catch(() => {
                 setPopup({
                     ...popup,
                     status: true,
@@ -159,7 +159,7 @@ const AddProduct = () => {
                         setCategoryData(response.data);
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
@@ -187,7 +187,7 @@ const AddProduct = () => {
                         setShops(shops);
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
@@ -199,7 +199,7 @@ const AddProduct = () => {
         getShops();
         getCatgeory();
         return () => {};
-    }, []);
+    }, [popup]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -362,7 +362,7 @@ const AddProduct = () => {
                                 value={status}
                                 onChange={(event) => setStatus(event.target.value)}
                             >
-                                <MenuItem value="Store">Store</MenuItem>
+                                <MenuItem value="In-stock">In-stock</MenuItem>
                             </TextField>
                         </Grid>
                     </Grid>

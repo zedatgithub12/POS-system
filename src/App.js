@@ -24,6 +24,13 @@ const AuthRegister = Loadable(lazy(() => import('views/pages/authentication/auth
 const App = () => {
     const customization = useSelector((state) => state.customization);
     const location = useLocation();
+
+    const [user, setUser] = useState({
+        name: '',
+        email: '',
+        profile: '',
+        role: ''
+    });
     const [login, setLogin] = useState(false);
     useEffect(() => {
         var tokens = sessionStorage.getItem('token');
@@ -32,13 +39,20 @@ const App = () => {
         }
         return () => {};
     }, [login]);
+
     const authContext = useMemo(
         () => ({
             SignIn: async (status, users) => {
                 if (status === 'Signed') {
                     sessionStorage.setItem('user', JSON.stringify(users));
-                    sessionStorage.setItem('token', JSON.stringify(users.fname));
-
+                    sessionStorage.setItem('token', JSON.stringify(users.name));
+                    setUser({
+                        ...user,
+                        name: users.name,
+                        email: users.email,
+                        profile: users.profile,
+                        role: users.role
+                    });
                     setLogin(true);
                 } else {
                     setLogin(false);
@@ -48,6 +62,14 @@ const App = () => {
             SignOut: async (status) => {
                 if (status === 'Signout') {
                     sessionStorage.clear();
+                    setUser({
+                        ...user,
+                        name: '',
+                        email: '',
+                        profile: '',
+                        role: ''
+                    });
+
                     setLogin(false);
                 }
                 {
@@ -61,25 +83,22 @@ const App = () => {
                 return userToken;
             },
 
-            getUser: async () => {
-                const userString = sessionStorage.getItem('user');
-                const userDetails = JSON.parse(userString);
-                return userDetails;
-            }
+            getUser: user
         }),
-        []
+
+        [user]
     );
     return (
-        <StyledEngineProvider injectFirst>
-            <AuthContext.Provider value={authContext}>
+        <AuthContext.Provider value={authContext}>
+            <StyledEngineProvider injectFirst>
                 <ThemeProvider theme={themes(customization)}>
                     <CssBaseline />
                     <NavigationScroll>
                         {login ? <Routes /> : location.pathname === '/pages/register/register' ? <AuthRegister /> : <AuthLogin />}
                     </NavigationScroll>
                 </ThemeProvider>
-            </AuthContext.Provider>
-        </StyledEngineProvider>
+            </StyledEngineProvider>
+        </AuthContext.Provider>
     );
 };
 

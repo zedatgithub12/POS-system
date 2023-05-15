@@ -34,7 +34,6 @@ import {
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 // import UpgradePlanCard from './UpgradePlanCard';
-import User1 from 'assets/images/users/user-round.svg';
 
 // assets
 import { IconLogout, IconSettings } from '@tabler/icons';

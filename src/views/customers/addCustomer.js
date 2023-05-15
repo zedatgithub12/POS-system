@@ -42,9 +42,9 @@ const AddCustomer = () => {
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [shopName, setShopName] = useState('');
-    const [nameError, setNameError] = useState(false);
-    const [emailError, setEmailError] = useState(false);
-    const [roleError, setRoleError] = useState(false);
+    const [nameError] = useState(false);
+    const [emailError] = useState(false);
+    const [roleError] = useState(false);
     const [spinner, setSpinner] = useState(false);
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -118,7 +118,7 @@ const AddCustomer = () => {
                         setShops([]);
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
@@ -129,7 +129,7 @@ const AddCustomer = () => {
         };
         getShops();
         return () => {};
-    }, []);
+    }, [popup]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>

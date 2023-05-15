@@ -1,16 +1,19 @@
 // assets
-import { IconDashboard, IconBrandChrome, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers } from '@tabler/icons';
+import { IconDashboard, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers } from '@tabler/icons';
 
 // constant
-const icons = { IconDashboard, IconBrandChrome, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers };
+const icons = { IconDashboard, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
-const dashboard = {
-    id: 'dashboard',
-    title: 'Dashboard',
-    type: 'group',
-    children: [
+const getUserRole = () => {
+    const userString = sessionStorage.getItem('user');
+    const user = JSON.parse(userString);
+    return user ? user.role : 'Sales';
+};
+
+const getDashboardItems = (role) => {
+    const adminItems = [
         {
             id: 'default',
             title: 'Dashboard',
@@ -59,7 +62,51 @@ const dashboard = {
             icon: icons.IconUsers,
             breadcrumbs: false
         }
-    ]
+    ];
+
+    const salesItems = [
+        {
+            id: 'default',
+            title: 'Dashboard',
+            type: 'item',
+            url: '/dashboard/default',
+            icon: icons.IconDashboard,
+            breadcrumbs: false
+        },
+        {
+            id: 'products',
+            title: 'Products',
+            type: 'item',
+            url: '/products',
+            icon: icons.IconBox,
+            breadcrumbs: false
+        },
+        {
+            id: 'sales',
+            title: 'Sales',
+            type: 'item',
+            url: '/sales',
+            icon: icons.IconTimeline,
+            breadcrumbs: false
+        },
+        {
+            id: 'customers',
+            title: 'Customers',
+            type: 'item',
+            url: '/customers',
+            icon: icons.IconUsers,
+            breadcrumbs: false
+        }
+    ];
+
+    return role === 'Admin' ? adminItems : salesItems;
+};
+
+const dashboard = {
+    id: 'dashboard',
+    title: 'Dashboard',
+    type: 'group',
+    children: getDashboardItems(getUserRole())
 };
 
 export default dashboard;

@@ -131,7 +131,7 @@ const Customers = () => {
         };
         getCustomers();
         return () => {};
-    }, []);
+    }, [popup]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>

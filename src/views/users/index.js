@@ -129,7 +129,7 @@ const Users = () => {
         };
         getUsers();
         return () => {};
-    }, [popup, userData]);
+    }, [popup]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -361,7 +361,7 @@ const UserRow = ({ user }) => {
 
     useEffect(() => {
         return () => {};
-    }, [spinner]);
+    }, [spinner, popup]);
 
     return (
         <>

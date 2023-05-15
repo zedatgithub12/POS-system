@@ -249,7 +249,7 @@ const Sales = () => {
         };
         getSales();
         return () => {};
-    }, [spinner, popup, salesData]);
+    }, [popup]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>

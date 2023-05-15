@@ -22,7 +22,6 @@ import {
     Divider,
     Autocomplete
 } from '@mui/material';
-import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -53,7 +52,6 @@ const UpdateSale = () => {
     const [shopName, setShopsName] = useState('');
     const [productData, setProductData] = useState([]);
     const [salesData, setSalesData] = useState(item);
-    const [grandTotal] = useState(item.grandtotal);
     const [saleTax, setSaleTax] = useState(item.tax);
     const [discount, setDiscount] = useState(item.discount);
     const [paymentStatus, setPaymentStatus] = useState(item.payment_status);
@@ -85,44 +83,44 @@ const UpdateSale = () => {
         setPaymentMethod(event.target.value);
     };
 
-    function handleAddToCart(itemToAdd) {
-        let newItem = {
-            id: itemToAdd.id,
-            itemName: itemToAdd.name,
-            itemCode: itemToAdd.code,
-            brand: itemToAdd.brand,
-            unit: itemToAdd.unit,
-            unitPrice: itemToAdd.price,
-            quantity: 1,
-            subtotal: itemToAdd.price
-        };
+    // function handleAddToCart(itemToAdd) {
+    //     let newItem = {
+    //         id: itemToAdd.id,
+    //         itemName: itemToAdd.name,
+    //         itemCode: itemToAdd.code,
+    //         brand: itemToAdd.brand,
+    //         unit: itemToAdd.unit,
+    //         unitPrice: itemToAdd.price,
+    //         quantity: 1,
+    //         subtotal: itemToAdd.price
+    //     };
 
-        // Parse the items string into a JavaScript array
-        const itemsArray = JSON.parse(salesData.items);
+    //     // Parse the items string into a JavaScript array
+    //     const itemsArray = JSON.parse(salesData.items);
 
-        // Find the index of the object that needs to be updated (if it already exists in the array)
-        const index = itemsArray.find((item) => item.id === newItem.id);
+    //     // Find the index of the object that needs to be updated (if it already exists in the array)
+    //     const index = itemsArray.find((item) => item.id === newItem.id);
 
-        if (index) {
-            // If the item already exists in the array, update its quantity and subtotal
-            itemsArray[index].quantity++;
-            itemsArray[index].subtotal = itemsArray[index].quantity * itemToAdd.price;
-        } else {
-            // If the item doesn't exist in the array, add it to the end
-            itemsArray.push(newItem);
-        }
+    //     if (index) {
+    //         // If the item already exists in the array, update its quantity and subtotal
+    //         itemsArray[index].quantity++;
+    //         itemsArray[index].subtotal = itemsArray[index].quantity * itemToAdd.price;
+    //     } else {
+    //         // If the item doesn't exist in the array, add it to the end
+    //         itemsArray.push(newItem);
+    //     }
 
-        // Stringify the array back into a JSON string
-        const updatedItems = JSON.stringify(itemsArray);
+    //     // Stringify the array back into a JSON string
+    //     const updatedItems = JSON.stringify(itemsArray);
 
-        const updatedSalesData = {
-            ...salesData,
-            items: updatedItems,
-            grandtotal: itemsArray.reduce((total, item) => total + item.subtotal, 0) + -salesData.discount
-        };
+    //     const updatedSalesData = {
+    //         ...salesData,
+    //         items: updatedItems,
+    //         grandtotal: itemsArray.reduce((total, item) => total + item.subtotal, 0) + -salesData.discount
+    //     };
 
-        setSalesData(updatedSalesData);
-    }
+    //     setSalesData(updatedSalesData);
+    // }
 
     // Handle incrementing item quantity
     function handleIncrement(itemId) {
@@ -245,7 +243,7 @@ const UpdateSale = () => {
                     setSpinner(false);
                 }
             })
-            .catch((error) => {
+            .catch(() => {
                 setPopup({
                     ...popup,
                     status: true,
@@ -275,7 +273,7 @@ const UpdateSale = () => {
                         setShops(shops);
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
@@ -315,7 +313,7 @@ const UpdateSale = () => {
         getProducts();
         getShops();
         return () => {};
-    }, []);
+    }, [popup]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>

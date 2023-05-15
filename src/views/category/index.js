@@ -18,7 +18,6 @@ import {
     DialogActions,
     TablePagination
 } from '@mui/material';
-import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { Search } from '@mui/icons-material';
@@ -276,7 +275,7 @@ const Category = () => {
                         setCategoryData(response.data);
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
@@ -287,7 +286,7 @@ const Category = () => {
         };
         getCatgeory();
         return () => {};
-    }, []);
+    }, [popup]);
 
     const filteredCategories = CategoryData.filter((category) => category.name.toLowerCase().includes(searchTerm.toLowerCase()));
 

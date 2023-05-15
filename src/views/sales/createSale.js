@@ -221,7 +221,7 @@ const CreateSale = () => {
         getProducts();
         getShops();
         return () => {};
-    }, [popup, shops, productData]);
+    }, [popup]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -314,7 +314,7 @@ const CreateSale = () => {
                                                 <TableCell>{item.unitPrice}</TableCell>
                                                 <TableCell>{parseInt(item.subtotal).toFixed(2)}</TableCell>
                                                 <TableCell>
-                                                    <IconButton onClick={() => handleRemoveFromCart(item.product)}>
+                                                    <IconButton onClick={() => handleRemoveFromCart(item)}>
                                                         <Delete />
                                                     </IconButton>
                                                 </TableCell>

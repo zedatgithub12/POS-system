@@ -283,7 +283,7 @@ const ViewShop = () => {
                                         <Grid item sm={6} xs={12} md={6} lg={12}>
                                             <TotalIncomeDarkCard
                                                 isLoading={isLoading}
-                                                totalcategories={stat.totalCategories ? stat.totalCategories : 0}
+                                                totalProducts={stat.totalProducts ? stat.totalProducts : 0}
                                             />
                                         </Grid>
                                         <Grid item sm={6} xs={12} md={6} lg={12}>
