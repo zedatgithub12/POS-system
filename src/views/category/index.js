@@ -280,13 +280,13 @@ const Category = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error creatng shop!'
+                        message: 'There is error featching category!'
                     });
                 });
         };
         getCatgeory();
         return () => {};
-    }, [popup]);
+    }, [popup, CategoryData]);
 
     const filteredCategories = CategoryData.filter((category) => category.name.toLowerCase().includes(searchTerm.toLowerCase()));
 

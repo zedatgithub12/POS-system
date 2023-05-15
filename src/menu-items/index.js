@@ -6,7 +6,8 @@ import Users from './users';
 
 // ==============================|| MENU ITEMS ||============================== //
 const userString = sessionStorage.getItem('user');
-const user = JSON.parse(userString);
+const users = JSON.parse(userString);
+const user = users ? users : {};
 
 const menuItems =
     user.role === 'Admin'
