@@ -86,7 +86,7 @@ const App = () => {
             getUser: user
         }),
 
-        [user]
+        []
     );
     return (
         <AuthContext.Provider value={authContext}>

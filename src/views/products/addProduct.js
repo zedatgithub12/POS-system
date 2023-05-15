@@ -156,7 +156,10 @@ const AddProduct = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        setCategoryData(response.data);
+                        setCategoryData((prevCat) => {
+                            // Combine the previous shops with the new ones from the API
+                            return [...prevCat, ...response.data];
+                        });
                     }
                 })
                 .catch(() => {
@@ -182,9 +185,15 @@ const AddProduct = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        setShops(response.data);
+                        setShops((prevShops) => {
+                            // Combine the previous shops with the new ones from the API
+                            return [...prevShops, ...response.data];
+                        });
                     } else {
-                        setShops(shops);
+                        setShops((prevShops) => {
+                            // Combine the previous shops with the new ones from the API
+                            return [...prevShops, ...shops];
+                        });
                     }
                 })
                 .catch(() => {

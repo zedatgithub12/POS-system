@@ -1,12 +1,10 @@
 // material-ui
 import { Grid, Typography, Button, Divider, Card, CardContent, CardMedia, CardActionArea } from '@mui/material';
-import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import Shoplist from 'data/shops';
 import { Link, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Connections from 'api';
@@ -56,7 +54,7 @@ const Shops = () => {
                         setShops([]);
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
