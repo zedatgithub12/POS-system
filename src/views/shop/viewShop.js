@@ -100,9 +100,11 @@ const ViewShop = () => {
         };
 
         const data = {
-            manager: managername
+            manager_id: managername.id,
+            manager: managername.name
         };
 
+        console.log(data);
         // Make the API call using fetch()
         fetch(Api, {
             method: 'POST',
@@ -193,6 +195,7 @@ const ViewShop = () => {
                 setStat(data.data);
             }
         };
+
         const getUsers = () => {
             var Api = Connections.api + Connections.viewuser;
             var headers = {
@@ -221,10 +224,15 @@ const ViewShop = () => {
                     });
                 });
         };
+
         getUsers();
         fetchData();
         setLoading(false);
     }, [month, year, spinner, popup, shop]);
+
+    // const username = users.find((user) => {
+    //     return user.id === shop.manager;
+    // });
 
     return (
         <>
@@ -474,11 +482,11 @@ const ViewShop = () => {
                         select
                         label="Manager"
                         className="mt-3"
-                        value={managername}
+                        value={managername.id}
                         onChange={(event) => setManagerName(event.target.value)}
                     >
                         {users.map((option) => (
-                            <MenuItem key={option.id} value={option.name}>
+                            <MenuItem key={option.id} value={option}>
                                 {option.name}
                             </MenuItem>
                         ))}

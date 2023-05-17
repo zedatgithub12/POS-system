@@ -55,7 +55,8 @@ const UpdateShop = () => {
 
         const data = new FormData();
         data.append('name', formData.shopName);
-        data.append('manager', managername);
+        data.append('manager_id', managername.id);
+        data.append('manager', managername.name);
         data.append('address', formData.address);
         data.append('description', formData.description);
         data.append('phone', formData.phone);
@@ -219,11 +220,11 @@ const UpdateShop = () => {
                                         select
                                         label="Manager"
                                         className="mt-3"
-                                        value={managername}
+                                        value={managername.name}
                                         onChange={(event) => setManagerName(event.target.value)}
                                     >
                                         {users.map((option) => (
-                                            <MenuItem key={option.id} value={option.name}>
+                                            <MenuItem key={option.id} value={option}>
                                                 {option.name}
                                             </MenuItem>
                                         ))}

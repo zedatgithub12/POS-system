@@ -43,6 +43,9 @@ const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 const Sales = () => {
+    const userString = sessionStorage.getItem('user');
+    const users = JSON.parse(userString);
+
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
@@ -220,7 +223,10 @@ const Sales = () => {
     };
     useEffect(() => {
         const getSales = () => {
-            var Api = Connections.api + Connections.viewsale;
+            var AdminApi = Connections.api + Connections.viewsale;
+            var SalesApi = Connections.api + Connections.viewstoresale + users.store_name;
+            var Api = users.role === 'Admin' ? AdminApi : SalesApi;
+
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'

@@ -26,10 +26,13 @@ const App = () => {
     const location = useLocation();
 
     const [user, setUser] = useState({
+        id: '',
         name: '',
         email: '',
         profile: '',
-        role: ''
+        role: '',
+        store_id: '',
+        store_name: ''
     });
     const [login, setLogin] = useState(false);
     useEffect(() => {
@@ -48,11 +51,15 @@ const App = () => {
                     sessionStorage.setItem('token', JSON.stringify(users.name));
                     setUser({
                         ...user,
+                        id: users.id,
                         name: users.name,
                         email: users.email,
                         profile: users.profile,
-                        role: users.role
+                        role: users.role,
+                        store_id: users.store_id,
+                        store_name: users.store_name
                     });
+
                     setLogin(true);
                     // console.log(users);
                     // window.location.reload(false);

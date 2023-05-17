@@ -19,6 +19,7 @@ const Connections = {
     //product api's
     addproduct: '/addproduct',
     viewproduct: '/viewproduct',
+    viewstoreproduct: '/viewstoreproduct/', //an api to fetch view sales role in store product
     updateproduct: '/updateproduct/',
     deleteproduct: '/deleteproduct/',
 
@@ -31,12 +32,14 @@ const Connections = {
     //sales api
     createsale: '/createsale',
     viewsale: '/viewsale',
+    viewstoresale: '/viewstoresale/', //an api to fetch view sales role sale
     updatesale: '/updatesale/',
     deletesale: '/deletesale/',
 
     //customer api
     addcustomer: '/addcustomer',
     viewcustomer: '/viewcustomer',
+    viewstorecustomer: '/viewstorecustomer/', //an api to fetch customer sales role customer
     updatecustomer: '/updatecustomer/',
     deletecustomer: '/deletecustomer/',
 

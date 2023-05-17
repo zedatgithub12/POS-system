@@ -45,7 +45,8 @@ const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 const Products = () => {
-    const { getUser } = useContext(AuthContext);
+    const userString = sessionStorage.getItem('user');
+    const users = JSON.parse(userString);
 
     const [searchText, setSearchText] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('Category');
@@ -113,67 +114,36 @@ const Products = () => {
     });
 
     useEffect(() => {
-        if (getUser.role === 'Admin') {
-            const getProducts = () => {
-                var Api = Connections.api + Connections.viewproduct;
-                var headers = {
-                    accept: 'application/json',
-                    'Content-Type': 'application/json'
-                };
-                // Make the API call using fetch()
-                fetch(Api, {
-                    method: 'GET',
-                    headers: headers
-                })
-                    .then((response) => response.json())
-                    .then((response) => {
-                        if (response.success) {
-                            setProductData(response.data);
-                        } else {
-                            setProductData(productData);
-                        }
-                    })
-                    .catch(() => {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: 'There is error fetching product!'
-                        });
-                    });
+        const getProducts = () => {
+            var Api = Connections.api + Connections.viewproduct;
+            var saleApi = Connections.api + Connections.viewstoreproduct + users.store_name;
+            var roles = users.role === 'Admin' ? Api : saleApi;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
             };
-            return getProducts();
-        } else {
-            const getProducts = () => {
-                var Api = Connections.api + Connections.viewproduct;
-                var headers = {
-                    accept: 'application/json',
-                    'Content-Type': 'application/json'
-                };
-                // Make the API call using fetch()
-                fetch(Api, {
-                    method: 'GET',
-                    headers: headers
+            // Make the API call using fetch()
+            fetch(roles, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setProductData(response.data);
+                    } else {
+                        setProductData(productData);
+                    }
                 })
-                    .then((response) => response.json())
-                    .then((response) => {
-                        if (response.success) {
-                            setProductData(response.data);
-                        } else {
-                            setProductData(productData);
-                        }
-                    })
-                    .catch(() => {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: 'There is error fetching product!'
-                        });
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error fetching product!'
                     });
-            };
-            return getProducts();
-        }
+                });
+        };
 
         getProducts();
         return () => {};
@@ -193,9 +163,17 @@ const Products = () => {
                             </Grid>
                         </Grid>
                         <Grid item>
-                            <Button component={Link} to="/add-product" variant="outlined" color="primary" sx={{ textDecoration: 'none' }}>
-                                Add Product
-                            </Button>
+                            {users.role === 'Admin' ? (
+                                <Button
+                                    component={Link}
+                                    to="/add-product"
+                                    variant="outlined"
+                                    color="primary"
+                                    sx={{ textDecoration: 'none' }}
+                                >
+                                    Add Product
+                                </Button>
+                            ) : null}
                         </Grid>
                     </Grid>
                 </Grid>
@@ -279,7 +257,7 @@ const Products = () => {
                                         <TableCell>Quantity</TableCell>
 
                                         <TableCell>Status</TableCell>
-                                        <TableCell>Actions</TableCell>
+                                        <>{users.role === 'Admin' ? <TableCell>Actions</TableCell> : null}</>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -306,6 +284,9 @@ const Products = () => {
 };
 
 const ProductRow = ({ product }) => {
+    const userString = sessionStorage.getItem('user');
+    const users = JSON.parse(userString);
+
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
@@ -425,22 +406,26 @@ const ProductRow = ({ product }) => {
                 <TableCell>{product.quantity}</TableCell>
 
                 <TableCell>{product.status}</TableCell>
-                <TableCell>
-                    <IconButton
-                        aria-label="Edit row"
-                        size="small"
-                        onClick={() =>
-                            navigate('/update-product', {
-                                state: { ...product }
-                            })
-                        }
-                    >
-                        <IconEdit />
-                    </IconButton>
-                    <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
-                        <IconTrash />
-                    </IconButton>
-                </TableCell>
+                <>
+                    {users.role === 'Admin' ? (
+                        <TableCell>
+                            <IconButton
+                                aria-label="Edit row"
+                                size="small"
+                                onClick={() =>
+                                    navigate('/update-product', {
+                                        state: { ...product }
+                                    })
+                                }
+                            >
+                                <IconEdit />
+                            </IconButton>
+                            <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
+                                <IconTrash />
+                            </IconButton>
+                        </TableCell>
+                    ) : null}
+                </>
             </TableRow>
             <TableRow className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary' : 'border-0'}>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
