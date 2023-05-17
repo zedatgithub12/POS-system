@@ -42,12 +42,12 @@ import Connections from 'api';
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-const categories = ['All', 'Admin', 'Sales'];
+const categories = ['Role', 'Admin', 'Sales'];
 
 const Users = () => {
     const [userData, setUserData] = useState([]);
     const [searchText, setSearchText] = useState('');
-    const [roleFilter, setRoleFilter] = useState('All');
+    const [roleFilter, setRoleFilter] = useState('Role');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
     const [popup, setPopup] = useState({
@@ -90,7 +90,7 @@ const Users = () => {
             isMatch = isMatch && (searchRegex.test(user.name) || searchRegex.test(user.email));
         }
 
-        if (roleFilter !== 'All') {
+        if (roleFilter !== 'Role') {
             isMatch = isMatch && user.role === roleFilter;
         }
 
@@ -161,7 +161,7 @@ const Users = () => {
                             color="primary"
                             value={searchText}
                             onChange={handleSearchTextChange}
-                            className="mb-4  "
+                            className="my-2"
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
@@ -175,12 +175,11 @@ const Users = () => {
 
                         <TextField
                             select
-                            label="Role"
                             variant="outlined"
                             color="primary"
                             value={roleFilter}
                             onChange={handleCategoryFilterChange}
-                            style={{ marginRight: '1rem', marginLeft: 6 }}
+                            className="my-2  ms-2"
                         >
                             {categories.map((category) => (
                                 <MenuItem key={category} value={category}>

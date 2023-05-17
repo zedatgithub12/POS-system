@@ -58,7 +58,7 @@ const Category = () => {
     const [newCategoryName, setNewCategoryName] = useState('');
     const [newCategoryDesc, setNewCategoryDesc] = useState('');
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(12);
     const [searchTerm, setSearchTerm] = useState('');
     const [spinner, setSpinner] = useState(false);
 
@@ -286,7 +286,7 @@ const Category = () => {
         };
         getCatgeory();
         return () => {};
-    }, [popup, CategoryData]);
+    }, [popup]);
 
     const filteredCategories = CategoryData.filter((category) => category.name.toLowerCase().includes(searchTerm.toLowerCase()));
 

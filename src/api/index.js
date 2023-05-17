@@ -1,7 +1,9 @@
 const Connections = {
     // url: 'http://localhost:3000',
     api: 'http://localhost:8000/api',
+    // api: 'https://addischircharo.com/backend/api',
     images: 'http://localhost:8000/api/images/',
+    // images: 'https://addischircharo.com/backend/api/images/',
     login: '/login',
 
     //stats api

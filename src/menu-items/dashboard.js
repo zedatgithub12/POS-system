@@ -66,14 +66,6 @@ const getDashboardItems = (role) => {
 
     const salesItems = [
         {
-            id: 'default',
-            title: 'Dashboard',
-            type: 'item',
-            url: '/dashboard/default',
-            icon: icons.IconDashboard,
-            breadcrumbs: false
-        },
-        {
             id: 'products',
             title: 'Products',
             type: 'item',

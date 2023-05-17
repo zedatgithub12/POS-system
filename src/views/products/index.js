@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 // material-ui
 import {
     Grid,
@@ -37,17 +37,21 @@ import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Connections from 'api';
+import { AuthContext } from 'context/context';
+
 // ==============================|| PRODUCT PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 const Products = () => {
+    const { getUser } = useContext(AuthContext);
+
     const [searchText, setSearchText] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('All');
-    const [brandFilter, setBrandFilter] = useState('All');
-    const [shopFilter, setShopFilter] = useState('All');
-    const [statusFilter, setStatusFilter] = useState('All');
+    const [categoryFilter, setCategoryFilter] = useState('Category');
+    const [brandFilter, setBrandFilter] = useState('Brand');
+    const [shopFilter, setShopFilter] = useState('Shop');
+    const [statusFilter, setStatusFilter] = useState('Status');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
     const [productData, setProductData] = useState([]);
@@ -89,19 +93,19 @@ const Products = () => {
             isMatch = isMatch && (searchRegex.test(product.name) || searchRegex.test(product.code));
         }
 
-        if (categoryFilter !== 'All') {
+        if (categoryFilter !== 'Category') {
             isMatch = isMatch && product.category === categoryFilter;
         }
 
-        if (brandFilter !== 'All') {
+        if (brandFilter !== 'Brand') {
             isMatch = isMatch && product.brand === brandFilter;
         }
 
-        if (shopFilter !== 'All') {
+        if (shopFilter !== 'Shop') {
             isMatch = isMatch && product.shop.includes(shopFilter);
         }
 
-        if (statusFilter !== 'All') {
+        if (statusFilter !== 'Status') {
             isMatch = isMatch && product.status === statusFilter;
         }
 
@@ -109,34 +113,68 @@ const Products = () => {
     });
 
     useEffect(() => {
-        const getProducts = () => {
-            var Api = Connections.api + Connections.viewproduct;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            // Make the API call using fetch()
-            fetch(Api, {
-                method: 'GET',
-                headers: headers
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setProductData(response.data);
-                    } else {
-                        setProductData(productData);
-                    }
+        if (getUser.role === 'Admin') {
+            const getProducts = () => {
+                var Api = Connections.api + Connections.viewproduct;
+                var headers = {
+                    accept: 'application/json',
+                    'Content-Type': 'application/json'
+                };
+                // Make the API call using fetch()
+                fetch(Api, {
+                    method: 'GET',
+                    headers: headers
                 })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: 'There is error fetching product!'
+                    .then((response) => response.json())
+                    .then((response) => {
+                        if (response.success) {
+                            setProductData(response.data);
+                        } else {
+                            setProductData(productData);
+                        }
+                    })
+                    .catch(() => {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: 'There is error fetching product!'
+                        });
                     });
-                });
-        };
+            };
+            return getProducts();
+        } else {
+            const getProducts = () => {
+                var Api = Connections.api + Connections.viewproduct;
+                var headers = {
+                    accept: 'application/json',
+                    'Content-Type': 'application/json'
+                };
+                // Make the API call using fetch()
+                fetch(Api, {
+                    method: 'GET',
+                    headers: headers
+                })
+                    .then((response) => response.json())
+                    .then((response) => {
+                        if (response.success) {
+                            setProductData(response.data);
+                        } else {
+                            setProductData(productData);
+                        }
+                    })
+                    .catch(() => {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: 'There is error fetching product!'
+                        });
+                    });
+            };
+            return getProducts();
+        }
+
         getProducts();
         return () => {};
     }, []);
@@ -173,7 +211,7 @@ const Products = () => {
                             color="primary"
                             value={searchText}
                             onChange={handleSearchTextChange}
-                            className="mb-4"
+                            className="mb-2 mt-2"
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
@@ -185,10 +223,9 @@ const Products = () => {
                             }}
                         />
 
-                        <FormControl className="ms-2">
-                            <InputLabel>Category</InputLabel>
+                        <FormControl className="ms-2 mt-2 ">
                             <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
-                                <MenuItem value="All">All</MenuItem>
+                                <MenuItem value="Category">Category</MenuItem>
                                 {Array.from(new Set(productData.map((product) => product.category))).map((category) => (
                                     <MenuItem key={category} value={category}>
                                         {category}
@@ -197,10 +234,9 @@ const Products = () => {
                             </Select>
                         </FormControl>
 
-                        <FormControl className="ms-2">
-                            <InputLabel>Brand</InputLabel>
+                        <FormControl className="ms-2 mt-2 ">
                             <Select value={brandFilter} onChange={handleBrandFilterChange}>
-                                <MenuItem value="All">All</MenuItem>
+                                <MenuItem value="Brand">Brand</MenuItem>
                                 {Array.from(new Set(productData.map((product) => product.brand))).map((brand) => (
                                     <MenuItem key={brand} value={brand}>
                                         {brand}
@@ -209,10 +245,9 @@ const Products = () => {
                             </Select>
                         </FormControl>
 
-                        <FormControl className="ms-2">
-                            <InputLabel>Shop</InputLabel>
+                        <FormControl className="ms-2 my-2 ">
                             <Select value={shopFilter} onChange={handleShopFilterChange}>
-                                <MenuItem value="All">All</MenuItem>
+                                <MenuItem value="Shop">Shop</MenuItem>
                                 {Array.from(new Set(productData.map((product) => product.shop))).map((shop) => (
                                     <MenuItem key={shop} value={shop}>
                                         {shop}
@@ -221,10 +256,9 @@ const Products = () => {
                             </Select>
                         </FormControl>
 
-                        <FormControl className="ms-2">
-                            <InputLabel>Status</InputLabel>
+                        <FormControl className="ms-2 my-2 ">
                             <Select value={statusFilter} onChange={handleStatusFilterChange}>
-                                <MenuItem value="All">All</MenuItem>
+                                <MenuItem value="Status">Status</MenuItem>
                                 {Array.from(new Set(productData.map((product) => product.status))).map((status) => (
                                     <MenuItem key={status} value={status}>
                                         {status}
@@ -328,7 +362,7 @@ const ProductRow = ({ product }) => {
                         severity: 'success',
                         message: response.message
                     });
-                    setProductData(productData);
+
                     setSpinner(false);
                     handleDialogClose();
                 } else {
@@ -354,7 +388,7 @@ const ProductRow = ({ product }) => {
 
     useEffect(() => {
         return () => {};
-    }, [spinner]);
+    }, [spinner, popup]);
     return (
         <>
             <TableRow

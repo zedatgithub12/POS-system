@@ -54,6 +54,8 @@ const App = () => {
                         role: users.role
                     });
                     setLogin(true);
+                    // console.log(users);
+                    // window.location.reload(false);
                 } else {
                     setLogin(false);
                 }

@@ -48,9 +48,9 @@ const Sales = () => {
     const [selectedRows, setSelectedRows] = useState([]);
     const [selectedItem, setSelectedItems] = useState();
     const [page, setPage] = useState(0);
-    const [filterDate, setFilterDate] = useState('All');
-    const [filterShop, setFilterShop] = useState('All');
-    const [filterPaymentMethod, setFilterPaymentMethod] = useState('All');
+    const [filterDate, setFilterDate] = useState('Date');
+    const [filterShop, setFilterShop] = useState('Shop');
+    const [filterPaymentMethod, setFilterPaymentMethod] = useState('Payment_M');
     const [searchText, setSearchText] = useState('');
     const [rowsPerPage, setRowsPerPage] = useState(15);
     const [spinner, setSpinner] = useState(false);
@@ -145,14 +145,14 @@ const Sales = () => {
             const searchRegex = new RegExp(searchText, 'i');
             isMatch = isMatch && (searchRegex.test(sale.reference) || searchRegex.test(sale.shop));
         }
-        if (filterDate !== 'All') {
+        if (filterDate !== 'Date') {
             isMatch = isMatch && sale.date === filterDate;
         }
 
-        if (filterShop !== 'All') {
+        if (filterShop !== 'Shop') {
             isMatch = isMatch && sale.shop === filterShop;
         }
-        if (filterPaymentMethod !== 'All') {
+        if (filterPaymentMethod !== 'Payment_M') {
             isMatch = isMatch && sale.payment_method === filterPaymentMethod;
         }
         return isMatch;
@@ -281,7 +281,7 @@ const Sales = () => {
                             color="primary"
                             value={searchText}
                             onChange={handleSearchTextChange}
-                            className="mb-4  "
+                            className="mb-2 mt-1  "
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
@@ -292,10 +292,9 @@ const Sales = () => {
                                 )
                             }}
                         />
-                        <FormControl className="ms-2">
-                            <InputLabel>Date</InputLabel>
+                        <FormControl className="ms-2 my-1">
                             <Select value={filterDate} onChange={handleFilterDateChange}>
-                                <MenuItem value="All">All</MenuItem>
+                                <MenuItem value="Date">Date</MenuItem>
                                 {Array.from(new Set(salesData.map((sale) => sale.date))).map((date) => (
                                     <MenuItem key={date} value={date}>
                                         {date}
@@ -303,10 +302,9 @@ const Sales = () => {
                                 ))}
                             </Select>
                         </FormControl>
-                        <FormControl className="ms-2">
-                            <InputLabel>Shop</InputLabel>
+                        <FormControl className="ms-2 my-1">
                             <Select value={filterShop} onChange={handleFilterShopChange}>
-                                <MenuItem value="All">All</MenuItem>
+                                <MenuItem value="Shop">Shop</MenuItem>
                                 {Array.from(new Set(salesData.map((sale) => sale.shop))).map((shop) => (
                                     <MenuItem key={shop} value={shop}>
                                         {shop}
@@ -314,10 +312,9 @@ const Sales = () => {
                                 ))}
                             </Select>
                         </FormControl>
-                        <FormControl className="ms-2">
-                            <InputLabel>Payment Method</InputLabel>
+                        <FormControl className="ms-2 my-1">
                             <Select value={filterPaymentMethod} onChange={handleFilterPaymentMethodChange}>
-                                <MenuItem value="All">All</MenuItem>
+                                <MenuItem value="Payment_M">Payment_M</MenuItem>
                                 {Array.from(new Set(salesData.map((sale) => sale.payment_method))).map((paymentMethod) => (
                                     <MenuItem key={paymentMethod} value={paymentMethod}>
                                         {paymentMethod}

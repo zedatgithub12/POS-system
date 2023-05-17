@@ -179,7 +179,6 @@ const FirebaseLogin = ({ ...others }) => {
                             }
                         })
                         .catch((err) => {
-                            console.log(err);
                             setStatus({ success: false });
                             setErrors({ submit: err.message });
                             setSubmitting(false);

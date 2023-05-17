@@ -47,7 +47,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const Customers = () => {
     const [CustomersData, setCustomersData] = useState([]);
     const [searchText, setSearchText] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('All');
+    const [categoryFilter, setCategoryFilter] = useState('Category');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
     const [popup, setPopup] = useState({
@@ -90,7 +90,7 @@ const Customers = () => {
             isMatch = isMatch && (searchRegex.test(customers.name) || searchRegex.test(customers.name));
         }
 
-        if (categoryFilter !== 'All') {
+        if (categoryFilter !== 'Category') {
             isMatch = isMatch && customers.shop === categoryFilter;
         }
 
@@ -176,9 +176,8 @@ const Customers = () => {
                         />
 
                         <FormControl className="ms-2">
-                            <InputLabel>Shops</InputLabel>
                             <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
-                                <MenuItem value="All">All</MenuItem>
+                                <MenuItem value="Category">Category</MenuItem>
                                 {Array.from(new Set(CustomersData.map((sale) => sale.shop))).map((shop) => (
                                     <MenuItem key={shop} value={shop}>
                                         {shop}
