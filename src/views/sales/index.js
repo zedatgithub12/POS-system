@@ -249,7 +249,7 @@ const Sales = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error fetching product!'
+                        message: 'There is error fetching Sales!'
                     });
                 });
         };
@@ -308,16 +308,18 @@ const Sales = () => {
                                 ))}
                             </Select>
                         </FormControl>
-                        <FormControl className="ms-2 my-1">
-                            <Select value={filterShop} onChange={handleFilterShopChange}>
-                                <MenuItem value="Shop">Shop</MenuItem>
-                                {Array.from(new Set(salesData.map((sale) => sale.shop))).map((shop) => (
-                                    <MenuItem key={shop} value={shop}>
-                                        {shop}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                        {users.role === 'Admin' && (
+                            <FormControl className="ms-2 my-1">
+                                <Select value={filterShop} onChange={handleFilterShopChange}>
+                                    <MenuItem value="Shop">Shop</MenuItem>
+                                    {Array.from(new Set(salesData.map((sale) => sale.shop))).map((shop) => (
+                                        <MenuItem key={shop} value={shop}>
+                                            {shop}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        )}
                         <FormControl className="ms-2 my-1">
                             <Select value={filterPaymentMethod} onChange={handleFilterPaymentMethodChange}>
                                 <MenuItem value="Payment_M">Payment_M</MenuItem>
@@ -384,7 +386,9 @@ const Sales = () => {
                                                     <MenuItem onClick={() => navigate('/update-sale', { state: { ...selectedItem } })}>
                                                         Edit Sale
                                                     </MenuItem>
-                                                    <MenuItem onClick={() => handleTrashClick(selectedItem)}>Delete Sale</MenuItem>
+                                                    {users.role === 'Admin' && (
+                                                        <MenuItem onClick={() => handleTrashClick(selectedItem)}>Delete Sale</MenuItem>
+                                                    )}
                                                 </Menu>
                                             </TableCell>
                                         </TableRow>

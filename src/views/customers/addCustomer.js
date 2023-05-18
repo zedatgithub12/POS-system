@@ -23,6 +23,9 @@ const AddCustomer = () => {
     const GoBack = () => {
         navigate(-1);
     };
+
+    const userString = sessionStorage.getItem('user');
+    const user = JSON.parse(userString);
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -41,7 +44,7 @@ const AddCustomer = () => {
     const [shop, setShops] = useState([]);
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
-    const [shopName, setShopName] = useState('');
+    const [shopName, setShopName] = useState(user.role === 'Admin' ? '' : user.store_name);
     const [nameError] = useState(false);
     const [emailError] = useState(false);
     const [roleError] = useState(false);
@@ -182,24 +185,27 @@ const AddCustomer = () => {
                                     helperText={emailError ? 'Please enter a valid phne' : ''}
                                 />
 
-                                <TextField
-                                    required
-                                    fullWidth
-                                    select
-                                    label="Shop"
-                                    className="mt-3"
-                                    value={shopName}
-                                    onChange={(event) => setShopName(event.target.value)}
-                                    error={roleError}
-                                    helperText={roleError ? 'Please select a role' : ''}
-                                >
-                                    {shop.map((option) => (
-                                        <MenuItem key={option.id} value={option.name}>
-                                            {option.name}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-
+                                {user.role === 'Admin' ? (
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        select
+                                        label="Shop"
+                                        className="mt-3"
+                                        value={shopName}
+                                        onChange={(event) => setShopName(event.target.value)}
+                                        error={roleError}
+                                        helperText={roleError ? 'Please select a role' : ''}
+                                    >
+                                        {shop.map((option) => (
+                                            <MenuItem key={option.id} value={option.name}>
+                                                {option.name}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                ) : (
+                                    <TextField disabled label="Shop" variant="outlined" value={user.store_name} className="mt-3" />
+                                )}
                                 <Button variant="contained" className="mt-3 w-100" color="primary" type="submit">
                                     {spinner ? (
                                         <div className="spinner-border spinner-border-sm text-dark " role="status">

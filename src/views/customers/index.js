@@ -45,9 +45,13 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const Customers = () => {
+    //fetch user info from session storage
+    const userString = sessionStorage.getItem('user');
+    const user = JSON.parse(userString);
+
     const [CustomersData, setCustomersData] = useState([]);
     const [searchText, setSearchText] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('Category');
+    const [shopFilter, setShopFilter] = useState('Shop');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
     const [popup, setPopup] = useState({
@@ -69,8 +73,8 @@ const Customers = () => {
         setSearchText(event.target.value);
     };
 
-    const handleCategoryFilterChange = (event) => {
-        setCategoryFilter(event.target.value);
+    const handleShopFilterChange = (event) => {
+        setShopFilter(event.target.value);
     };
 
     const handleChangePage = (event, newPage) => {
@@ -90,8 +94,8 @@ const Customers = () => {
             isMatch = isMatch && (searchRegex.test(customers.name) || searchRegex.test(customers.name));
         }
 
-        if (categoryFilter !== 'Category') {
-            isMatch = isMatch && customers.shop === categoryFilter;
+        if (shopFilter !== 'Shop') {
+            isMatch = isMatch && customers.shop === shopFilter;
         }
 
         return isMatch;
@@ -102,7 +106,10 @@ const Customers = () => {
 
     useEffect(() => {
         const getCustomers = () => {
-            var Api = Connections.api + Connections.viewcustomer;
+            var AdminApi = Connections.api + Connections.viewcustomer;
+            var SalesApi = Connections.api + Connections.viewstorecustomer + user.store_name;
+            var Api = user.role === 'Admin' ? AdminApi : SalesApi;
+
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -175,16 +182,18 @@ const Customers = () => {
                             }}
                         />
 
-                        <FormControl className="ms-2">
-                            <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
-                                <MenuItem value="Category">Category</MenuItem>
-                                {Array.from(new Set(CustomersData.map((sale) => sale.shop))).map((shop) => (
-                                    <MenuItem key={shop} value={shop}>
-                                        {shop}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                        {user.role === 'Admin' && (
+                            <FormControl className="ms-2">
+                                <Select value={shopFilter} onChange={handleShopFilterChange}>
+                                    <MenuItem value="Shop">Shop</MenuItem>
+                                    {Array.from(new Set(CustomersData.map((sale) => sale.shop))).map((shop) => (
+                                        <MenuItem key={shop} value={shop}>
+                                            {shop}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        )}
 
                         <TableContainer component={Paper} className="shadow-sm">
                             <Table aria-label="product table">

@@ -358,7 +358,11 @@ const ViewShop = () => {
                         >
                             <Grid item>
                                 <img
-                                    src={Connections.images + shop.profile_image}
+                                    src={
+                                        shop.profile_image
+                                            ? Connections.images + shop.profile_image
+                                            : Connections.images + '646137991fd91.jpg'
+                                    }
                                     alt="Shop Profile Preview"
                                     style={{ width: '100%', borderRadius: 8 }}
                                 />

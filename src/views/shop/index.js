@@ -109,7 +109,11 @@ const Shops = () => {
                                     <CardMedia
                                         component="img"
                                         height="140"
-                                        image={Connections.images + shop.profile_image}
+                                        image={
+                                            shop.profile_image
+                                                ? Connections.images + shop.profile_image
+                                                : Connections.images + '646137991fd91.jpg'
+                                        }
                                         alt={shop.name}
                                     />
                                     <CardContent>

@@ -51,6 +51,7 @@ const CreateSale = () => {
     const user = JSON.parse(userString);
 
     const [shops, setShops] = useState([]);
+    const [CustomersData, setCustomersData] = useState([]);
     const [productData, setProductData] = useState([]);
     const items = useSelector((state) => state.cart.items);
     const grandTotal = useSelector((state) => state.cart.grandTotal);
@@ -58,10 +59,11 @@ const CreateSale = () => {
     const [discount, setDiscount] = useState(0);
     const [paymentStatus, setPaymentStatus] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('');
-    const [shopName, setShopsName] = useState('');
+    const [shopName, setShopsName] = useState(user.role === 'Admin' ? '' : user.store_name);
     const [customerName, setCustomerName] = useState('');
     const [note, setNote] = useState('');
     const [spinner, setSpinner] = useState(false);
+    const sname = user.role === 'Admin' ? shops : user.store_name;
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -190,8 +192,43 @@ const CreateSale = () => {
                     });
                 });
         };
+
+        const getCustomers = () => {
+            var AdminApi = Connections.api + Connections.viewcustomer;
+            var SalesApi = Connections.api + Connections.viewstorecustomer + user.store_name;
+            var Api = user.role === 'Admin' ? AdminApi : SalesApi;
+
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setCustomersData(response.data);
+                    } else {
+                        setCustomersData(CustomersData);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error creatng shop!'
+                    });
+                });
+        };
+
         const getProducts = () => {
-            var Api = Connections.api + Connections.viewproduct;
+            var AdminApi = Connections.api + Connections.viewproduct;
+            var saleApi = Connections.api + Connections.viewstoreproduct + user.store_name;
+            var Api = user.role === 'Admin' ? AdminApi : saleApi;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -218,8 +255,13 @@ const CreateSale = () => {
                     });
                 });
         };
+        getCustomers();
         getProducts();
-        getShops();
+
+        if (user.role === 'Admin') {
+            getShops();
+        }
+
         return () => {};
     }, [popup]);
     return (
@@ -248,20 +290,24 @@ const CreateSale = () => {
                 <Grid item xs={12}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
-                            <Autocomplete
-                                options={shops}
-                                getOptionLabel={(option) => option.name}
-                                onInputChange={(event, value) => {
-                                    if (value) {
-                                        setShopsName(value);
-                                    }
-                                }}
-                                renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" />}
-                            />
+                            {user.role === 'Admin' ? (
+                                <Autocomplete
+                                    options={shops}
+                                    getOptionLabel={(option) => option.name}
+                                    onInputChange={(event, value) => {
+                                        if (value) {
+                                            setShopsName(value);
+                                        }
+                                    }}
+                                    renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" />}
+                                />
+                            ) : (
+                                <TextField disabled label="Shop" variant="outlined" value={user.store_name} />
+                            )}
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <Autocomplete
-                                options={dummyNames}
+                                options={CustomersData}
                                 getOptionLabel={(option) => option.name}
                                 onInputChange={(event, value) => {
                                     setCustomerName(value);

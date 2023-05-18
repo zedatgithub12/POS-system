@@ -115,15 +115,15 @@ const Products = () => {
 
     useEffect(() => {
         const getProducts = () => {
-            var Api = Connections.api + Connections.viewproduct;
+            var AdminApi = Connections.api + Connections.viewproduct;
             var saleApi = Connections.api + Connections.viewstoreproduct + users.store_name;
-            var roles = users.role === 'Admin' ? Api : saleApi;
+            var Api = users.role === 'Admin' ? AdminApi : saleApi;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
             };
             // Make the API call using fetch()
-            fetch(roles, {
+            fetch(Api, {
                 method: 'GET',
                 headers: headers
             })
@@ -223,16 +223,18 @@ const Products = () => {
                             </Select>
                         </FormControl>
 
-                        <FormControl className="ms-2 my-2 ">
-                            <Select value={shopFilter} onChange={handleShopFilterChange}>
-                                <MenuItem value="Shop">Shop</MenuItem>
-                                {Array.from(new Set(productData.map((product) => product.shop))).map((shop) => (
-                                    <MenuItem key={shop} value={shop}>
-                                        {shop}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                        {users.role === 'Admin' && (
+                            <FormControl className="ms-2 my-2 ">
+                                <Select value={shopFilter} onChange={handleShopFilterChange}>
+                                    <MenuItem value="Shop">Shop</MenuItem>
+                                    {Array.from(new Set(productData.map((product) => product.shop))).map((shop) => (
+                                        <MenuItem key={shop} value={shop}>
+                                            {shop}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        )}
 
                         <FormControl className="ms-2 my-2 ">
                             <Select value={statusFilter} onChange={handleStatusFilterChange}>

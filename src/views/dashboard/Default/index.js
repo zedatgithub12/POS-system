@@ -16,6 +16,9 @@ import Connections from 'api';
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
 const Dashboard = () => {
+    const userString = sessionStorage.getItem('user');
+    const user = JSON.parse(userString);
+
     const [isLoading, setLoading] = useState(true);
     const [stat, setStat] = useState([]);
     const [month] = useState('');
@@ -23,7 +26,11 @@ const Dashboard = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const response = await fetch(Connections.api + Connections.adminstat + `?month=${month}&year=${year}`);
+            var AdminApi = Connections.api + Connections.adminstat + `?month=${month}&year=${year}`;
+            var SalesApi = Connections.api + Connections.shopstat + `?shop=${user.store_name}&month=${month}&year=${year}`;
+            var Api = user.role === 'Admin' ? AdminApi : SalesApi;
+
+            const response = await fetch(Api);
             const data = await response.json();
             if (data.success) {
                 setStat(data.data);

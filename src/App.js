@@ -61,8 +61,7 @@ const App = () => {
                     });
 
                     setLogin(true);
-                    // console.log(users);
-                    // window.location.reload(false);
+                    window.location.reload(false); //refresh the page when user login
                 } else {
                     setLogin(false);
                 }
