@@ -1,8 +1,7 @@
 const Connections = {
-    // url: 'http://localhost:3000',
     api: 'http://localhost:8000/api',
-    // api: 'https://addischircharo.com/backend/api',
     images: 'http://localhost:8000/api/images/',
+    // api: 'https://addischircharo.com/backend/api',
     // images: 'https://addischircharo.com/backend/api/images/',
     login: '/login',
 
@@ -47,7 +46,11 @@ const Connections = {
     adduser: '/adduser',
     viewuser: '/viewuser',
     updateuser: '/updateuser/',
-    deleteuser: '/deleteuser/'
+    deleteuser: '/deleteuser/',
+
+    //price updates
+    priceupdates: '/priceupdates/',
+    updateprice: '/updateprice'
 };
 
 export default Connections;

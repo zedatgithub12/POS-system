@@ -385,7 +385,7 @@ const CreateSale = () => {
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell>Grand Total</TableCell>
-                                                <TableCell className="fw-semibold fs-4">{parseInt(grandTotal).toFixed(2)} ETB</TableCell>
+                                                <TableCell className="fw-semibold fs-4">{parseFloat(grandTotal).toFixed(2)} ETB</TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 // material-ui
 import {
     Grid,
@@ -25,8 +25,11 @@ import {
     Collapse,
     FormControl,
     Select,
-    InputLabel
+    List,
+    ListItem,
+    ListItemText
 } from '@mui/material';
+import { IconCheck, IconChevronsDown, IconChevronsUp } from '@tabler/icons';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
@@ -37,7 +40,6 @@ import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Connections from 'api';
-import { AuthContext } from 'context/context';
 
 // ==============================|| PRODUCT PAGE ||============================== //
 
@@ -369,9 +371,113 @@ const ProductRow = ({ product }) => {
             });
     };
 
+    const [prices, setPrices] = useState([]);
+
+    const [inputValue, setInputValue] = React.useState('');
+    const [updating, setUpdating] = useState(false);
+    const handleInputChange = (event) => {
+        setInputValue(event.target.value);
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        if (inputValue === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please enter the new price'
+            });
+        } else {
+            setUpdating(true);
+            var Api = Connections.api + Connections.updateprice;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            var data = {
+                productid: product.id,
+                name: product.shop,
+                from: product.price,
+                to: inputValue
+            };
+
+            fetch(Api, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(data)
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    console.log(response.data);
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        setUpdating(false);
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setUpdating(false);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error updating price'
+                    });
+                    setUpdating(false);
+                });
+        }
+    };
+
     useEffect(() => {
+        const FetchPrices = () => {
+            var Api = Connections.api + Connections.priceupdates + product.id;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPrices(response.data);
+                    } else {
+                        setPrices(prices);
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                });
+        };
+        FetchPrices();
         return () => {};
-    }, [spinner, popup]);
+    }, [spinner, popup, open]);
     return (
         <>
             <TableRow
@@ -432,36 +538,102 @@ const ProductRow = ({ product }) => {
             <TableRow className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary' : 'border-0'}>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box margin={1}>
-                            <Typography variant="h6" gutterBottom component="div">
-                                Product details
-                            </Typography>
-                            <Table size="small" aria-label="product details">
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell>Code</TableCell>
-                                        <TableCell>{product.code}</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>Cost</TableCell>
-                                        <TableCell>{product.cost}</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>Unit</TableCell>
-                                        <TableCell>{product.unit}</TableCell>
-                                    </TableRow>
+                        <Grid container>
+                            <Grid item xs={12} md={6}>
+                                <Box margin={1}>
+                                    <Typography variant="h6" gutterBottom component="div">
+                                        Product details
+                                    </Typography>
+                                    <Table size="small" aria-label="product details">
+                                        <TableBody>
+                                            <TableRow>
+                                                <TableCell>Code</TableCell>
+                                                <TableCell>{product.code}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>Cost</TableCell>
+                                                <TableCell>{product.cost}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>Unit</TableCell>
+                                                <TableCell>{product.unit}</TableCell>
+                                            </TableRow>
 
-                                    <TableRow>
-                                        <TableCell>Shop</TableCell>
-                                        <TableCell>{product.shop}</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell className="border-0">Description</TableCell>
-                                        <TableCell className="border-0">{product.description}</TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </Box>
+                                            <TableRow>
+                                                <TableCell>Shop</TableCell>
+                                                <TableCell>{product.shop}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell className="border-0">Description</TableCell>
+                                                <TableCell className="border-0">{product.description}</TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                </Box>
+                            </Grid>
+
+                            <Grid item xs={12} md={6} className="border border-start-1 border-top-0 border-bottom-0 border-end-0">
+                                <Box margin={1}>
+                                    <Typography variant="h6" gutterBottom component="div">
+                                        Price Updates
+                                    </Typography>
+                                    {users.role === 'Admin' && (
+                                        <form onSubmit={handleSubmit}>
+                                            <TextField
+                                                label="Change to"
+                                                variant="outlined"
+                                                size="small"
+                                                value={inputValue}
+                                                className="mt-2"
+                                                onChange={handleInputChange}
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <IconButton type="submit">
+                                                            {updating ? (
+                                                                <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                                                    <span className="visually-hidden">Loading...</span>
+                                                                </div>
+                                                            ) : (
+                                                                <IconCheck />
+                                                            )}
+                                                        </IconButton>
+                                                    )
+                                                }}
+                                            />
+                                        </form>
+                                    )}
+
+                                    {prices ? (
+                                        <List>
+                                            {prices.map((item) => (
+                                                <ListItem key={item.id}>
+                                                    <ListItemText primary={item.date} />
+                                                    <ListItemText secondary={item.from} />
+                                                    <ListItemText secondary={item.to} />
+                                                    <ListItemText
+                                                        primary={
+                                                            item.to > item.from ? (
+                                                                <>
+                                                                    {item.to - item.from}
+                                                                    <IconChevronsUp size={18} className="text-success" />
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    {item.from - item.to}
+                                                                    <IconChevronsDown size={18} className="text-danger" />
+                                                                </>
+                                                            )
+                                                        }
+                                                    />
+                                                </ListItem>
+                                            ))}
+                                        </List>
+                                    ) : (
+                                        <Typography>No price update yet!</Typography>
+                                    )}
+                                </Box>
+                            </Grid>
+                        </Grid>
                     </Collapse>
                 </TableCell>
             </TableRow>
@@ -495,6 +667,7 @@ const ProductRow = ({ product }) => {
 
 ProductRow.propTypes = {
     product: PropTypes.shape({
+        id: PropTypes.number,
         picture: PropTypes.string,
         name: PropTypes.string.isRequired,
         category: PropTypes.string.isRequired,
