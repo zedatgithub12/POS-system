@@ -30,8 +30,9 @@ import { gridSpacing } from 'store/constant';
 import { useNavigate } from 'react-router-dom';
 import { Delete } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
-import { addItem, removeItem, incrementQuantity, decrementQuantity } from 'cart/cartSlice';
+import { addItem, removeItem, incrementQuantity, decrementQuantity, setGrandTotal } from 'cart/cartSlice';
 import Connections from 'api';
+import { IconReload } from '@tabler/icons';
 
 // ==============================|| CREATE SALE PAGE ||============================== //
 const dummyNames = [{ name: 'Walking Customer' }, { name: 'Jane Doe' }, { name: 'Bob Smith' }, { name: 'Mary Johnson' }];
@@ -162,6 +163,15 @@ const CreateSale = () => {
                 setSpinner(false);
             });
     };
+
+    useEffect(() => {
+        const newGrandTotal = items.reduce((total, item) => total + item.subtotal, 0);
+        if (newGrandTotal !== grandTotal) {
+            // Update the grandTotal value in the Redux store if it has changed
+            // This will trigger a re-render of the component
+            dispatch(setGrandTotal(newGrandTotal));
+        }
+    }, [items, grandTotal, dispatch]);
 
     useEffect(() => {
         const getShops = () => {
@@ -358,7 +368,7 @@ const CreateSale = () => {
                                                 </TableCell>
                                                 <TableCell>{item.unit}</TableCell>
                                                 <TableCell>{item.unitPrice}</TableCell>
-                                                <TableCell>{parseInt(item.subtotal).toFixed(2)}</TableCell>
+                                                <TableCell>{parseInt(item.subtotal)}</TableCell>
                                                 <TableCell>
                                                     <IconButton onClick={() => handleRemoveFromCart(item)}>
                                                         <Delete />
@@ -385,7 +395,7 @@ const CreateSale = () => {
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell>Grand Total</TableCell>
-                                                <TableCell className="fw-semibold fs-4">{parseFloat(grandTotal).toFixed(2)} ETB</TableCell>
+                                                <TableCell className="fw-semibold fs-4">{parseInt(grandTotal).toFixed(2)} ETB</TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>

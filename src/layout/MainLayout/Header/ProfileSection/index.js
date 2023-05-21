@@ -166,7 +166,9 @@ const ProfileSection = () => {
                                                     {user.name}
                                                 </Typography>
                                             </Stack>
-                                            <Typography variant="subtitle2">{user.role}</Typography>
+                                            <Typography variant="subtitle2">
+                                                {user.store_name ? user.store_name + ',' : ''} {user.role}
+                                            </Typography>
                                         </Stack>
                                         {/* <OutlinedInput
                                             sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}
@@ -249,7 +251,7 @@ const ProfileSection = () => {
                                                 }
                                             }}
                                         >
-                                            <ListItemButton
+                                            {/* <ListItemButton
                                                 sx={{ borderRadius: `${customization.borderRadius}px` }}
                                                 selected={selectedIndex === 0}
                                                 onClick={(event) => handleListItemClick(event, 0, '/account')}
@@ -258,7 +260,7 @@ const ProfileSection = () => {
                                                     <IconSettings stroke={1.5} size="1.3rem" />
                                                 </ListItemIcon>
                                                 <ListItemText primary={<Typography variant="body2">Account Settings</Typography>} />
-                                            </ListItemButton>
+                                            </ListItemButton> */}
                                             {/* <ListItemButton
                                                     sx={{ borderRadius: `${customization.borderRadius}px` }}
                                                     selected={selectedIndex === 1}
