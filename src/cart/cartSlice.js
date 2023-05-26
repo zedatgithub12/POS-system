@@ -1,5 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const calculateGrandTotal = (items) => {
+    return items.reduce((total, item) => total + item.subtotal, 0);
+};
+
 const cartSlice = createSlice({
     name: 'cart',
     initialState: {
@@ -11,7 +15,10 @@ const cartSlice = createSlice({
             const { product } = action.payload;
             const existingItem = state.items.find((item) => item.id === product.id);
 
-            if (!existingItem) {
+            if (existingItem) {
+                existingItem.quantity++;
+                existingItem.subtotal = existingItem.quantity * existingItem.unitPrice;
+            } else {
                 state.items.push({
                     id: product.id,
                     itemName: product.name,
@@ -22,8 +29,8 @@ const cartSlice = createSlice({
                     quantity: 1,
                     subtotal: product.price
                 });
-                state.grandTotal = state.items.reduce((total, item) => total + item.subtotal, 0);
             }
+            state.grandTotal = calculateGrandTotal(state.items);
         },
         removeItem: (state, action) => {
             const { id } = action.payload;
@@ -32,7 +39,7 @@ const cartSlice = createSlice({
             if (existingItem) {
                 state.items = state.items.filter((item) => item.id !== id);
                 // state.grandTotal = state.grandTotal -= state.items.subtotal;
-                state.grandTotal = state.items.reduce((total, item) => total + item.subtotal, 0);
+                state.grandTotal = calculateGrandTotal(state.items);
             }
         },
         incrementQuantity: (state, action) => {
@@ -40,7 +47,7 @@ const cartSlice = createSlice({
             const index = state.items.findIndex((item) => item.id === id);
             state.items[index].quantity++;
             state.items[index].subtotal = state.items[index].unitPrice * state.items[index].quantity;
-            state.grandTotal = state.items.reduce((total, item) => total + item.subtotal, 0);
+            state.grandTotal = calculateGrandTotal(state.items);
         },
 
         decrementQuantity: (state, action) => {
@@ -49,7 +56,7 @@ const cartSlice = createSlice({
             if (state.items[index].quantity > 1) {
                 state.items[index].quantity--;
                 state.items[index].subtotal = state.items[index].unitPrice * state.items[index].quantity;
-                state.grandTotal = state.items.reduce((total, item) => (total += item.subtotal), 0);
+                state.grandTotal = calculateGrandTotal(state.items);
             }
         },
         setGrandTotal: (state, action) => {

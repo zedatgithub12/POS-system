@@ -18,8 +18,11 @@ import { useMemo } from 'react';
 
 // ==============================|| APP ||============================== //
 import Loadable from 'ui-component/Loadable';
+
 const AuthLogin = Loadable(lazy(() => import('views/pages/authentication/authentication3/Login')));
 const AuthRegister = Loadable(lazy(() => import('views/pages/authentication/authentication3/Register')));
+const Forgot_Password = Loadable(lazy(() => import('views/password')));
+const Reset_Password = Loadable(lazy(() => import('views/password/reset')));
 
 const App = () => {
     const customization = useSelector((state) => state.customization);
@@ -102,7 +105,17 @@ const App = () => {
                 <ThemeProvider theme={themes(customization)}>
                     <CssBaseline />
                     <NavigationScroll>
-                        {login ? <Routes /> : location.pathname === '/pages/register/register' ? <AuthRegister /> : <AuthLogin />}
+                        {login ? (
+                            <Routes />
+                        ) : location.pathname === '/pages/register/register' ? (
+                            <AuthRegister />
+                        ) : location.pathname === '/password' ? (
+                            <Forgot_Password />
+                        ) : location.pathname === '/reset-password/:token' ? (
+                            <Reset_Password />
+                        ) : (
+                            <AuthLogin />
+                        )}
                     </NavigationScroll>
                 </ThemeProvider>
             </StyledEngineProvider>

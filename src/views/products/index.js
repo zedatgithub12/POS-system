@@ -40,7 +40,8 @@ import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Connections from 'api';
-
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 // ==============================|| PRODUCT PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -491,16 +492,20 @@ const ProductRow = ({ product }) => {
                 </TableCell>
                 <TableCell component="th" scope="row">
                     {product.picture ? (
-                        <img
+                        <LazyLoadImage
+                            alt={product}
+                            effect="blur"
+                            delayTime={500}
                             src={Connections.images + product.picture}
-                            alt="product"
                             style={{ width: 60, height: 60 }}
                             className="img-fluid rounded m-auto me-2"
                         />
                     ) : (
-                        <img
+                        <LazyLoadImage
+                            alt={product}
+                            effect="blur"
+                            delayTime={500}
                             src="http://placehold.it/120x120&text=image"
-                            alt="product"
                             style={{ width: 60, height: 60 }}
                             className="img-fluid rounded m-auto me-2"
                         />

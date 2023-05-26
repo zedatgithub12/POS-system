@@ -4,7 +4,8 @@ const Connections = {
     // api: 'https://addischircharo.com/backend/api',
     // images: 'https://addischircharo.com/backend/api/images/',
     login: '/login',
-
+    forgotpassword: '/forgotpassword',
+    resetpassword: '/resetpassword',
     //stats api
     adminstat: '/adminstat',
     shopstat: '/shopstat',
