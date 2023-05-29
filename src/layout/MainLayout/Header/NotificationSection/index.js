@@ -106,11 +106,11 @@ const NotificationSection = () => {
                             ...theme.typography.commonAvatar,
                             ...theme.typography.mediumAvatar,
                             transition: 'all .2s ease-in-out',
-                            background: theme.palette.secondary.light,
-                            color: theme.palette.secondary.dark,
+                            background: theme.palette.primary.light,
+                            color: theme.palette.primary.dark,
                             '&[aria-controls="menu-list-grow"],&:hover': {
-                                background: theme.palette.secondary.dark,
-                                color: theme.palette.secondary.light
+                                background: theme.palette.primary.dark,
+                                color: theme.palette.background.default
                             }
                         }}
                         ref={anchorRef}
@@ -157,15 +157,10 @@ const NotificationSection = () => {
                                                             label="01"
                                                             sx={{
                                                                 color: theme.palette.background.default,
-                                                                bgcolor: theme.palette.warning.dark
+                                                                bgcolor: theme.palette.error.main
                                                             }}
                                                         />
                                                     </Stack>
-                                                </Grid>
-                                                <Grid item>
-                                                    <Typography component={Link} to="#" variant="subtitle2" color="primary">
-                                                        Mark as all read
-                                                    </Typography>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -174,26 +169,6 @@ const NotificationSection = () => {
                                                 style={{ height: '100%', maxHeight: 'calc(100vh - 205px)', overflowX: 'hidden' }}
                                             >
                                                 <Grid container direction="column" spacing={2}>
-                                                    <Grid item xs={12}>
-                                                        <Box sx={{ px: 2, pt: 0.25 }}>
-                                                            <TextField
-                                                                id="outlined-select-currency-native"
-                                                                select
-                                                                fullWidth
-                                                                value={value}
-                                                                onChange={handleChange}
-                                                                SelectProps={{
-                                                                    native: true
-                                                                }}
-                                                            >
-                                                                {status.map((option) => (
-                                                                    <option key={option.value} value={option.value}>
-                                                                        {option.label}
-                                                                    </option>
-                                                                ))}
-                                                            </TextField>
-                                                        </Box>
-                                                    </Grid>
                                                     <Grid item xs={12} p={0}>
                                                         <Divider sx={{ my: 0 }} />
                                                     </Grid>

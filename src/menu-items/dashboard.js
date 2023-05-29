@@ -31,8 +31,8 @@ const getDashboardItems = (role) => {
             breadcrumbs: false
         },
         {
-            id: 'products',
-            title: 'Products',
+            id: 'stocks',
+            title: 'Stocks',
             type: 'item',
             url: '/products',
             icon: icons.IconBox,
@@ -74,8 +74,8 @@ const getDashboardItems = (role) => {
             breadcrumbs: false
         },
         {
-            id: 'products',
-            title: 'Products',
+            id: 'stocks',
+            title: 'Stocks',
             type: 'item',
             url: '/products',
             icon: icons.IconBox,

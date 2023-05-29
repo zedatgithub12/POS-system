@@ -35,7 +35,6 @@ import Connections from 'api';
 import { IconReload, IconUpload } from '@tabler/icons';
 
 // ==============================|| CREATE SALE PAGE ||============================== //
-const dummyNames = [{ name: 'Walking Customer' }, { name: 'Jane Doe' }, { name: 'Bob Smith' }, { name: 'Mary Johnson' }];
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -56,6 +55,7 @@ const CreateSale = () => {
     const [productData, setProductData] = useState([]);
     const items = useSelector((state) => state.cart.items);
     const grandTotal = useSelector((state) => state.cart.grandTotal);
+    const [totalprice, setTotalPrice] = useState(grandTotal);
     const [saleTax, setSaleTax] = useState(0);
     const [discount, setDiscount] = useState(0);
     const [paymentStatus, setPaymentStatus] = useState('');
@@ -122,7 +122,7 @@ const CreateSale = () => {
             products: items,
             tax: saleTax,
             discount: discount,
-            grandTotal: grandTotal,
+            grandTotal: totalprice,
             payment_status: paymentStatus,
             payment_method: paymentMethod,
             note: note
@@ -163,15 +163,6 @@ const CreateSale = () => {
                 setSpinner(false);
             });
     };
-
-    useEffect(() => {
-        const newGrandTotal = items.reduce((total, item) => total + item.subtotal, 0);
-        if (newGrandTotal !== grandTotal) {
-            // Update the grandTotal value in the Redux store if it has changed
-            // This will trigger a re-render of the component
-            dispatch(setGrandTotal(newGrandTotal));
-        }
-    }, [items, grandTotal, dispatch]);
 
     useEffect(() => {
         const getShops = () => {
@@ -396,8 +387,8 @@ const CreateSale = () => {
                                             <TableRow>
                                                 <TableCell>Grand Total</TableCell>
                                                 <TableCell className="fw-semibold fs-4">
-                                                    {parseFloat(grandTotal).toFixed(2)} ETB
-                                                    {/* <IconButton className="ms-3">
+                                                    {parseInt(grandTotal).toFixed(2)} ETB
+                                                    {/* <IconButton className="ms-3" onClick={() => setGrandTotal(grandTotal)}>
                                                         <IconReload />
                                                     </IconButton> */}
                                                 </TableCell>

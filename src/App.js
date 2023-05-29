@@ -2,7 +2,7 @@ import { lazy, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, StyledEngineProvider } from '@mui/material';
-import { useLocation } from 'react-router-dom';
+import { Switch, Route, Redirect, useLocation } from 'react-router-dom';
 // routing
 import Routes from 'routes';
 
@@ -18,6 +18,7 @@ import { useMemo } from 'react';
 
 // ==============================|| APP ||============================== //
 import Loadable from 'ui-component/Loadable';
+import ChangePassword from 'views/pages/authentication/ChangePassword';
 
 const AuthLogin = Loadable(lazy(() => import('views/pages/authentication/authentication3/Login')));
 const AuthRegister = Loadable(lazy(() => import('views/pages/authentication/authentication3/Register')));
@@ -113,6 +114,8 @@ const App = () => {
                             <Forgot_Password />
                         ) : location.pathname === '/reset-password/:token' ? (
                             <Reset_Password />
+                        ) : location.pathname === '/pages/change-password' ? (
+                            <ChangePassword />
                         ) : (
                             <AuthLogin />
                         )}

@@ -9,6 +9,9 @@ const AuthLogin = Loadable(lazy(() => import('views/pages/authentication/authent
 const AuthRegister = Loadable(lazy(() => import('views/pages/authentication/authentication3/Register')));
 const Forgot_Password = Loadable(lazy(() => import('views/password')));
 const Reset_Password = Loadable(lazy(() => import('views/password/reset')));
+
+// password changing page
+const ChangePassword = Loadable(lazy(() => import('views/pages/authentication/ChangePassword')));
 // ==============================|| AUTHENTICATION ROUTING ||============================== //
 
 const AuthenticationRoutes = {
@@ -30,6 +33,10 @@ const AuthenticationRoutes = {
         {
             path: '/reset-password/:token',
             element: <Reset_Password />
+        },
+        {
+            path: 'pages/change-password',
+            element: <ChangePassword />
         }
     ]
 };

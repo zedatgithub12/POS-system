@@ -18,6 +18,7 @@ const cartSlice = createSlice({
             if (existingItem) {
                 existingItem.quantity++;
                 existingItem.subtotal = existingItem.quantity * existingItem.unitPrice;
+                state.grandTotal = calculateGrandTotal(state.items);
             } else {
                 state.items.push({
                     id: product.id,
@@ -29,8 +30,8 @@ const cartSlice = createSlice({
                     quantity: 1,
                     subtotal: product.price
                 });
+                state.grandTotal = calculateGrandTotal(state.items);
             }
-            state.grandTotal = calculateGrandTotal(state.items);
         },
         removeItem: (state, action) => {
             const { id } = action.payload;

@@ -29,11 +29,10 @@ import {
     ListItem,
     ListItemText
 } from '@mui/material';
-import { IconCheck, IconChevronsDown, IconChevronsUp } from '@tabler/icons';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
-import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
+import { IconCheck, IconChevronsDown, IconChevronsUp, IconTrash, IconEdit, IconSearch, IconEye } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
@@ -161,7 +160,7 @@ const Products = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Products</Typography>
+                                    <Typography variant="h3">Stocks</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -174,7 +173,7 @@ const Products = () => {
                                     color="primary"
                                     sx={{ textDecoration: 'none' }}
                                 >
-                                    Add Product
+                                    Add Stock
                                 </Button>
                             ) : null}
                         </Grid>
@@ -520,24 +519,38 @@ const ProductRow = ({ product }) => {
 
                 <TableCell>{product.status}</TableCell>
                 <>
-                    {users.role === 'Admin' ? (
-                        <TableCell>
-                            <IconButton
-                                aria-label="Edit row"
-                                size="small"
-                                onClick={() =>
-                                    navigate('/update-product', {
-                                        state: { ...product }
-                                    })
-                                }
-                            >
-                                <IconEdit />
-                            </IconButton>
-                            <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
-                                <IconTrash />
-                            </IconButton>
-                        </TableCell>
-                    ) : null}
+                    <TableCell>
+                        <IconButton
+                            aria-label="Edit row"
+                            size="small"
+                            onClick={() =>
+                                navigate('/view-product', {
+                                    state: { ...product }
+                                })
+                            }
+                        >
+                            <IconEye />
+                        </IconButton>
+
+                        {users.role === 'Admin' ? (
+                            <>
+                                <IconButton
+                                    aria-label="Edit row"
+                                    size="small"
+                                    onClick={() =>
+                                        navigate('/update-product', {
+                                            state: { ...product }
+                                        })
+                                    }
+                                >
+                                    <IconEdit />
+                                </IconButton>
+                                <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
+                                    <IconTrash />
+                                </IconButton>
+                            </>
+                        ) : null}
+                    </TableCell>
                 </>
             </TableRow>
             <TableRow className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary' : 'border-0'}>

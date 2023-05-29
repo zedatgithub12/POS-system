@@ -6,6 +6,7 @@ const Connections = {
     login: '/login',
     forgotpassword: '/forgotpassword',
     resetpassword: '/resetpassword',
+    changepass: '/changepass/',
     //stats api
     adminstat: '/adminstat',
     shopstat: '/shopstat',
@@ -19,6 +20,7 @@ const Connections = {
     //product api's
     addproduct: '/addproduct',
     viewproduct: '/viewproduct',
+    productdetail: '/products/',
     viewstoreproduct: '/viewstoreproduct/', //an api to fetch view sales role in store product
     updateproduct: '/updateproduct/',
     deleteproduct: '/deleteproduct/',
