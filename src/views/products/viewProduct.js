@@ -9,6 +9,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import Barcode from 'react-barcode';
 
 // ==============================|| SAMPLE PAGE ||============================== //
 
@@ -147,7 +148,7 @@ const ViewProduct = () => {
                             </Grid>
 
                             <Grid item lg={5} md={6} sm={12} xs={12} hidden={isMediumScreen}>
-                                <Box marginTop={9} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Box marginTop={7} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {product.picture ? (
                                         <LazyLoadImage
                                             alt={product.name}
@@ -167,6 +168,9 @@ const ViewProduct = () => {
                                             className="img-fluid rounded m-auto me-2"
                                         />
                                     )}
+                                </Box>
+                                <Box paddingX={4} marginTop={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                    <Barcode value={product.code} />
                                 </Box>
                             </Grid>
                         </Grid>

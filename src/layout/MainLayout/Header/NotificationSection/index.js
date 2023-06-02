@@ -27,11 +27,10 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
-import NotificationList from './NotificationList';
-
 // assets
 import { IconBell } from '@tabler/icons';
-
+import StockAlert from './StockAlert';
+import Notification from 'data/notification';
 // notification status options
 const status = [
     {
@@ -151,7 +150,7 @@ const NotificationSection = () => {
                                             <Grid container alignItems="center" justifyContent="space-between" sx={{ pt: 2, px: 2 }}>
                                                 <Grid item>
                                                     <Stack direction="row" spacing={2}>
-                                                        <Typography variant="subtitle1">All Notification</Typography>
+                                                        <Typography variant="subtitle1">Notifications</Typography>
                                                         <Chip
                                                             size="small"
                                                             label="01"
@@ -173,16 +172,21 @@ const NotificationSection = () => {
                                                         <Divider sx={{ my: 0 }} />
                                                     </Grid>
                                                 </Grid>
-                                                <NotificationList />
+                                                {Notification.map((notice, index) => (
+                                                    <StockAlert
+                                                        key={index}
+                                                        type={notice.type}
+                                                        title={notice.title}
+                                                        time={notice.time}
+                                                        message={notice.message}
+                                                        status={notice.status}
+                                                        onPress={() => alert(notice.title + 'Clicked')}
+                                                    />
+                                                ))}
                                             </PerfectScrollbar>
                                         </Grid>
                                     </Grid>
                                     <Divider />
-                                    <CardActions sx={{ p: 1.25, justifyContent: 'center' }}>
-                                        <Button size="small" disableElevation>
-                                            View All
-                                        </Button>
-                                    </CardActions>
                                 </MainCard>
                             </ClickAwayListener>
                         </Paper>

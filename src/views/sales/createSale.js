@@ -30,9 +30,8 @@ import { gridSpacing } from 'store/constant';
 import { useNavigate } from 'react-router-dom';
 import { Delete } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
-import { addItem, removeItem, incrementQuantity, decrementQuantity, setGrandTotal } from 'cart/cartSlice';
+import { addItem, removeItem, incrementQuantity, decrementQuantity } from 'cart/cartSlice';
 import Connections from 'api';
-import { IconReload, IconUpload } from '@tabler/icons';
 
 // ==============================|| CREATE SALE PAGE ||============================== //
 
@@ -55,7 +54,6 @@ const CreateSale = () => {
     const [productData, setProductData] = useState([]);
     const items = useSelector((state) => state.cart.items);
     const grandTotal = useSelector((state) => state.cart.grandTotal);
-    const [totalprice, setTotalPrice] = useState(grandTotal);
     const [saleTax, setSaleTax] = useState(0);
     const [discount, setDiscount] = useState(0);
     const [paymentStatus, setPaymentStatus] = useState('');
@@ -122,7 +120,7 @@ const CreateSale = () => {
             products: items,
             tax: saleTax,
             discount: discount,
-            grandTotal: totalprice,
+            grandTotal: grandTotal,
             payment_status: paymentStatus,
             payment_method: paymentMethod,
             note: note
