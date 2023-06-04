@@ -18,9 +18,11 @@
         "bootstrap": "^5.2.3",
         "formik": "^2.2.9",
         "framer-motion": "^10.12.4",
+        "laravel-echo": "^1.15.1",
         "lodash": "^4.17.21",
         "material-ui-popup-state": "^4.0.1",
         "prop-types": "^15.8.1",
+        "pusher-js": "^8.0.2",
         "react": "^18.2.0",
         "react-apexcharts": "^1.4.0",
         "react-barcode": "^1.4.6",
@@ -34,6 +36,8 @@
         "react-router-dom": "6.3.0",
         "react-scripts": "^5.0.1",
         "redux": "^4.2.0",
+        "socket.io": "^4.6.2",
+        "socket.io-client": "^4.6.2",
         "yup": "^0.32.11"
     },
     "scripts": {

@@ -56,11 +56,11 @@ const StockAlert = ({ type, title, date, message, status, onPress }) => {
         <List
             sx={{
                 width: '100%',
-                maxWidth: 330,
+                maxWidth: 400,
                 py: 0,
                 background: status === 'seen' ? theme.palette.background.default : theme.palette.primary.light,
                 [theme.breakpoints.down('md')]: {
-                    maxWidth: 300
+                    maxWidth: 400
                 },
                 '& .MuiListItemSecondaryAction-root': {
                     top: 22

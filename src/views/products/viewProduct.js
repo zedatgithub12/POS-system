@@ -29,9 +29,26 @@ const ViewProduct = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        var statusChecked = true;
+        var status = state.status ? state.status : '';
+        if (statusChecked && status === 'unseen') {
+            var Api = Connections.api + Connections.updateStatus + state.id;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'PUT',
+                headers: headers
+            });
+            statusChecked = false;
+        }
+        //fetch product informationa when component get mounted
         const FetchProductInfo = () => {
             setIsLoading(true);
-            var Api = Connections.api + Connections.productdetail + state.id;
+            var id = state.itemid ? state.itemid : state.id;
+            var Api = Connections.api + Connections.productdetail + id;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -59,7 +76,7 @@ const ViewProduct = () => {
         FetchProductInfo();
 
         return () => {};
-    }, []);
+    }, [state]);
     return (
         <>
             <MainCard>

@@ -1,36 +1,30 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {
     Avatar,
     Box,
     Badge,
-    Button,
     ButtonBase,
-    CardActions,
-    Chip,
     ClickAwayListener,
     Divider,
     Grid,
     Paper,
     Popper,
     Stack,
-    TextField,
     Typography,
     useMediaQuery
 } from '@mui/material';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
-
+import io from 'socket.io-client';
+import { useNavigate } from 'react-router-dom';
+import { IconBell, IconBellRinging } from '@tabler/icons';
+import StockAlert from './StockAlert';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
-// assets
-import { IconBell } from '@tabler/icons';
-import StockAlert from './StockAlert';
 import Connections from 'api';
 
 // notification status options
@@ -39,11 +33,11 @@ import Connections from 'api';
 
 const NotificationSection = () => {
     const theme = useTheme();
+    const navigate = useNavigate();
     const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
     const [open, setOpen] = useState(false);
-    const [value, setValue] = useState('');
     const [notifications, setNotifications] = useState([]);
 
     /**
@@ -96,33 +90,33 @@ const NotificationSection = () => {
             })
             .catch((error) => {
                 console.log(error);
-                // setPopup({
-                //     ...popup,
-                //     status: true,
-                //     severity: 'error',
-                //     message: 'There is error fetching product!'
-                // });
             });
     };
 
-    const handleOpenNotification = (id) => {
-        var Api = Connections.api + Connections.updateStatus + id;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'PUT',
-            headers: headers
-        }).catch((error) => {
-            console.log(error);
-        });
+    const handleOpenNotification = (notificationInfo) => {
+        navigate('/view-product', { state: { ...notificationInfo } });
+        setOpen(false);
     };
 
     useEffect(() => {
-        getNotification();
-        return () => {};
+        var AdminApi = Connections.api + Connections.adminnotification;
+        var saleApi = Connections.api + Connections.salesnotification + users.store_id;
+        var Api = users.role === 'Admin' ? AdminApi : saleApi;
+
+        const eventSource = new EventSource(Api);
+
+        eventSource.addEventListener('message', (event) => {
+            const data = JSON.parse(event.data);
+            setNotifications((notifications) => [...notifications, data]); // append new post to the existing array
+        });
+
+        const intervalId = setInterval(() => {
+            getNotification();
+        }, 10000);
+        return () => {
+            eventSource.close();
+            clearInterval(intervalId);
+        };
     }, []);
     return (
         <>
@@ -214,17 +208,35 @@ const NotificationSection = () => {
                                                         <Divider sx={{ my: 0 }} />
                                                     </Grid>
                                                 </Grid>
-                                                {notifications.map((notice, index) => (
-                                                    <StockAlert
-                                                        key={index}
-                                                        type={notice.type}
-                                                        title={notice.title}
-                                                        date={notice.created_at}
-                                                        message={notice.message}
-                                                        status={notice.status}
-                                                        onPress={() => handleOpenNotification(notice.id)}
-                                                    />
-                                                ))}
+                                                {notifications.length > 0 ? (
+                                                    notifications.map((notice, index) => (
+                                                        <StockAlert
+                                                            key={index}
+                                                            type={notice.type}
+                                                            title={notice.title}
+                                                            date={notice.created_at}
+                                                            message={notice.message}
+                                                            status={notice.status}
+                                                            onPress={() => handleOpenNotification(notice)}
+                                                        />
+                                                    ))
+                                                ) : (
+                                                    <Box
+                                                        padding={6}
+                                                        sx={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            flexDirection: 'column',
+                                                            color: theme.palette.grey[500]
+                                                        }}
+                                                    >
+                                                        <IconBellRinging size={30} />
+                                                        <Typography variant="body2" sx={{ marginTop: 2 }}>
+                                                            No Notification!
+                                                        </Typography>
+                                                    </Box>
+                                                )}
                                             </PerfectScrollbar>
                                         </Grid>
                                     </Grid>
