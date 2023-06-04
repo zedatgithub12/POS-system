@@ -6,6 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import {
     Avatar,
     Box,
+    Badge,
     Button,
     ButtonBase,
     CardActions,
@@ -30,35 +31,21 @@ import Transitions from 'ui-component/extended/Transitions';
 // assets
 import { IconBell } from '@tabler/icons';
 import StockAlert from './StockAlert';
-import Notification from 'data/notification';
+import Connections from 'api';
+
 // notification status options
-const status = [
-    {
-        value: 'all',
-        label: 'All Notification'
-    },
-    {
-        value: 'new',
-        label: 'New'
-    },
-    {
-        value: 'unread',
-        label: 'Unread'
-    },
-    {
-        value: 'other',
-        label: 'Other'
-    }
-];
 
 // ==============================|| NOTIFICATION ||============================== //
 
 const NotificationSection = () => {
     const theme = useTheme();
     const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
-
+    const userString = sessionStorage.getItem('user');
+    const users = JSON.parse(userString);
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState('');
+    const [notifications, setNotifications] = useState([]);
+
     /**
      * anchorRef is used on different componets and specifying one type leads to other components throwing an error
      * */
@@ -75,6 +62,9 @@ const NotificationSection = () => {
         setOpen(false);
     };
 
+    //unseen comment filtering
+    const unseenCount = notifications.filter((item) => item.status === 'unseen');
+
     const prevOpen = useRef(open);
     useEffect(() => {
         if (prevOpen.current === true && open === false) {
@@ -83,10 +73,57 @@ const NotificationSection = () => {
         prevOpen.current = open;
     }, [open]);
 
-    const handleChange = (event) => {
-        if (event?.target.value) setValue(event?.target.value);
+    const getNotification = () => {
+        var AdminApi = Connections.api + Connections.adminnotification;
+        var saleApi = Connections.api + Connections.salesnotification + users.store_id;
+        var Api = users.role === 'Admin' ? AdminApi : saleApi;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'GET',
+            headers: headers
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setNotifications(response.data);
+                } else {
+                    setNotifications(notifications);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                // setPopup({
+                //     ...popup,
+                //     status: true,
+                //     severity: 'error',
+                //     message: 'There is error fetching product!'
+                // });
+            });
     };
 
+    const handleOpenNotification = (id) => {
+        var Api = Connections.api + Connections.updateStatus + id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'PUT',
+            headers: headers
+        }).catch((error) => {
+            console.log(error);
+        });
+    };
+
+    useEffect(() => {
+        getNotification();
+        return () => {};
+    }, []);
     return (
         <>
             <Box
@@ -99,16 +136,29 @@ const NotificationSection = () => {
                 }}
             >
                 <ButtonBase sx={{ borderRadius: '12px' }}>
+                    {unseenCount.length > 0 && (
+                        <Badge
+                            badgeContent={unseenCount.length}
+                            color="error"
+                            sx={{
+                                position: 'absolute',
+                                top: 2,
+                                right: 2,
+                                zIndex: 1
+                            }}
+                        />
+                    )}
+
                     <Avatar
                         variant="rounded"
                         sx={{
                             ...theme.typography.commonAvatar,
                             ...theme.typography.mediumAvatar,
                             transition: 'all .2s ease-in-out',
-                            background: theme.palette.primary.light,
-                            color: theme.palette.primary.dark,
+                            background: theme.palette.warning.light,
+                            color: theme.palette.warning.dark,
                             '&[aria-controls="menu-list-grow"],&:hover': {
-                                background: theme.palette.primary.dark,
+                                background: theme.palette.warning.dark,
                                 color: theme.palette.background.default
                             }
                         }}
@@ -151,14 +201,6 @@ const NotificationSection = () => {
                                                 <Grid item>
                                                     <Stack direction="row" spacing={2}>
                                                         <Typography variant="subtitle1">Notifications</Typography>
-                                                        <Chip
-                                                            size="small"
-                                                            label="01"
-                                                            sx={{
-                                                                color: theme.palette.background.default,
-                                                                bgcolor: theme.palette.error.main
-                                                            }}
-                                                        />
                                                     </Stack>
                                                 </Grid>
                                             </Grid>
@@ -172,15 +214,15 @@ const NotificationSection = () => {
                                                         <Divider sx={{ my: 0 }} />
                                                     </Grid>
                                                 </Grid>
-                                                {Notification.map((notice, index) => (
+                                                {notifications.map((notice, index) => (
                                                     <StockAlert
                                                         key={index}
                                                         type={notice.type}
                                                         title={notice.title}
-                                                        time={notice.time}
+                                                        date={notice.created_at}
                                                         message={notice.message}
                                                         status={notice.status}
-                                                        onPress={() => alert(notice.title + 'Clicked')}
+                                                        onPress={() => handleOpenNotification(notice.id)}
                                                     />
                                                 ))}
                                             </PerfectScrollbar>

@@ -53,7 +53,12 @@ const Connections = {
 
     //price updates
     priceupdates: '/priceupdates/',
-    updateprice: '/updateprice'
+    updateprice: '/updateprice',
+
+    //Notifaction Api's
+    adminnotification: '/adminnotification',
+    salesnotification: '/salesnotification/',
+    updateStatus: '/updatestatus/'
 };
 
 export default Connections;

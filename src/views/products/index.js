@@ -410,7 +410,6 @@ const ProductRow = ({ product }) => {
             })
                 .then((response) => response.json())
                 .then((response) => {
-                    console.log(response.data);
                     if (response.success) {
                         setPopup({
                             ...popup,
