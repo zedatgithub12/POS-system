@@ -35,11 +35,10 @@ const NotificationSection = () => {
     const theme = useTheme();
     const navigate = useNavigate();
     const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
-    const userString = sessionStorage.getItem('user');
-    const users = JSON.parse(userString);
     const [open, setOpen] = useState(false);
     const [notifications, setNotifications] = useState([]);
-
+    const userString = sessionStorage.getItem('user');
+    const users = JSON.parse(userString);
     /**
      * anchorRef is used on different componets and specifying one type leads to other components throwing an error
      * */
@@ -57,7 +56,10 @@ const NotificationSection = () => {
     };
 
     //unseen comment filtering
-    const unseenCount = notifications.filter((item) => item.status === 'unseen');
+    const unseenCount =
+        users.role === 'Admin'
+            ? notifications.filter((item) => item.status === 'unseen')
+            : notifications.filter((item) => item.salesstatus === 'unseen');
 
     const prevOpen = useRef(open);
     useEffect(() => {
@@ -217,6 +219,7 @@ const NotificationSection = () => {
                                                             date={notice.created_at}
                                                             message={notice.message}
                                                             status={notice.status}
+                                                            salesstatus={notice.salesstatus}
                                                             onPress={() => handleOpenNotification(notice)}
                                                         />
                                                     ))

@@ -19,9 +19,12 @@ const ListItemWrapper = styled('div')(({ theme }) => ({
 
 // ==============================|| NOTIFICATION LIST ITEM ||============================== //
 
-const StockAlert = ({ type, title, date, message, status, onPress }) => {
+const StockAlert = ({ type, title, date, message, status, onPress, salesstatus }) => {
     const theme = useTheme();
+    const userString = sessionStorage.getItem('user');
+    const users = JSON.parse(userString);
 
+    var noticestatus = users.role === 'Admin' ? status : salesstatus;
     // const getTimeSinceReceived = (time) => {
     //     const [hours, minutes, seconds] = time.split(':');
     //     const receivedAt = new Date();
@@ -58,7 +61,7 @@ const StockAlert = ({ type, title, date, message, status, onPress }) => {
                 width: '100%',
                 maxWidth: 400,
                 py: 0,
-                background: status === 'seen' ? theme.palette.background.default : theme.palette.primary.light,
+                background: noticestatus === 'seen' ? theme.palette.background.default : theme.palette.primary.light,
                 [theme.breakpoints.down('md')]: {
                     maxWidth: 400
                 },

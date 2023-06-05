@@ -27,12 +27,19 @@ const ViewProduct = () => {
     const [product, setProduct] = useState({});
     const [availablity, setAvailablity] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const userString = sessionStorage.getItem('user');
+    const users = JSON.parse(userString);
 
     useEffect(() => {
         var statusChecked = true;
         var status = state.status ? state.status : '';
-        if (statusChecked && status === 'unseen') {
-            var Api = Connections.api + Connections.updateStatus + state.id;
+        var salesStatus = state.salesstatus ? state.salesstatus : '';
+        var notificationStatus = users.role === 'Admin' ? status : salesStatus;
+
+        if (statusChecked && notificationStatus === 'unseen') {
+            var AdminApi = Connections.api + Connections.updateStatus + state.id;
+            var saleApi = Connections.api + Connections.updateSalesStatus + state.id;
+            var Api = users.role === 'Admin' ? AdminApi : saleApi;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -47,6 +54,7 @@ const ViewProduct = () => {
         //fetch product informationa when component get mounted
         const FetchProductInfo = () => {
             setIsLoading(true);
+
             var id = state.itemid ? state.itemid : state.id;
             var Api = Connections.api + Connections.productdetail + id;
             var headers = {

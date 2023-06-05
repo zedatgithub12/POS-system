@@ -58,7 +58,8 @@ const Connections = {
     //Notifaction Api's
     adminnotification: '/adminnotification',
     salesnotification: '/salesnotification/',
-    updateStatus: '/updatestatus/'
+    updateStatus: '/updatestatus/',
+    updateSalesStatus: '/updatesalesstatus/'
 };
 
 export default Connections;
