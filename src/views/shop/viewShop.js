@@ -19,6 +19,7 @@ import TotalOrderLineChartCard from 'views/dashboard/Default/TotalOrderLineChart
 import TotalIncomeDarkCard from 'views/dashboard/Default/TotalIncomeDarkCard';
 import TotalIncomeLightCard from 'views/dashboard/Default/TotalIncomeLightCard';
 import Connections from 'api';
+import LowProducts from 'views/dashboard/Default/LowProducts';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -103,8 +104,6 @@ const ViewShop = () => {
             manager_id: managername.id,
             manager: managername.name
         };
-
-        console.log(data);
         // Make the API call using fetch()
         fetch(Api, {
             method: 'POST',
@@ -189,10 +188,12 @@ const ViewShop = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             const response = await fetch(Connections.api + Connections.shopstat + `?shop=${shop.name}&month=${month}&year=${year}`);
             const data = await response.json();
             if (data.success) {
                 setStat(data.data);
+                setLoading(false);
             }
         };
 
@@ -275,26 +276,24 @@ const ViewShop = () => {
                             }}
                         >
                             <Grid container spacing={gridSpacing}>
-                                <Grid item lg={5} md={6} sm={6} xs={12}>
-                                    <EarningCard isLoading={isLoading} earnings={stat.monthlyEarnings ? stat.monthlyEarnings : 0} />
-                                </Grid>
-
-                                <Grid item lg={4} md={6} sm={6} xs={12}>
+                                <Grid item lg={8} md={12} sm={12} xs={12}>
                                     <TotalOrderLineChartCard
                                         isLoading={isLoading}
+                                        dailySales={stat.dailySales ? stat.dailySales : 0}
                                         monthlysales={stat.monthlySales ? stat.monthlySales : 0}
                                         anualsales={stat.annualSales ? stat.annualSales : 0}
+                                        todatesales={stat.todatesales ? stat.todatesales : 0}
                                     />
                                 </Grid>
-                                <Grid item lg={3} md={12} sm={12} xs={12}>
+                                <Grid item lg={4} md={12} sm={12} xs={12}>
                                     <Grid container spacing={gridSpacing}>
-                                        <Grid item sm={6} xs={12} md={6} lg={12}>
+                                        <Grid item sm={12} xs={12} md={12} lg={12}>
                                             <TotalIncomeDarkCard
                                                 isLoading={isLoading}
                                                 totalProducts={stat.totalProducts ? stat.totalProducts : 0}
                                             />
                                         </Grid>
-                                        <Grid item sm={6} xs={12} md={6} lg={12}>
+                                        <Grid item sm={12} xs={12} md={12} lg={12}>
                                             <TotalIncomeLightCard
                                                 isLoading={isLoading}
                                                 totalcustomers={stat.totalCustomers ? stat.totalCustomers : 0}
@@ -317,8 +316,11 @@ const ViewShop = () => {
                             }}
                         >
                             <Grid container spacing={gridSpacing}>
-                                <Grid item xs={12} md={12}>
+                                <Grid item xs={12} md={6}>
                                     <PopularCard isLoading={isLoading} topProducts={stat.topProducts} />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <LowProducts isLoading={isLoading} lowProducts={stat.lowProducts} />
                                 </Grid>
                             </Grid>
                         </Grid>

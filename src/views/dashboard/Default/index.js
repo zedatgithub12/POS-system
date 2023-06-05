@@ -44,15 +44,13 @@ const Dashboard = () => {
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
-                    <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <EarningCard isLoading={isLoading} earnings={stat.monthlyEarnings ? stat.monthlyEarnings : 0} />
-                    </Grid>
-
-                    <Grid item lg={4} md={6} sm={6} xs={12}>
+                    <Grid item lg={8} md={12} sm={12} xs={12}>
                         <TotalOrderLineChartCard
                             isLoading={isLoading}
+                            dailySales={stat.dailySales ? stat.dailySales : 0}
                             monthlysales={stat.monthlySales ? stat.monthlySales : 0}
                             anualsales={stat.annualSales ? stat.annualSales : 0}
+                            todatesales={stat.todatesales ? stat.todatesales : 0}
                         />
                     </Grid>
                     <Grid item lg={4} md={12} sm={12} xs={12}>

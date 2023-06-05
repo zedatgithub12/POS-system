@@ -261,7 +261,7 @@ const Products = () => {
                                         <TableCell>Quantity</TableCell>
 
                                         <TableCell>Status</TableCell>
-                                        <>{users.role === 'Admin' ? <TableCell>Actions</TableCell> : null}</>
+                                        <TableCell>Actions</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
