@@ -32,7 +32,7 @@ import { Delete } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { addItem, removeItem, incrementQuantity, decrementQuantity } from 'cart/cartSlice';
 import Connections from 'api';
-
+import Quagga from 'quagga';
 // ==============================|| CREATE SALE PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -54,6 +54,7 @@ const CreateSale = () => {
     const [productData, setProductData] = useState([]);
     const items = useSelector((state) => state.cart.items);
     const grandTotal = useSelector((state) => state.cart.grandTotal);
+    const [isScanning, setIsScanning] = useState(false);
     const [saleTax, setSaleTax] = useState(0);
     const [discount, setDiscount] = useState(0);
     const [paymentStatus, setPaymentStatus] = useState('');
@@ -103,6 +104,52 @@ const CreateSale = () => {
     const handleNoteChange = (event) => {
         setNote(event.target.value);
     };
+
+    const startScanner = () => {
+        Quagga.init(
+            {
+                inputStream: {
+                    name: 'Live',
+                    type: 'LiveStream',
+                    target: document.querySelector('#barcode') //
+                },
+                decoder: {
+                    readers: ['code_128_reader'] // specify the barcode format
+                }
+            },
+            function (err) {
+                if (err) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is problem with initializing barcode scanner'
+                    });
+                    return;
+                }
+
+                Quagga.start();
+                setIsScanning(true);
+            }
+        );
+    };
+
+    Quagga.onDetected((data) => {
+        setIsScanning(false);
+        Quagga.stop();
+
+        const scannedItem = productData.find((item) => item.code === parseInt(data.codeResult.code));
+        if (scannedItem) {
+            handleAddToCart(scannedItem);
+        } else {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Unable to detect the barcode!'
+            });
+        }
+    });
 
     const handleSave = () => {
         // Save sale to database
@@ -265,7 +312,7 @@ const CreateSale = () => {
     }, [popup]);
     return (
         <MainCard>
-            <Grid container spacing={gridSpacing}>
+            <Grid container spacing={gridSpacing} gutterBottom>
                 <Grid item xs={12}>
                     <Grid container alignItems="center" justifyContent="space-between">
                         <Grid item>
@@ -325,6 +372,9 @@ const CreateSale = () => {
                                 }}
                                 renderInput={(params) => <TextField {...params} label="Search Product" variant="outlined" />}
                             />
+                            <Button className="mt-2" onClick={() => startScanner()} disabled={isScanning}>
+                                Scan Barcode
+                            </Button>
                         </Grid>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
@@ -369,6 +419,7 @@ const CreateSale = () => {
                                 </Table>
                             </TableContainer>
                         </Grid>
+
                         <Grid item xs={12} md={6} className="m-auto">
                             <Box mt={2} className="border rounded mx-5">
                                 <TableContainer component={Paper}>
@@ -473,6 +524,7 @@ const CreateSale = () => {
                                 </Box>
                             </Box>
                         </Grid>
+                        <div id="barcode" style={isScanning ? { height: 250, borderRadius: 10, marginBottom: 20 } : {}}></div>
                     </Grid>
                 </Grid>
             </Grid>
