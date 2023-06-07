@@ -33,12 +33,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addItem, removeItem, incrementQuantity, decrementQuantity } from 'cart/cartSlice';
 import Connections from 'api';
 import Quagga from 'quagga';
+import { useTheme } from '@mui/material/styles';
+
 // ==============================|| CREATE SALE PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 const CreateSale = () => {
+    const theme = useTheme();
     const navigate = useNavigate();
     const GoBack = () => {
         navigate(-1);
@@ -111,8 +114,15 @@ const CreateSale = () => {
                 inputStream: {
                     name: 'Live',
                     type: 'LiveStream',
-                    target: document.querySelector('#barcode') //
+                    target: document.querySelector('#barcode'),
+                    constraints: {
+                        width: 40,
+                        height: 40,
+                        facingMode: 'environment',
+                        margin: 10
+                    }
                 },
+
                 decoder: {
                     readers: ['code_128_reader'] // specify the barcode format
                 }
@@ -372,9 +382,12 @@ const CreateSale = () => {
                                 }}
                                 renderInput={(params) => <TextField {...params} label="Search Product" variant="outlined" />}
                             />
-                            <Button className="mt-2" onClick={() => startScanner()} disabled={isScanning}>
-                                Scan Barcode
-                            </Button>
+                            <Box style={{ display: 'flex', alignItems: 'center' }}>
+                                <Button className="mt-2" onClick={() => startScanner()} disabled={isScanning}>
+                                    Scan Barcode
+                                </Button>
+                                <Typography sx={{ color: theme.palette.error.main }}>{isScanning ? 'Scanning...' : ''}</Typography>
+                            </Box>
                         </Grid>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
@@ -418,6 +431,11 @@ const CreateSale = () => {
                                     </TableBody>
                                 </Table>
                             </TableContainer>
+                            <Grid container>
+                                <Grid item xs={2} md={2} lg={2} xl={2}>
+                                    <div id="barcode" style={isScanning ? { height: 140 } : {}}></div>
+                                </Grid>
+                            </Grid>
                         </Grid>
 
                         <Grid item xs={12} md={6} className="m-auto">
@@ -524,7 +542,6 @@ const CreateSale = () => {
                                 </Box>
                             </Box>
                         </Grid>
-                        <div id="barcode" style={isScanning ? { height: 250, borderRadius: 10, marginBottom: 20 } : {}}></div>
                     </Grid>
                 </Grid>
             </Grid>

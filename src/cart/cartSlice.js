@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const calculateGrandTotal = (items) => {
-    return items.reduce((total, item) => total + item.subtotal, 0);
+    return items.reduce((total, item) => parseInt(total) + parseInt(item.subtotal), 0);
 };
 
 const cartSlice = createSlice({
@@ -16,7 +16,7 @@ const cartSlice = createSlice({
             const existingItem = state.items.find((item) => item.id === product.id);
 
             if (existingItem) {
-                existingItem.quantity++;
+                existingItem.quantity += 1;
                 existingItem.subtotal = existingItem.quantity * existingItem.unitPrice;
                 state.grandTotal = calculateGrandTotal(state.items);
             } else {
