@@ -41,6 +41,103 @@ const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 const CreateSale = () => {
+    window.addEventListener('offline', listenForNetworkConnectivityChanges);
+    window.addEventListener('online', listenForNetworkConnectivityChanges);
+    function listenForNetworkConnectivityChanges() {
+        // Get the network status.
+        var networkStatus = navigator.connection.effectiveType;
+
+        // Check if there is a network connection.
+        if (networkStatus === 'cellular' || networkStatus === 'wifi') {
+            // Send the data to the online database.
+            var data = getIndexDbData();
+            updateOnlineDatabase(data);
+        } else {
+            // Save the data to the local indexdb database.
+            saveIndexDbData(data);
+            console.log('saving to local database');
+            console.log(getIndexDbData());
+        }
+    }
+
+    function getIndexDbData() {
+        // Get the indexdb database.
+        var db = window.indexedDB;
+
+        // Open the database.
+        var request = db.open('addis_chircharo', 1);
+
+        // Wait for the database to open.
+        request.onsuccess = function (event) {
+            // Get the data from the database.
+            var data = event.target.result.transaction.objectStore('data').getAllKeys();
+
+            // Return the data.
+            return data;
+        };
+    }
+
+    function updateOnlineDatabase(data) {
+        setSpinner(true);
+        var Api = Connections.api + Connections.createsale;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        fetch(Api, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(data)
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error creating sale!'
+                });
+                setSpinner(false);
+            });
+    }
+
+    function saveIndexDbData(data) {
+        // Get the indexdb database.
+        var db = window.indexedDB;
+
+        // Open the database.
+        var request = db.open('addis_chircharo', 1);
+
+        // Wait for the database to open.
+        request.onsuccess = function (event) {
+            // Save the data to the database.
+            var transaction = event.target.result.transaction;
+            var objectStore = transaction.objectStore('data');
+
+            objectStore.add(data);
+        };
+    }
+
     const theme = useTheme();
     const navigate = useNavigate();
     const GoBack = () => {
@@ -76,7 +173,6 @@ const CreateSale = () => {
         if (reason === 'clickaway') {
             return;
         }
-
         setPopup({
             ...popup,
             status: false
@@ -213,7 +309,7 @@ const CreateSale = () => {
                     ...popup,
                     status: true,
                     severity: 'error',
-                    message: 'There is error creatng shop!'
+                    message: 'There is error creating sale!'
                 });
                 setSpinner(false);
             });
@@ -319,7 +415,7 @@ const CreateSale = () => {
         }
 
         return () => {};
-    }, [popup]);
+    }, []);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing} gutterBottom>
