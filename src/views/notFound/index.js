@@ -1,20 +1,40 @@
 // material-ui
-import { Typography } from '@mui/material';
+import { Grid, Box, Button, Typography } from '@mui/material';
+import notfound from 'assets/images/notfound.png';
+import { useNavigate } from 'react-router-dom';
+import Logo from 'ui-component/Logo';
 
-// project imports
-import MainCard from 'ui-component/cards/MainCard';
+// ==============================|| PAGE NOT FOUND ||============================== //
 
-// ==============================|| SAMPLE PAGE ||============================== //
+const NotFound = () => {
+    const navigate = useNavigate();
+    return (
+        <Box>
+            <Box paddingX={4} sx={{ background: '#0781f2' }}>
+                <Typography component="a" href="/">
+                    <Logo />
+                </Typography>
+            </Box>
 
-const NotFound = () => (
-    <MainCard title="Sample Card">
-        <Typography variant="body2">
-            Lorem ipsum dolor sit amen, consenter nipissing eli, sed do elusion tempos incident ut laborers et doolie magna alissa. Ut enif
-            ad minim venice, quin nostrum exercitation illampu laborings nisi ut liquid ex ea commons construal. Duos aube grue dolor in
-            reprehended in voltage veil esse colum doolie eu fujian bulla parian. Exceptive sin ocean cuspidate non president, sunk in culpa
-            qui officiate descent molls anim id est labours.
-        </Typography>
-    </MainCard>
-);
+            <Grid container margin="auto" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Grid item margin="auto" sx={{ width: 400, height: 'auto' }}>
+                    <img src={notfound} alt="Page Not Found " width="100%" />
+                    <Typography variant="h2" sx={{ textAlign: 'center' }}>
+                        Page Not Found
+                    </Typography>
+                    <Typography variant="body2" sx={{ textAlign: 'center', marginTop: 1 }}>
+                        The page you are looking for doesn't exist!
+                    </Typography>
+
+                    <Box sx={{ alignSelf: 'center', textAlign: 'center', marginTop: 1 }}>
+                        <Button component="a" href="/">
+                            Go Back{' '}
+                        </Button>
+                    </Box>
+                </Grid>
+            </Grid>
+        </Box>
+    );
+};
 
 export default NotFound;

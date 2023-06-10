@@ -158,15 +158,9 @@ const ProfileSection = () => {
                     alignItems: 'center',
                     borderRadius: '27px',
                     transition: 'all .2s ease-in-out',
-                    borderColor: theme.palette.primary.light,
-                    backgroundColor: theme.palette.warning.light,
+                    color: theme.palette.primary.dark,
                     '&[aria-controls="menu-list-grow"], &:hover': {
-                        borderColor: theme.palette.warning.dark,
-                        background: `${theme.palette.warning.dark}!important`,
-                        color: theme.palette.warning.light,
-                        '& svg': {
-                            stroke: theme.palette.primary.light
-                        }
+                        color: theme.palette.warning.light
                     },
                     '& .MuiChip-label': {
                         lineHeight: 0
@@ -177,8 +171,10 @@ const ProfileSection = () => {
                         src={Connections.images + user.profile}
                         sx={{
                             ...theme.typography.mediumAvatar,
-                            margin: '8px 0 8px 8px !important',
-                            cursor: 'pointer'
+                            margin: '8px 8px 8px 8px !important',
+                            cursor: 'pointer',
+                            color: theme.palette.primary.light,
+                            background: theme.palette.primary.dark
                         }}
                         ref={anchorRef}
                         aria-controls={open ? 'menu-list-grow' : undefined}
@@ -186,7 +182,6 @@ const ProfileSection = () => {
                         color="inherit"
                     />
                 }
-                label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.dark.main} />}
                 variant="outlined"
                 ref={anchorRef}
                 aria-controls={open ? 'menu-list-grow' : undefined}

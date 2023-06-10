@@ -2,7 +2,7 @@ import { lazy, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, StyledEngineProvider } from '@mui/material';
-import { Switch, Route, Redirect, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 // routing
 import Routes from 'routes';
 
@@ -18,7 +18,6 @@ import { useMemo } from 'react';
 
 // ==============================|| APP ||============================== //
 import Loadable from 'ui-component/Loadable';
-import ChangePassword from 'views/pages/authentication/ChangePassword';
 import NotFound from 'views/notFound';
 
 const AuthLogin = Loadable(lazy(() => import('views/pages/authentication/authentication3/Login')));
@@ -29,6 +28,9 @@ const Reset_Password = Loadable(lazy(() => import('views/password/reset')));
 const App = () => {
     const customization = useSelector((state) => state.customization);
     const location = useLocation();
+    const path = location.pathname;
+    const tokenIndex = path.lastIndexOf('/') + 1;
+    const token = path.substring(tokenIndex);
 
     const [user, setUser] = useState({
         id: '',
@@ -113,14 +115,14 @@ const App = () => {
                             <AuthRegister />
                         ) : location.pathname === '/password' ? (
                             <Forgot_Password />
-                        ) : location.pathname == '/reset-password/:token' ? (
+                        ) : location.pathname === `/reset-password/${token}` ? (
                             <Reset_Password />
-                        ) : location.pathname === '/pages/change-password' ? (
-                            <ChangePassword />
-                        ) : location.pathname == '*' ? (
-                            <NotFound />
-                        ) : (
+                        ) : location.pathname === '/pages/login/login' ? (
                             <AuthLogin />
+                        ) : location.pathname === '/' ? (
+                            <AuthLogin />
+                        ) : (
+                            <NotFound />
                         )}
                     </NavigationScroll>
                 </ThemeProvider>

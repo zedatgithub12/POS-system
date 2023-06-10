@@ -203,6 +203,10 @@ const MainRoutes = {
         {
             path: 'Update-user',
             element: <UpdateUsers />
+        },
+        {
+            path: '*',
+            element: <NotFound />
         }
     ]
 };

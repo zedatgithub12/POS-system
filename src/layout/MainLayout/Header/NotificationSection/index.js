@@ -114,7 +114,7 @@ const NotificationSection = () => {
 
         const intervalId = setInterval(() => {
             getNotification();
-        }, 10000);
+        }, 5000);
         return () => {
             eventSource.close();
             clearInterval(intervalId);
@@ -151,11 +151,11 @@ const NotificationSection = () => {
                             ...theme.typography.commonAvatar,
                             ...theme.typography.mediumAvatar,
                             transition: 'all .2s ease-in-out',
-                            background: theme.palette.warning.light,
-                            color: theme.palette.warning.dark,
+                            color: theme.palette.primary.light,
+                            background: theme.palette.primary.dark,
                             '&[aria-controls="menu-list-grow"],&:hover': {
-                                background: theme.palette.warning.dark,
-                                color: theme.palette.background.default
+                                color: theme.palette.primary.dark,
+                                background: theme.palette.background.default
                             }
                         }}
                         ref={anchorRef}
