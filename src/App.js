@@ -19,6 +19,7 @@ import { useMemo } from 'react';
 // ==============================|| APP ||============================== //
 import Loadable from 'ui-component/Loadable';
 import ChangePassword from 'views/pages/authentication/ChangePassword';
+import NotFound from 'views/notFound';
 
 const AuthLogin = Loadable(lazy(() => import('views/pages/authentication/authentication3/Login')));
 const AuthRegister = Loadable(lazy(() => import('views/pages/authentication/authentication3/Register')));
@@ -112,10 +113,12 @@ const App = () => {
                             <AuthRegister />
                         ) : location.pathname === '/password' ? (
                             <Forgot_Password />
-                        ) : location.pathname === '/reset-password/:token' ? (
+                        ) : location.pathname == '/reset-password/:token' ? (
                             <Reset_Password />
                         ) : location.pathname === '/pages/change-password' ? (
                             <ChangePassword />
+                        ) : location.pathname == '*' ? (
+                            <NotFound />
                         ) : (
                             <AuthLogin />
                         )}

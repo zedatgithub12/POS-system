@@ -43,6 +43,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const CreateSale = () => {
     window.addEventListener('offline', listenForNetworkConnectivityChanges);
     window.addEventListener('online', listenForNetworkConnectivityChanges);
+
     function listenForNetworkConnectivityChanges() {
         // Get the network status.
         var networkStatus = navigator.connection.effectiveType;

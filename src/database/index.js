@@ -72,7 +72,6 @@ const saveUserDataToIndexedDB = async (userData) => {
 const saveProductDataToIndexedDB = async (productData) => {
     try {
         const db = indexedDB.open('productData', 1);
-
         db.onupgradeneeded = (event) => {
             const objectStore = event.target.result.createObjectStore('products', { keyPath: 'code' });
             objectStore.createIndex('name', 'name', { unique: false });
@@ -82,11 +81,9 @@ const saveProductDataToIndexedDB = async (productData) => {
         db.onsuccess = (event) => {
             const transaction = event.target.result.transaction('products', 'readwrite');
             const objectStore = transaction.objectStore('products');
-
             productData.forEach((product) => {
                 objectStore.put(product);
             });
-
             transaction.oncomplete = () => {
                 console.log('Product data saved to IndexedDB');
             };
@@ -99,7 +96,6 @@ const saveProductDataToIndexedDB = async (productData) => {
 const saveCategoryDataToIndexedDB = async (categoryData) => {
     try {
         const db = indexedDB.open('categoryData', 1);
-
         db.onupgradeneeded = (event) => {
             const objectStore = event.target.result.createObjectStore('categories', { keyPath: 'name' });
         };
@@ -107,7 +103,6 @@ const saveCategoryDataToIndexedDB = async (categoryData) => {
         db.onsuccess = (event) => {
             const transaction = event.target.result.transaction('categories', 'readwrite');
             const objectStore = transaction.objectStore('categories');
-
             categoryData.forEach((category) => {
                 objectStore.put(category);
             });
@@ -133,7 +128,6 @@ const saveCustomerDataToIndexedDB = async (customerData) => {
         db.onsuccess = (event) => {
             const transaction = event.target.result.transaction('customers', 'readwrite');
             const objectStore = transaction.objectStore('customers');
-
             customerData.forEach((customer) => {
                 objectStore.put(customer);
             });

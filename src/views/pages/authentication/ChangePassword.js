@@ -8,7 +8,6 @@ const ChangePassword = () => {
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
-        // Add your password change logic here
     };
 
     return (
