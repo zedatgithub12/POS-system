@@ -310,7 +310,7 @@ const CreateSale = () => {
                     ...popup,
                     status: true,
                     severity: 'error',
-                    message: 'There is error creating sale!'
+                    message: 'There is error fetching sales!'
                 });
                 setSpinner(false);
             });
@@ -341,7 +341,7 @@ const CreateSale = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error creatng shop!'
+                        message: 'There is error fetching shop!'
                     });
                 });
         };
@@ -373,7 +373,7 @@ const CreateSale = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error creatng shop!'
+                        message: 'There is error fetching customers!'
                     });
                 });
         };

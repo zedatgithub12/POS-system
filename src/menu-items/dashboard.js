@@ -1,8 +1,8 @@
 // assets
-import { IconDashboard, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers } from '@tabler/icons';
+import { IconDashboard, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers, IconPackages } from '@tabler/icons';
 
 // constant
-const icons = { IconDashboard, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers };
+const icons = { IconDashboard, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers, IconPackages };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
@@ -36,6 +36,14 @@ const getDashboardItems = (role) => {
             type: 'item',
             url: '/products',
             icon: icons.IconBox,
+            breadcrumbs: false
+        },
+        {
+            id: 'packages',
+            title: 'Packages',
+            type: 'item',
+            url: '/packages',
+            icon: icons.IconPackages,
             breadcrumbs: false
         },
         {

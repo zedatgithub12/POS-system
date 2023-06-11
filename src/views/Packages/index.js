@@ -32,6 +32,7 @@ import {
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 import { IconCheck, IconChevronsDown, IconChevronsUp, IconTrash, IconEdit, IconSearch, IconEye } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -41,18 +42,17 @@ import PropTypes from 'prop-types';
 import Connections from 'api';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
-// ==============================|| PRODUCT PAGE ||============================== //
+import PackageData from 'data/packages';
+// ==============================|| PACKAGES PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-const Products = () => {
+const Packages = () => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
 
     const [searchText, setSearchText] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('Category');
-    const [brandFilter, setBrandFilter] = useState('Brand');
     const [shopFilter, setShopFilter] = useState('Shop');
     const [statusFilter, setStatusFilter] = useState('Status');
     const [page, setPage] = useState(0);
@@ -61,14 +61,6 @@ const Products = () => {
 
     const handleSearchTextChange = (event) => {
         setSearchText(event.target.value);
-    };
-
-    const handleCategoryFilterChange = (event) => {
-        setCategoryFilter(event.target.value);
-    };
-
-    const handleBrandFilterChange = (event) => {
-        setBrandFilter(event.target.value);
     };
 
     const handleShopFilterChange = (event) => {
@@ -88,20 +80,12 @@ const Products = () => {
         setPage(0);
     };
 
-    const filteredData = productData.filter((product) => {
+    const filteredData = PackageData.filter((product) => {
         let isMatch = true;
 
         if (searchText) {
             const searchRegex = new RegExp(searchText, 'i');
             isMatch = isMatch && (searchRegex.test(product.name) || searchRegex.test(product.code));
-        }
-
-        if (categoryFilter !== 'Category') {
-            isMatch = isMatch && product.category === categoryFilter;
-        }
-
-        if (brandFilter !== 'Brand') {
-            isMatch = isMatch && product.brand === brandFilter;
         }
 
         if (shopFilter !== 'Shop') {
@@ -134,7 +118,7 @@ const Products = () => {
                     if (response.success) {
                         setProductData(response.data);
                     } else {
-                        setProductData(productData);
+                        setProductData([]);
                     }
                 })
                 .catch(() => {
@@ -160,7 +144,7 @@ const Products = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Stocks</Typography>
+                                    <Typography variant="h3">Packages</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -175,20 +159,6 @@ const Products = () => {
                                         sx={{ textDecoration: 'none', marginRight: 2 }}
                                     >
                                         Create Package
-                                    </Button>
-
-                                    <Button
-                                        component={Link}
-                                        to="/add-product"
-                                        variant="contained"
-                                        sx={{
-                                            textDecoration: 'none',
-                                            '&:hover': {
-                                                color: 'white'
-                                            }
-                                        }}
-                                    >
-                                        Add Stock Item
                                     </Button>
                                 </>
                             ) : null}
@@ -219,33 +189,11 @@ const Products = () => {
                             }}
                         />
 
-                        <FormControl className="ms-2 mt-2 ">
-                            <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
-                                <MenuItem value="Category">Category</MenuItem>
-                                {Array.from(new Set(productData.map((product) => product.category))).map((category) => (
-                                    <MenuItem key={category} value={category}>
-                                        {category}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-
-                        <FormControl className="ms-2 mt-2 ">
-                            <Select value={brandFilter} onChange={handleBrandFilterChange}>
-                                <MenuItem value="Brand">Brand</MenuItem>
-                                {Array.from(new Set(productData.map((product) => product.brand))).map((brand) => (
-                                    <MenuItem key={brand} value={brand}>
-                                        {brand}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-
                         {users.role === 'Admin' && (
                             <FormControl className="ms-2 my-2 ">
                                 <Select value={shopFilter} onChange={handleShopFilterChange}>
                                     <MenuItem value="Shop">Shop</MenuItem>
-                                    {Array.from(new Set(productData.map((product) => product.shop))).map((shop) => (
+                                    {Array.from(new Set(PackageData.map((item) => item.shop))).map((shop) => (
                                         <MenuItem key={shop} value={shop}>
                                             {shop}
                                         </MenuItem>
@@ -257,7 +205,7 @@ const Products = () => {
                         <FormControl className="ms-2 my-2 ">
                             <Select value={statusFilter} onChange={handleStatusFilterChange}>
                                 <MenuItem value="Status">Status</MenuItem>
-                                {Array.from(new Set(productData.map((product) => product.status))).map((status) => (
+                                {Array.from(new Set(PackageData.map((item) => item.status))).map((status) => (
                                     <MenuItem key={status} value={status}>
                                         {status}
                                     </MenuItem>
@@ -270,12 +218,9 @@ const Products = () => {
                                     <TableRow>
                                         <TableCell></TableCell>
                                         <TableCell>Name</TableCell>
-                                        <TableCell>Category</TableCell>
-                                        <TableCell>Brand</TableCell>
-
+                                        <TableCell>Shop</TableCell>
                                         <TableCell>Price</TableCell>
-                                        <TableCell>Quantity</TableCell>
-
+                                        <TableCell>Expire Date</TableCell>
                                         <TableCell>Status</TableCell>
                                         <TableCell>Actions</TableCell>
                                     </TableRow>
@@ -306,6 +251,7 @@ const Products = () => {
 const ProductRow = ({ product }) => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
+    const theme = useTheme();
 
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
@@ -504,56 +450,22 @@ const ProductRow = ({ product }) => {
                         {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                     </IconButton>
                 </TableCell>
-                <TableCell component="th" scope="row">
-                    {product.picture ? (
-                        <LazyLoadImage
-                            alt={product}
-                            effect="blur"
-                            delayTime={500}
-                            src={Connections.images + product.picture}
-                            style={{ width: 60, height: 60 }}
-                            className="img-fluid rounded m-auto me-2"
-                        />
-                    ) : (
-                        <LazyLoadImage
-                            alt={product}
-                            effect="blur"
-                            delayTime={500}
-                            src="http://placehold.it/120x120&text=image"
-                            style={{ width: 60, height: 60 }}
-                            className="img-fluid rounded m-auto me-2"
-                        />
-                    )}
-                    {product.name}
-                </TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{product.brand}</TableCell>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>{product.shop}</TableCell>
 
                 <TableCell>{product.price} Birr</TableCell>
-                <TableCell>{product.quantity}</TableCell>
+                <TableCell>{product.expireDate}</TableCell>
 
                 <TableCell>{product.status}</TableCell>
                 <>
                     <TableCell>
-                        <IconButton
-                            aria-label="Edit row"
-                            size="small"
-                            onClick={() =>
-                                navigate('/view-product', {
-                                    state: { ...product }
-                                })
-                            }
-                        >
-                            <IconEye />
-                        </IconButton>
-
                         {users.role === 'Admin' ? (
                             <>
                                 <IconButton
                                     aria-label="Edit row"
                                     size="small"
                                     onClick={() =>
-                                        navigate('/update-product', {
+                                        navigate('/update-package', {
                                             state: { ...product }
                                         })
                                     }
@@ -568,102 +480,39 @@ const ProductRow = ({ product }) => {
                     </TableCell>
                 </>
             </TableRow>
-            <TableRow className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary' : 'border-0'}>
+            <TableRow
+                className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary' : 'border-0'}
+                sx={{ bgcolor: theme.palette.primary.light }}
+            >
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Grid container>
-                            <Grid item xs={12} md={6}>
+                            <Grid item xs={12}>
                                 <Box margin={1}>
-                                    <Typography variant="h6" gutterBottom component="div">
-                                        Product details
+                                    <Typography variant="h5" gutterBottom sx={{ paddingLeft: 2, color: theme.palette.primary.dark }}>
+                                        Items In Package
                                     </Typography>
                                     <Table size="small" aria-label="product details">
-                                        <TableBody>
+                                        <TableHead>
                                             <TableRow>
-                                                <TableCell>Code</TableCell>
-                                                <TableCell>{product.code}</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell>Cost</TableCell>
-                                                <TableCell>{product.cost}</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell>Unit</TableCell>
-                                                <TableCell>{product.unit}</TableCell>
-                                            </TableRow>
+                                                <TableCell>Item Name</TableCell>
+                                                <TableCell>Item Code</TableCell>
 
-                                            <TableRow>
-                                                <TableCell>Shop</TableCell>
-                                                <TableCell>{product.shop}</TableCell>
+                                                <TableCell>Quantity</TableCell>
+                                                <TableCell>Unit</TableCell>
                                             </TableRow>
-                                            <TableRow>
-                                                <TableCell className="border-0">Description</TableCell>
-                                                <TableCell className="border-0">{product.description}</TableCell>
-                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {product.items.map((item, index) => (
+                                                <TableRow key={index}>
+                                                    <TableCell>{item.name}</TableCell>
+                                                    <TableCell>{item.code}</TableCell>
+                                                    <TableCell>{item.quantity}</TableCell>
+                                                    <TableCell>{item.unit}</TableCell>
+                                                </TableRow>
+                                            ))}
                                         </TableBody>
                                     </Table>
-                                </Box>
-                            </Grid>
-
-                            <Grid item xs={12} md={6} className="border border-start-1 border-top-0 border-bottom-0 border-end-0">
-                                <Box margin={1}>
-                                    <Typography variant="h6" gutterBottom component="div">
-                                        Price Updates
-                                    </Typography>
-                                    {users.role === 'Admin' && (
-                                        <form onSubmit={handleSubmit}>
-                                            <TextField
-                                                label="Change to"
-                                                variant="outlined"
-                                                size="small"
-                                                value={inputValue}
-                                                className="mt-2"
-                                                onChange={handleInputChange}
-                                                InputProps={{
-                                                    endAdornment: (
-                                                        <IconButton type="submit">
-                                                            {updating ? (
-                                                                <div className="spinner-border spinner-border-sm text-dark " role="status">
-                                                                    <span className="visually-hidden">Loading...</span>
-                                                                </div>
-                                                            ) : (
-                                                                <IconCheck />
-                                                            )}
-                                                        </IconButton>
-                                                    )
-                                                }}
-                                            />
-                                        </form>
-                                    )}
-
-                                    {prices ? (
-                                        <List>
-                                            {prices.map((item) => (
-                                                <ListItem key={item.id}>
-                                                    <ListItemText primary={item.date} />
-                                                    <ListItemText secondary={item.from} />
-                                                    <ListItemText secondary={item.to} />
-                                                    <ListItemText
-                                                        primary={
-                                                            item.to > item.from ? (
-                                                                <>
-                                                                    {item.to - item.from}
-                                                                    <IconChevronsUp size={18} className="text-success" />
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    {item.from - item.to}
-                                                                    <IconChevronsDown size={18} className="text-danger" />
-                                                                </>
-                                                            )
-                                                        }
-                                                    />
-                                                </ListItem>
-                                            ))}
-                                        </List>
-                                    ) : (
-                                        <Typography>No price update yet!</Typography>
-                                    )}
                                 </Box>
                             </Grid>
                         </Grid>
@@ -715,4 +564,4 @@ ProductRow.propTypes = {
         description: PropTypes.string.isRequired
     }).isRequired
 };
-export default Products;
+export default Packages;
