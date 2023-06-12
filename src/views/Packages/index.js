@@ -57,7 +57,7 @@ const Packages = () => {
     const [statusFilter, setStatusFilter] = useState('Status');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
-    const [productData, setProductData] = useState([]);
+    const [packages, setPackages] = useState([]);
 
     const handleSearchTextChange = (event) => {
         setSearchText(event.target.value);
@@ -80,7 +80,7 @@ const Packages = () => {
         setPage(0);
     };
 
-    const filteredData = PackageData.filter((product) => {
+    const filteredData = packages.filter((product) => {
         let isMatch = true;
 
         if (searchText) {
@@ -89,7 +89,7 @@ const Packages = () => {
         }
 
         if (shopFilter !== 'Shop') {
-            isMatch = isMatch && product.shop.includes(shopFilter);
+            isMatch = isMatch && product.shopname.includes(shopFilter);
         }
 
         if (statusFilter !== 'Status') {
@@ -100,9 +100,9 @@ const Packages = () => {
     });
 
     useEffect(() => {
-        const getProducts = () => {
-            var AdminApi = Connections.api + Connections.viewproduct;
-            var saleApi = Connections.api + Connections.viewstoreproduct + users.store_name;
+        const getPackages = () => {
+            var AdminApi = Connections.api + Connections.viewpackages;
+            var saleApi = Connections.api + Connections.viewstorepackage + users.store_name;
             var Api = users.role === 'Admin' ? AdminApi : saleApi;
             var headers = {
                 accept: 'application/json',
@@ -116,9 +116,9 @@ const Packages = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        setProductData(response.data);
+                        setPackages(response.data);
                     } else {
-                        setProductData([]);
+                        setPackages([]);
                     }
                 })
                 .catch(() => {
@@ -131,7 +131,7 @@ const Packages = () => {
                 });
         };
 
-        getProducts();
+        getPackages();
         return () => {};
     }, []);
     const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
@@ -193,7 +193,7 @@ const Packages = () => {
                             <FormControl className="ms-2 my-2 ">
                                 <Select value={shopFilter} onChange={handleShopFilterChange}>
                                     <MenuItem value="Shop">Shop</MenuItem>
-                                    {Array.from(new Set(PackageData.map((item) => item.shop))).map((shop) => (
+                                    {Array.from(new Set(packages.map((item) => item.shopname))).map((shop) => (
                                         <MenuItem key={shop} value={shop}>
                                             {shop}
                                         </MenuItem>
@@ -205,7 +205,7 @@ const Packages = () => {
                         <FormControl className="ms-2 my-2 ">
                             <Select value={statusFilter} onChange={handleStatusFilterChange}>
                                 <MenuItem value="Status">Status</MenuItem>
-                                {Array.from(new Set(PackageData.map((item) => item.status))).map((status) => (
+                                {Array.from(new Set(packages.map((item) => item.status))).map((status) => (
                                     <MenuItem key={status} value={status}>
                                         {status}
                                     </MenuItem>
@@ -289,7 +289,7 @@ const ProductRow = ({ product }) => {
     const Delete = () => {
         // Do something with the deleted category
         setSpinner(true);
-        var Api = Connections.api + Connections.deleteproduct + selectedProduct.id;
+        var Api = Connections.api + Connections.deletepackage + selectedProduct.id;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
@@ -341,104 +341,6 @@ const ProductRow = ({ product }) => {
         setInputValue(event.target.value);
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-
-        if (inputValue === '') {
-            setPopup({
-                ...popup,
-                status: true,
-                severity: 'error',
-                message: 'Please enter the new price'
-            });
-        } else {
-            setUpdating(true);
-            var Api = Connections.api + Connections.updateprice;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            var data = {
-                productid: product.id,
-                name: product.shop,
-                from: product.price,
-                to: inputValue
-            };
-
-            fetch(Api, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(data)
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'success',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    } else {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: 'There is error updating price'
-                    });
-                    setUpdating(false);
-                });
-        }
-    };
-
-    useEffect(() => {
-        const FetchPrices = () => {
-            var Api = Connections.api + Connections.priceupdates + product.id;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            fetch(Api, {
-                method: 'GET',
-                headers: headers
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setPrices(response.data);
-                    } else {
-                        setPrices(prices);
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: response.message
-                        });
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: response.message
-                    });
-                });
-        };
-        FetchPrices();
-        return () => {};
-    }, [spinner, popup, open]);
     return (
         <>
             <TableRow
@@ -451,12 +353,42 @@ const ProductRow = ({ product }) => {
                     </IconButton>
                 </TableCell>
                 <TableCell>{product.name}</TableCell>
-                <TableCell>{product.shop}</TableCell>
+                <TableCell>{product.shopname}</TableCell>
 
                 <TableCell>{product.price} Birr</TableCell>
-                <TableCell>{product.expireDate}</TableCell>
+                <TableCell>{product.expiredate}</TableCell>
 
-                <TableCell>{product.status}</TableCell>
+                <TableCell>
+                    {product.status === 'inactive' ? (
+                        <Box
+                            sx={{
+                                bgcolor: theme.palette.error.light,
+                                color: theme.palette.error.dark,
+                                textTransform: 'capitalize',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: 4,
+                                textAlign: 'center'
+                            }}
+                        >
+                            {product.status}
+                        </Box>
+                    ) : (
+                        <Box
+                            sx={{
+                                bgcolor: theme.palette.success.light,
+                                color: theme.palette.success.dark,
+                                textTransform: 'capitalize',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: 4,
+                                textAlign: 'center'
+                            }}
+                        >
+                            {product.status}
+                        </Box>
+                    )}
+                </TableCell>
                 <>
                     <TableCell>
                         {users.role === 'Admin' ? (
@@ -503,7 +435,7 @@ const ProductRow = ({ product }) => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {product.items.map((item, index) => (
+                                            {JSON.parse(product.items).map((item, index) => (
                                                 <TableRow key={index}>
                                                     <TableCell>{item.name}</TableCell>
                                                     <TableCell>{item.code}</TableCell>

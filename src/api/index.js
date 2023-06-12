@@ -25,6 +25,14 @@ const Connections = {
     updateproduct: '/updateproduct/',
     deleteproduct: '/deleteproduct/',
 
+    //product api's
+    addpackage: '/addpackage',
+    viewpackages: '/viewpackages',
+    packagedetail: '/package/',
+    viewstorepackage: '/viewstorepackage/',
+    updatepackage: '/updatepackage/',
+    deletepackage: '/deletepackage/',
+
     //category api's
     addcategory: '/addcategory',
     viewcategory: '/viewcategory',
