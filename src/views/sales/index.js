@@ -47,6 +47,7 @@ const Sales = () => {
     const users = JSON.parse(userString);
 
     const navigate = useNavigate();
+    const [active, setActive] = useState(true);
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]);
     const [selectedItem, setSelectedItems] = useState();
@@ -262,9 +263,24 @@ const Sales = () => {
                 <Grid item xs={12}>
                     <Grid container alignItems="center" justifyContent="space-between">
                         <Grid item>
-                            <Grid container direction="column" spacing={1}>
+                            <Grid container direction="row" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Sales</Typography>
+                                    <Button
+                                        onClick={() => setActive(true)}
+                                        variant={active ? 'outlined' : 'text'}
+                                        color={active ? 'primary' : 'dark'}
+                                    >
+                                        Stock Sales
+                                    </Button>
+                                </Grid>
+                                <Grid item>
+                                    <Button
+                                        onClick={() => setActive(false)}
+                                        variant={active ? 'text' : 'outlined'}
+                                        color={active ? 'dark' : 'primary'}
+                                    >
+                                        Package Sales
+                                    </Button>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -279,134 +295,265 @@ const Sales = () => {
                 <Grid item xs={12}>
                     <Divider />
                 </Grid>
-                <Grid item xs={12}>
-                    <Box paddingX={2} className="shadow-1 p-4 pt-2 rounded">
-                        <TextField
-                            label="Search"
-                            variant="outlined"
-                            color="primary"
-                            value={searchText}
-                            onChange={handleSearchTextChange}
-                            className="mb-2 mt-1  "
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton>
-                                            <IconSearch />
-                                        </IconButton>
-                                    </InputAdornment>
-                                )
-                            }}
-                        />
-                        <FormControl className="ms-2 my-1">
-                            <Select value={filterDate} onChange={handleFilterDateChange}>
-                                <MenuItem value="Date">Date</MenuItem>
-                                {Array.from(new Set(salesData.map((sale) => sale.date))).map((date) => (
-                                    <MenuItem key={date} value={date}>
-                                        {date}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        {users.role === 'Admin' && (
+                {active ? (
+                    <Grid item xs={12}>
+                        <Box paddingX={2} className="shadow-1 p-4 pt-2 rounded">
+                            <TextField
+                                label="Search stock sales"
+                                variant="outlined"
+                                color="primary"
+                                value={searchText}
+                                onChange={handleSearchTextChange}
+                                className="mb-2 mt-1  "
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton>
+                                                <IconSearch />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
+                            />
                             <FormControl className="ms-2 my-1">
-                                <Select value={filterShop} onChange={handleFilterShopChange}>
-                                    <MenuItem value="Shop">Shop</MenuItem>
-                                    {Array.from(new Set(salesData.map((sale) => sale.shop))).map((shop) => (
-                                        <MenuItem key={shop} value={shop}>
-                                            {shop}
+                                <Select value={filterDate} onChange={handleFilterDateChange}>
+                                    <MenuItem value="Date">Date</MenuItem>
+                                    {Array.from(new Set(salesData.map((sale) => sale.date))).map((date) => (
+                                        <MenuItem key={date} value={date}>
+                                            {date}
                                         </MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
-                        )}
-                        <FormControl className="ms-2 my-1">
-                            <Select value={filterPaymentMethod} onChange={handleFilterPaymentMethodChange}>
-                                <MenuItem value="Payment_M">Payment_M</MenuItem>
-                                {Array.from(new Set(salesData.map((sale) => sale.payment_method))).map((paymentMethod) => (
-                                    <MenuItem key={paymentMethod} value={paymentMethod}>
-                                        {paymentMethod}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <TableContainer component={Paper}>
-                            <Table className="" aria-label="Sales Table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell padding="checkbox">
-                                            <Checkbox
-                                                indeterminate={selectedRows.length > 0 && selectedRows.length < salesData.length}
-                                                checked={selectedRows.length === salesData.length}
-                                                onChange={handleSelectAllClick}
-                                            />
-                                        </TableCell>
-                                        <TableCell>Reference</TableCell>
-                                        <TableCell>Customer</TableCell>
-                                        <TableCell>Shop</TableCell>
-                                        <TableCell>Total Price</TableCell>
-                                        <TableCell>Payment Status</TableCell>
-                                        <TableCell>Payment Method</TableCell>
-                                        <TableCell>Sold On</TableCell>
-                                        <TableCell>Actions </TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {displayedSalesData.map((soldItem) => (
-                                        <TableRow key={soldItem.id} hover onClick={(event) => handleRowClick(event, soldItem.id)}>
-                                            <TableCell padding="checkbox">
-                                                <Checkbox checked={selectedRows.indexOf(soldItem.id) !== -1} />
-                                            </TableCell>
-                                            <TableCell>{soldItem.reference}</TableCell>
-                                            <TableCell>{soldItem.customer}</TableCell>
-                                            <TableCell>{soldItem.shop}</TableCell>
-                                            <TableCell>{parseInt(soldItem.grandtotal).toFixed(2)}</TableCell>
-                                            <TableCell>{soldItem.payment_status}</TableCell>
-                                            <TableCell>{soldItem.payment_method}</TableCell>
-                                            <TableCell>{soldItem.date}</TableCell>
-                                            <TableCell>
-                                                <IconButton
-                                                    aria-controls="row-menu"
-                                                    aria-haspopup="true"
-                                                    onClick={(event) => handleSelectItem(event, soldItem)}
-                                                >
-                                                    <MoreVert />
-                                                </IconButton>
-                                                <Menu
-                                                    id="row-menu"
-                                                    anchorEl={anchorEl}
-                                                    keepMounted
-                                                    open={Boolean(anchorEl)}
-                                                    onClose={handleMenuClose}
-                                                    className="shadow-sm"
-                                                >
-                                                    <MenuItem onClick={() => navigate('/view-sale', { state: { ...selectedItem } })}>
-                                                        View Sale
-                                                    </MenuItem>
-                                                    <MenuItem onClick={() => navigate('/update-sale', { state: { ...selectedItem } })}>
-                                                        Edit Sale
-                                                    </MenuItem>
-                                                    {users.role === 'Admin' && (
-                                                        <MenuItem onClick={() => handleTrashClick(selectedItem)}>Delete Sale</MenuItem>
-                                                    )}
-                                                </Menu>
-                                            </TableCell>
-                                        </TableRow>
+                            {users.role === 'Admin' && (
+                                <FormControl className="ms-2 my-1">
+                                    <Select value={filterShop} onChange={handleFilterShopChange}>
+                                        <MenuItem value="Shop">Shop</MenuItem>
+                                        {Array.from(new Set(salesData.map((sale) => sale.shop))).map((shop) => (
+                                            <MenuItem key={shop} value={shop}>
+                                                {shop}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            )}
+                            <FormControl className="ms-2 my-1">
+                                <Select value={filterPaymentMethod} onChange={handleFilterPaymentMethodChange}>
+                                    <MenuItem value="Payment_M">Payment_M</MenuItem>
+                                    {Array.from(new Set(salesData.map((sale) => sale.payment_method))).map((paymentMethod) => (
+                                        <MenuItem key={paymentMethod} value={paymentMethod}>
+                                            {paymentMethod}
+                                        </MenuItem>
                                     ))}
-                                </TableBody>
-                            </Table>
-                            <TablePagination
-                                rowsPerPageOptions={[15, 25, 50, 75, 100]}
-                                component="div"
-                                count={filteredSalesData.length}
-                                rowsPerPage={rowsPerPage}
-                                page={page}
-                                onPageChange={handlePageChange}
-                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                </Select>
+                            </FormControl>
+                            <TableContainer component={Paper}>
+                                <Table className="" aria-label="Sales Table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell padding="checkbox">
+                                                <Checkbox
+                                                    indeterminate={selectedRows.length > 0 && selectedRows.length < salesData.length}
+                                                    checked={selectedRows.length === salesData.length}
+                                                    onChange={handleSelectAllClick}
+                                                />
+                                            </TableCell>
+                                            <TableCell>Reference</TableCell>
+                                            <TableCell>Customer</TableCell>
+                                            <TableCell>Shop</TableCell>
+                                            <TableCell>Total Price</TableCell>
+                                            <TableCell>Payment Status</TableCell>
+                                            <TableCell>Payment Method</TableCell>
+                                            <TableCell>Sold On</TableCell>
+                                            <TableCell>Actions </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {displayedSalesData.map((soldItem) => (
+                                            <TableRow key={soldItem.id} hover onClick={(event) => handleRowClick(event, soldItem.id)}>
+                                                <TableCell padding="checkbox">
+                                                    <Checkbox checked={selectedRows.indexOf(soldItem.id) !== -1} />
+                                                </TableCell>
+                                                <TableCell>{soldItem.reference}</TableCell>
+                                                <TableCell>{soldItem.customer}</TableCell>
+                                                <TableCell>{soldItem.shop}</TableCell>
+                                                <TableCell>{parseInt(soldItem.grandtotal).toFixed(2)}</TableCell>
+                                                <TableCell>{soldItem.payment_status}</TableCell>
+                                                <TableCell>{soldItem.payment_method}</TableCell>
+                                                <TableCell>{soldItem.date}</TableCell>
+                                                <TableCell>
+                                                    <IconButton
+                                                        aria-controls="row-menu"
+                                                        aria-haspopup="true"
+                                                        onClick={(event) => handleSelectItem(event, soldItem)}
+                                                    >
+                                                        <MoreVert />
+                                                    </IconButton>
+                                                    <Menu
+                                                        id="row-menu"
+                                                        anchorEl={anchorEl}
+                                                        keepMounted
+                                                        open={Boolean(anchorEl)}
+                                                        onClose={handleMenuClose}
+                                                        className="shadow-sm"
+                                                    >
+                                                        <MenuItem onClick={() => navigate('/view-sale', { state: { ...selectedItem } })}>
+                                                            View Sale
+                                                        </MenuItem>
+                                                        <MenuItem onClick={() => navigate('/update-sale', { state: { ...selectedItem } })}>
+                                                            Edit Sale
+                                                        </MenuItem>
+                                                        {users.role === 'Admin' && (
+                                                            <MenuItem onClick={() => handleTrashClick(selectedItem)}>Delete Sale</MenuItem>
+                                                        )}
+                                                    </Menu>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                <TablePagination
+                                    rowsPerPageOptions={[15, 25, 50, 75, 100]}
+                                    component="div"
+                                    count={filteredSalesData.length}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    onPageChange={handlePageChange}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                />
+                            </TableContainer>
+                        </Box>
+                    </Grid>
+                ) : (
+                    <Grid item xs={12}>
+                        <Box paddingX={2} className="shadow-1 p-4 pt-2 rounded">
+                            <TextField
+                                label="Search packages sales"
+                                variant="outlined"
+                                color="primary"
+                                value={searchText}
+                                onChange={handleSearchTextChange}
+                                className="mb-2 mt-1  "
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton>
+                                                <IconSearch />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
                             />
-                        </TableContainer>
-                    </Box>
-                </Grid>
+                            <FormControl className="ms-2 my-1">
+                                <Select value={filterDate} onChange={handleFilterDateChange}>
+                                    <MenuItem value="Date">Date</MenuItem>
+                                    {Array.from(new Set(salesData.map((sale) => sale.date))).map((date) => (
+                                        <MenuItem key={date} value={date}>
+                                            {date}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            {users.role === 'Admin' && (
+                                <FormControl className="ms-2 my-1">
+                                    <Select value={filterShop} onChange={handleFilterShopChange}>
+                                        <MenuItem value="Shop">Shop</MenuItem>
+                                        {Array.from(new Set(salesData.map((sale) => sale.shop))).map((shop) => (
+                                            <MenuItem key={shop} value={shop}>
+                                                {shop}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            )}
+                            <FormControl className="ms-2 my-1">
+                                <Select value={filterPaymentMethod} onChange={handleFilterPaymentMethodChange}>
+                                    <MenuItem value="Payment_M">Payment_M</MenuItem>
+                                    {Array.from(new Set(salesData.map((sale) => sale.payment_method))).map((paymentMethod) => (
+                                        <MenuItem key={paymentMethod} value={paymentMethod}>
+                                            {paymentMethod}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            <TableContainer component={Paper}>
+                                <Table className="" aria-label="Sales Table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell padding="checkbox">
+                                                <Checkbox
+                                                    indeterminate={selectedRows.length > 0 && selectedRows.length < salesData.length}
+                                                    checked={selectedRows.length === salesData.length}
+                                                    onChange={handleSelectAllClick}
+                                                />
+                                            </TableCell>
+                                            <TableCell>Reference</TableCell>
+                                            <TableCell>Customer</TableCell>
+                                            <TableCell>Shop</TableCell>
+                                            <TableCell>Total Price</TableCell>
+                                            <TableCell>Payment Status</TableCell>
+                                            <TableCell>Payment Method</TableCell>
+                                            <TableCell>Sold On</TableCell>
+                                            <TableCell>Actions </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {displayedSalesData.map((soldItem) => (
+                                            <TableRow key={soldItem.id} hover onClick={(event) => handleRowClick(event, soldItem.id)}>
+                                                <TableCell padding="checkbox">
+                                                    <Checkbox checked={selectedRows.indexOf(soldItem.id) !== -1} />
+                                                </TableCell>
+                                                <TableCell>{soldItem.reference}</TableCell>
+                                                <TableCell>{soldItem.customer}</TableCell>
+                                                <TableCell>{soldItem.shop}</TableCell>
+                                                <TableCell>{parseInt(soldItem.grandtotal).toFixed(2)}</TableCell>
+                                                <TableCell>{soldItem.payment_status}</TableCell>
+                                                <TableCell>{soldItem.payment_method}</TableCell>
+                                                <TableCell>{soldItem.date}</TableCell>
+                                                <TableCell>
+                                                    <IconButton
+                                                        aria-controls="row-menu"
+                                                        aria-haspopup="true"
+                                                        onClick={(event) => handleSelectItem(event, soldItem)}
+                                                    >
+                                                        <MoreVert />
+                                                    </IconButton>
+                                                    <Menu
+                                                        id="row-menu"
+                                                        anchorEl={anchorEl}
+                                                        keepMounted
+                                                        open={Boolean(anchorEl)}
+                                                        onClose={handleMenuClose}
+                                                        className="shadow-sm"
+                                                    >
+                                                        <MenuItem onClick={() => navigate('/view-sale', { state: { ...selectedItem } })}>
+                                                            View Sale
+                                                        </MenuItem>
+                                                        <MenuItem onClick={() => navigate('/update-sale', { state: { ...selectedItem } })}>
+                                                            Edit Sale
+                                                        </MenuItem>
+                                                        {users.role === 'Admin' && (
+                                                            <MenuItem onClick={() => handleTrashClick(selectedItem)}>Delete Sale</MenuItem>
+                                                        )}
+                                                    </Menu>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                <TablePagination
+                                    rowsPerPageOptions={[15, 25, 50, 75, 100]}
+                                    component="div"
+                                    count={filteredSalesData.length}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    onPageChange={handlePageChange}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                />
+                            </TableContainer>
+                        </Box>
+                    </Grid>
+                )}
             </Grid>
             <Dialog open={dialogOpen} onClose={handleDialogClose}>
                 <DialogTitle>Delete Sale</DialogTitle>

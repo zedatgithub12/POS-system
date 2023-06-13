@@ -51,7 +51,6 @@ const UpdatePackage = () => {
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(false);
     const [productData, setProductData] = useState([]);
-    const [Items, setItems] = useState(item);
     const [products, setProducts] = useState(item.items);
     const [name, setName] = useState(item.name);
     const [Price, setPrice] = useState(item.price);
@@ -110,44 +109,47 @@ const UpdatePackage = () => {
             });
     };
     const handleAddToCart = (product) => {
-        const existingItem = products.find((item) => item.id === product.id);
+        const existingItem = JSON.parse(products).find((item) => item.id === product.id);
 
         if (existingItem) {
             // If it does, update the quantity of the existing item
-            const updatedItems = products.map((item) => {
+            const updatedItems = JSON.parse(products).map((item) => {
                 if (item.id === product.id) {
                     return { ...item, quantity: item.quantity + 1 };
                 }
                 return item;
             });
-            setProducts(updatedItems);
+            setProducts(JSON.stringify(updatedItems));
         } else {
-            setProducts([...products, { id: product.id, name: product.name, code: product.code, unit: product.unit, quantity: 1 }]);
+            var newProduct = JSON.parse(products);
+            setProducts(
+                JSON.stringify([...newProduct, { id: product.id, name: product.name, code: product.code, unit: product.unit, quantity: 1 }])
+            );
         }
     };
 
     const handleRemoveFromCart = (product) => {
-        const updatedItems = products.filter((item) => item.id !== product.id);
-        setProducts(updatedItems);
+        const updatedItems = JSON.parse(products).filter((item) => item.id !== product.id);
+        setProducts(JSON.stringify(updatedItems));
     };
     const handleIncrement = (id) => {
-        const updatedItems = products.map((item) => {
+        const updatedItems = JSON.parse(products).map((item) => {
             if (item.id === id) {
                 return { ...item, quantity: item.quantity + 1 };
             }
             return item;
         });
-        setProducts(updatedItems);
+        setProducts(JSON.stringify(updatedItems));
     };
 
     const handleDecrement = (id) => {
-        const updatedItems = products.map((item) => {
+        const updatedItems = JSON.parse(products).map((item) => {
             if (item.id === id && item.quantity > 0) {
                 return { ...item, quantity: item.quantity - 1 };
             }
             return item;
         });
-        setProducts(updatedItems);
+        setProducts(JSON.stringify(updatedItems));
     };
 
     const handleDateChange = (event) => {
@@ -166,7 +168,7 @@ const UpdatePackage = () => {
             });
             setSpinner(false);
         }
-        if (Items.length == 0) {
+        if (products.length == 0) {
             setPopup({
                 ...popup,
                 status: true,
@@ -187,7 +189,7 @@ const UpdatePackage = () => {
                 shopid: shopId,
                 userid: user.id,
                 name: name,
-                items: products,
+                items: JSON.parse(products),
                 price: Price,
                 expiredate: date
             };
@@ -273,8 +275,8 @@ const UpdatePackage = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">
-                                        Update <i>{name}</i>
+                                    <Typography variant="h4">
+                                        Update <span className="text-primary">{name}</span>
                                     </Typography>
                                 </Grid>
                             </Grid>
@@ -303,7 +305,9 @@ const UpdatePackage = () => {
                                             handleShopSelection(value);
                                         }
                                     }}
-                                    renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" value={shopName} />}
+                                    renderInput={(params) => (
+                                        <TextField {...params} label="Shop" variant="outlined" value={shopName} defaultValue={shopName} />
+                                    )}
                                     noOptionsText="Loading..."
                                 />
                             </Grid>
@@ -458,7 +462,7 @@ const UpdatePackage = () => {
                                             <span className="visually-hidden">Loading...</span>
                                         </div>
                                     ) : (
-                                        'Create'
+                                        'Update'
                                     )}
                                 </Button>
                             </Box>

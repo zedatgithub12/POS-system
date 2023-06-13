@@ -370,7 +370,7 @@ const CreatePackage = () => {
                                         ) : (
                                             <TableBody>
                                                 <TableRow>
-                                                    <TableCell colSpan={5} align="center" sx={{ borderBottom: 0 }}>
+                                                    <TableCell colSpan={6} align="center" sx={{ borderBottom: 0 }}>
                                                         <Box padding={3}>
                                                             <img src={packages} alt="Add Item" width="40%" height="40%" />
                                                             <Typography variant="h4" color="textSecondary" sx={{ marginY: 4 }}>
@@ -443,7 +443,7 @@ const CreatePackage = () => {
                                 </Grid>
                             </Grid>
                             <Box paddingTop={5}>
-                                <Button variant="text" color="error" sx={{ paddingX: 4, marginRight: 2 }}>
+                                <Button onClick={GoBack} variant="text" color="error" sx={{ paddingX: 4, marginRight: 2 }}>
                                     Cancel
                                 </Button>
                                 <Button type="submit" variant="contained" color="primary" sx={{ paddingX: 4 }}>

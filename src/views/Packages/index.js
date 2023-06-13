@@ -33,16 +33,15 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
-import { IconCheck, IconChevronsDown, IconChevronsUp, IconTrash, IconEdit, IconSearch, IconEye } from '@tabler/icons';
+import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Connections from 'api';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import packages from 'assets/images/packages.svg';
 import 'react-lazy-load-image-component/src/effects/blur.css';
-import PackageData from 'data/packages';
 // ==============================|| PACKAGES PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -225,11 +224,23 @@ const Packages = () => {
                                         <TableCell>Actions</TableCell>
                                     </TableRow>
                                 </TableHead>
-                                <TableBody>
-                                    {paginatedData.map((product, index) => (
-                                        <ProductRow key={index} product={product} />
-                                    ))}
-                                </TableBody>
+                                {paginatedData.length > 0 ? (
+                                    <TableBody>
+                                        {paginatedData.map((product, index) => (
+                                            <ProductRow key={index} product={product} />
+                                        ))}
+                                    </TableBody>
+                                ) : (
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell colSpan={5} align="center" sx={{ borderBottom: 0 }}>
+                                                <Box padding={3}>
+                                                    <img src={packages} alt="No Packages" width="40%" height="40%" />
+                                                </Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                )}
                             </Table>
                             <TablePagination
                                 rowsPerPageOptions={[15, 25, 50]}
@@ -333,13 +344,9 @@ const ProductRow = ({ product }) => {
             });
     };
 
-    const [prices, setPrices] = useState([]);
-
-    const [inputValue, setInputValue] = React.useState('');
-    const [updating, setUpdating] = useState(false);
-    const handleInputChange = (event) => {
-        setInputValue(event.target.value);
-    };
+    useEffect(() => {
+        return () => {};
+    }, [spinner]);
 
     return (
         <>
@@ -453,7 +460,7 @@ const ProductRow = ({ product }) => {
             </TableRow>
 
             <Dialog open={dialogOpen} onClose={handleDialogClose}>
-                <DialogTitle>Delete Product</DialogTitle>
+                <DialogTitle>Delete Packages</DialogTitle>
                 <DialogContent>Do you want to delete {selectedProduct ? selectedProduct.name : ''} ?</DialogContent>
                 <DialogActions>
                     <Button variant="text" color="primary" onClick={handleDialogClose}>

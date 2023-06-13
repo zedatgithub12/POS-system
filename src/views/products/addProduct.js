@@ -123,7 +123,7 @@ const AddProduct = () => {
                     ...popup,
                     status: true,
                     severity: 'error',
-                    message: 'There is error creatng shop!'
+                    message: 'There is error adding  product!'
                 });
                 setSpinner(false);
             });
