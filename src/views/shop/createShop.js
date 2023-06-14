@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 // material-ui
-import { Grid, Typography, Button, Divider, Box, TextField, IconButton } from '@mui/material';
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import { Grid, Typography, Button, Divider, Box, TextField } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import shop from 'assets/images/placeholder-store.png';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -14,6 +15,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 const CreateShop = () => {
+    const theme = useTheme();
     const navigate = useNavigate();
     const GoBack = () => {
         navigate(-1);
@@ -37,6 +39,10 @@ const CreateShop = () => {
     };
     const [formData, setFormData] = useState({
         shopName: '',
+        category: '',
+        region: '',
+        city: '',
+        subcity: '',
         address: '',
         description: '',
         phone: '',
@@ -68,6 +74,10 @@ const CreateShop = () => {
         var Api = Connections.api + Connections.createstore;
         const data = new FormData();
         data.append('name', formData.shopName);
+        data.append('category', formData.category);
+        data.append('region', formData.region);
+        data.append('city', formData.city);
+        data.append('subcity', formData.subcity);
         data.append('address', formData.address);
         data.append('description', formData.description);
         data.append('phone', formData.phone);
@@ -103,7 +113,7 @@ const CreateShop = () => {
                     ...popup,
                     status: true,
                     severity: 'error',
-                    message: 'There is error creatng shop!'
+                    message: 'There is error creating shop!'
                 });
                 setSpinner(false);
             });
@@ -140,15 +150,6 @@ const CreateShop = () => {
                             <form onSubmit={handleSubmit}>
                                 <Grid container spacing={2}>
                                     <Grid item xs={12}>
-                                        {formData.shopProfilePreview && (
-                                            <img
-                                                src={formData.shopProfilePreview}
-                                                alt="Shop Profile Preview"
-                                                className="img-fluid border  rounded-3"
-                                                style={{ width: '100%', marginTop: 10 }}
-                                            />
-                                        )}
-
                                         <input
                                             type="file"
                                             id="shopProfile"
@@ -157,14 +158,21 @@ const CreateShop = () => {
                                             style={{ display: 'none' }}
                                         />
                                         <label htmlFor="shopProfile">
-                                            <IconButton component="span">
-                                                <AddPhotoAlternateIcon />
-                                            </IconButton>
-                                            Upload Shop Profile
+                                            <img
+                                                src={formData.shopProfilePreview ? formData.shopProfilePreview : shop}
+                                                alt="Shop Profile Preview"
+                                                className="img-fluid border  rounded-3"
+                                                style={{ width: 220, height: 220, marginTop: 10 }}
+                                            />
+
+                                            <Typography variant="text" color={theme.palette.primary.main} sx={{ marginX: 4 }}>
+                                                Shop Picture
+                                            </Typography>
                                         </label>
                                     </Grid>
                                     <Grid item xs={12}>
                                         <TextField
+                                            fullWidth
                                             label="Shop Name"
                                             name="shopName"
                                             onChange={handleInputChange}
@@ -175,15 +183,58 @@ const CreateShop = () => {
                                     <Grid item xs={12}>
                                         <TextField
                                             fullWidth
+                                            label="Category"
+                                            name="category"
+                                            onChange={handleInputChange}
+                                            value={formData.category}
+                                            required
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <TextField
+                                            label="Region"
+                                            name="region"
+                                            onChange={handleInputChange}
+                                            value={formData.region}
+                                            required
+                                            sx={{ width: '48%' }}
+                                        />
+                                        <TextField
+                                            label="City"
+                                            name="city"
+                                            onChange={handleInputChange}
+                                            value={formData.city}
+                                            sx={{ width: '48%' }}
+                                            required
+                                        />
+                                    </Grid>
+
+                                    <Grid item xs={12}></Grid>
+
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            fullWidth
+                                            label="Sub City"
+                                            name="subcity"
+                                            onChange={handleInputChange}
+                                            value={formData.subcity}
+                                        />
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            fullWidth
                                             label="Address"
                                             name="address"
                                             onChange={handleInputChange}
                                             value={formData.address}
-                                            required
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
                                         <TextField
+                                            multiline
+                                            rows={6}
+                                            rowsMax={12}
                                             fullWidth
                                             label="Description"
                                             name="description"

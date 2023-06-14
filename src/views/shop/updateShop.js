@@ -38,7 +38,10 @@ const UpdateShop = () => {
 
     const [formData, setFormData] = useState({
         shopName: state.name ? state.name : '',
-
+        category: state.category ? state.category : '',
+        region: state.region ? state.region : '',
+        city: state.city ? state.city : '',
+        subcity: state.subcity ? state.subcity : '',
         address: state.address ? state.address : '',
         description: state.description ? state.description : '',
         phone: state.phone ? state.phone : '',
@@ -57,6 +60,10 @@ const UpdateShop = () => {
         data.append('name', formData.shopName);
         data.append('manager_id', managername.id);
         data.append('manager', managername.name);
+        data.append('category', formData.category);
+        data.append('region', formData.region);
+        data.append('city', formData.city);
+        data.append('subcity', formData.subcity);
         data.append('address', formData.address);
         data.append('description', formData.description);
         data.append('phone', formData.phone);
@@ -144,7 +151,9 @@ const UpdateShop = () => {
                     });
                 });
         };
+
         getUsers();
+
         return () => {};
     }, [spinner, popup]);
     return (
@@ -206,6 +215,7 @@ const UpdateShop = () => {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
+                                        fullWidth
                                         label="Shop Name"
                                         name="shopName"
                                         onChange={handleInputChange}
@@ -224,12 +234,53 @@ const UpdateShop = () => {
                                         onChange={(event) => setManagerName(event.target.value)}
                                     >
                                         {users.map((option) => (
-                                            <MenuItem key={option.id} value={option}>
+                                            <MenuItem key={option.id} value={option} defaultValue={option.name === state.manager}>
                                                 {option.name}
                                             </MenuItem>
                                         ))}
                                     </TextField>
                                 </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Category"
+                                        name="category"
+                                        onChange={handleInputChange}
+                                        value={formData.category}
+                                        required
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <TextField
+                                        label="Region"
+                                        name="region"
+                                        onChange={handleInputChange}
+                                        value={formData.region}
+                                        required
+                                        sx={{ width: '48%' }}
+                                    />
+                                    <TextField
+                                        label="City"
+                                        name="city"
+                                        onChange={handleInputChange}
+                                        value={formData.city}
+                                        sx={{ width: '48%' }}
+                                        required
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12}></Grid>
+
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Sub City"
+                                        name="subcity"
+                                        onChange={handleInputChange}
+                                        value={formData.subcity}
+                                    />
+                                </Grid>
+
                                 <Grid item xs={12}>
                                     <TextField
                                         fullWidth
@@ -242,6 +293,9 @@ const UpdateShop = () => {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
+                                        multiline
+                                        rows={6}
+                                        rowsMax={12}
                                         fullWidth
                                         label="Description"
                                         name="description"

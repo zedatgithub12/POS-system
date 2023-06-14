@@ -260,7 +260,7 @@ const ViewShop = () => {
                         <Divider />
                     </Grid>
                 </Grid>
-                <Grid item lg={4} md={6} sm={6} xs={12} spacing={2}></Grid>
+                <Grid item lg={6} md={12} sm={12} xs={12} spacing={2}></Grid>
 
                 <Grid container justifyContent="center">
                     <Grid item lg={7} md={6} sm={6} xs={12}>
@@ -384,10 +384,9 @@ const ViewShop = () => {
                                 <Typography variant="body2">Shop Address</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h4">{shop.address}</Typography>
+                                <Typography variant="h5">{shop.address}</Typography>
                             </Grid>
                         </Grid>
-
                         <Grid
                             container
                             direction="row"
@@ -398,10 +397,74 @@ const ViewShop = () => {
                             style={{ marginTop: 10, borderRadius: 6, padding: 6, paddingRight: 20, paddingLeft: 20 }}
                         >
                             <Grid item>
-                                <Typography variant="body2">Shop Manager</Typography>
+                                <Typography variant="body2">Category</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h4">
+                                <Typography variant="h5">{shop.category}</Typography>
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            container
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            spacing={1}
+                            className="bg-light"
+                            style={{ marginTop: 10, borderRadius: 6, padding: 6, paddingRight: 20, paddingLeft: 20 }}
+                        >
+                            <Grid item>
+                                <Typography variant="body2">Region</Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="h5">{shop.region}</Typography>
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            container
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            spacing={1}
+                            className="bg-light"
+                            style={{ marginTop: 10, borderRadius: 6, padding: 6, paddingRight: 20, paddingLeft: 20 }}
+                        >
+                            <Grid item>
+                                <Typography variant="body2">City</Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="h5">{shop.city}</Typography>
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            container
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            spacing={1}
+                            className="bg-light"
+                            style={{ marginTop: 10, borderRadius: 6, padding: 6, paddingRight: 20, paddingLeft: 20 }}
+                        >
+                            <Grid item>
+                                <Typography variant="body2">Subcity</Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="h5">{shop.address}</Typography>
+                            </Grid>
+                        </Grid>
+                        <Grid
+                            container
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            spacing={1}
+                            className="bg-light"
+                            style={{ marginTop: 10, borderRadius: 6, padding: 6, paddingRight: 20, paddingLeft: 20 }}
+                        >
+                            <Grid item>
+                                <Typography variant="body2"> Manager</Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="h5">
                                     {shop.manager ? shop.manager : <Button onClick={() => handleAddDialogOpen()}>Add</Button>}
                                 </Typography>
                             </Grid>
@@ -417,10 +480,10 @@ const ViewShop = () => {
                             style={{ marginTop: 10, borderRadius: 6, padding: 6, paddingRight: 20, paddingLeft: 20 }}
                         >
                             <Grid item>
-                                <Typography variant="body2">Shop Phone</Typography>
+                                <Typography variant="body2"> Phone</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h4">{shop.phone}</Typography>
+                                <Typography variant="h5">{shop.phone}</Typography>
                             </Grid>
                         </Grid>
 
@@ -437,7 +500,7 @@ const ViewShop = () => {
                                 <Typography variant="body2">Created at</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h4">{DateSlice(shop.created_at)}</Typography>
+                                <Typography variant="h5">{DateSlice(shop.created_at)}</Typography>
                             </Grid>
                         </Grid>
 
