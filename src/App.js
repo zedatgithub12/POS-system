@@ -18,13 +18,30 @@ import { useMemo } from 'react';
 
 // ==============================|| APP ||============================== //
 import Loadable from 'ui-component/Loadable';
+import NotFound from 'views/notFound';
+
 const AuthLogin = Loadable(lazy(() => import('views/pages/authentication/authentication3/Login')));
 const AuthRegister = Loadable(lazy(() => import('views/pages/authentication/authentication3/Register')));
+const Forgot_Password = Loadable(lazy(() => import('views/password')));
+const Reset_Password = Loadable(lazy(() => import('views/password/reset')));
 
 const App = () => {
     const customization = useSelector((state) => state.customization);
     const location = useLocation();
-    const [login, setLogin] = useState(true);
+    const path = location.pathname;
+    const tokenIndex = path.lastIndexOf('/') + 1;
+    const token = path.substring(tokenIndex);
+
+    const [user, setUser] = useState({
+        id: '',
+        name: '',
+        email: '',
+        profile: '',
+        role: '',
+        store_id: '',
+        store_name: ''
+    });
+    const [login, setLogin] = useState(false);
     useEffect(() => {
         var tokens = sessionStorage.getItem('token');
         if (tokens !== null) {
@@ -32,27 +49,46 @@ const App = () => {
         }
         return () => {};
     }, [login]);
+
     const authContext = useMemo(
         () => ({
             SignIn: async (status, users) => {
                 if (status === 'Signed') {
                     sessionStorage.setItem('user', JSON.stringify(users));
-                    sessionStorage.setItem('token', JSON.stringify(users.fname));
+                    sessionStorage.setItem('token', JSON.stringify(users.name));
+                    setUser({
+                        ...user,
+                        id: users.id,
+                        name: users.name,
+                        email: users.email,
+                        profile: users.profile,
+                        role: users.role,
+                        store_id: users.store_id,
+                        store_name: users.store_name
+                    });
 
-                    setLoged(true);
+                    setLogin(true);
+                    window.location.reload(false); //refresh the page when user login
                 } else {
-                    setLoged(false);
+                    setLogin(false);
                 }
             },
 
             SignOut: async (status) => {
                 if (status === 'Signout') {
                     sessionStorage.clear();
+                    setUser({
+                        ...user,
+                        name: '',
+                        email: '',
+                        profile: '',
+                        role: ''
+                    });
 
-                    setLoged(false);
+                    setLogin(false);
                 }
                 {
-                    setLoged(false);
+                    setLogin(false);
                 }
             },
 
@@ -62,25 +98,36 @@ const App = () => {
                 return userToken;
             },
 
-            getUser: async () => {
-                const userString = sessionStorage.getItem('user');
-                const userDetails = JSON.parse(userString);
-                return userDetails;
-            }
+            getUser: user
         }),
-        []
+
+        [user]
     );
     return (
-        <StyledEngineProvider injectFirst>
-            <AuthContext.Provider value={authContext}>
+        <AuthContext.Provider value={authContext}>
+            <StyledEngineProvider injectFirst>
                 <ThemeProvider theme={themes(customization)}>
                     <CssBaseline />
                     <NavigationScroll>
-                        {login ? <Routes /> : location.pathname === '/pages/register/register' ? <AuthRegister /> : <AuthLogin />}
+                        {login ? (
+                            <Routes />
+                        ) : location.pathname === '/pages/register/register' ? (
+                            <AuthRegister />
+                        ) : location.pathname === '/password' ? (
+                            <Forgot_Password />
+                        ) : location.pathname === `/reset-password/${token}` ? (
+                            <Reset_Password />
+                        ) : location.pathname === '/pages/login/login' ? (
+                            <AuthLogin />
+                        ) : location.pathname === '/' ? (
+                            <AuthLogin />
+                        ) : (
+                            <NotFound />
+                        )}
                     </NavigationScroll>
                 </ThemeProvider>
-            </AuthContext.Provider>
-        </StyledEngineProvider>
+            </StyledEngineProvider>
+        </AuthContext.Provider>
     );
 };
 

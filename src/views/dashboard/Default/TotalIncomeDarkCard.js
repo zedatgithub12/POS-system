@@ -42,7 +42,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 // ==============================|| DASHBOARD - TOTAL INCOME DARK CARD ||============================== //
 
-const TotalIncomeDarkCard = ({ isLoading }) => {
+const TotalIncomeDarkCard = ({ isLoading, totalProducts }) => {
     const theme = useTheme();
 
     return (
@@ -75,12 +75,12 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                                     }}
                                     primary={
                                         <Typography variant="h4" sx={{ color: '#fff' }}>
-                                            18
+                                            {totalProducts}
                                         </Typography>
                                     }
                                     secondary={
                                         <Typography variant="subtitle2" sx={{ color: 'primary.light', mt: 0.25 }}>
-                                            Categories
+                                            Total Item In-Stock
                                         </Typography>
                                     }
                                 />
@@ -94,7 +94,8 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
 };
 
 TotalIncomeDarkCard.propTypes = {
-    isLoading: PropTypes.bool
+    isLoading: PropTypes.bool,
+    totalProducts: PropTypes.number
 };
 
 export default TotalIncomeDarkCard;

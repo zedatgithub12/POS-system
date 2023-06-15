@@ -11,23 +11,50 @@ import {
     // Checkbox,
     // InputLabel,
     // Select,
-    MenuItem
+    MenuItem,
+    Autocomplete
     // FormHelperText
 } from '@mui/material';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Connections from 'api';
 // ==============================|| Add Product PAGE ||============================== //
-
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const AddProduct = () => {
     const navigate = useNavigate();
     const GoBack = () => {
         navigate(-1);
     };
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
+    //category data
+    const [CategoryData, setCategoryData] = useState([]);
+    //shops data
+    const [shops, setShops] = useState([]);
+    //
 
     const [productPicture, setProductPicture] = useState(null);
+    const [picturePreview, setPicturePreview] = useState(null);
     const [productName, setProductName] = useState('');
     const [productCategory, setProductCategory] = useState('');
     const [brand, setBrand] = useState('');
@@ -39,22 +66,149 @@ const AddProduct = () => {
     const [productDescription, setProductDescription] = useState('');
     const [warehouses, setWarehouses] = useState('');
     const [status, setStatus] = useState('');
+    const [spinner, setSpinner] = useState(false);
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        setSpinner(true);
         // Handle form submission here
+        // Declare the data to be sent to the API
+        var Api = Connections.api + Connections.addproduct;
+        // var headers = {
+        //     accept: 'application/json',
+        //     'Content-Type': 'application/json'
+        // };
+
+        const data = new FormData();
+        data.append('picture', productPicture);
+        data.append('name', productName);
+        data.append('category', productCategory);
+        data.append('brand', brand);
+        data.append('code', productCode);
+        data.append('cost', productCost);
+        data.append('unit', productUnit);
+        data.append('price', productPrice);
+        data.append('quantity', productQuantity);
+        data.append('description', productDescription);
+        data.append('shop', warehouses);
+        data.append('status', status);
+
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'POST',
+            body: data
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error adding  product!'
+                });
+                setSpinner(false);
+            });
     };
 
     const handlePictureChange = (event) => {
         const file = event.target.files[0];
+        setProductPicture(file);
         if (file) {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => {
-                setProductPicture(reader.result);
+                setPicturePreview(reader.result);
             };
         }
     };
+
+    useEffect(() => {
+        const getCatgeory = () => {
+            var Api = Connections.api + Connections.viewcategory;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setCategoryData((prevCat) => {
+                            // Combine the previous shops with the new ones from the API
+                            return [...prevCat, ...response.data];
+                        });
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error creatng shop!'
+                    });
+                });
+        };
+        const getShops = () => {
+            var Api = Connections.api + Connections.viewstore;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setShops((prevShops) => {
+                            // Combine the previous shops with the new ones from the API
+                            return [...prevShops, ...response.data];
+                        });
+                    } else {
+                        setShops((prevShops) => {
+                            // Combine the previous shops with the new ones from the API
+                            return [...prevShops, ...shops];
+                        });
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error creatng shop!'
+                    });
+                });
+        };
+        getShops();
+        getCatgeory();
+        return () => {};
+    }, [popup]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -93,9 +247,9 @@ const AddProduct = () => {
                             />
                             <label htmlFor="product-picture">
                                 <Button variant="contained" color="primary" component="span" fullWidth style={{ height: '100%' }}>
-                                    {productPicture ? (
+                                    {picturePreview ? (
                                         <img
-                                            src={productPicture}
+                                            src={picturePreview}
                                             alt="Product"
                                             style={{ width: '100%' }}
                                             className="img-fluid rounded m-auto"
@@ -117,19 +271,16 @@ const AddProduct = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <TextField
-                                select
-                                fullWidth
-                                label="Product Category"
-                                color="primary"
-                                value={productCategory}
-                                onChange={(event) => setProductCategory(event.target.value)}
-                                required
-                            >
-                                <MenuItem value="category1">Category 1</MenuItem>
-                                <MenuItem value="category2">Category 2</MenuItem>
-                                <MenuItem value="category3">Category 3</MenuItem>
-                            </TextField>
+                            <Autocomplete
+                                options={CategoryData}
+                                getOptionLabel={(option) => option.name}
+                                onChange={(event, value) => {
+                                    if (value) {
+                                        setProductCategory(value.name);
+                                    }
+                                }}
+                                renderInput={(params) => <TextField {...params} label="Select Category" variant="outlined" />}
+                            />
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
@@ -200,18 +351,16 @@ const AddProduct = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <TextField
-                                select
-                                fullWidth
-                                label="Add to Shop"
-                                color="primary"
-                                value={warehouses}
-                                onChange={(event) => setWarehouses(event.target.value)}
-                            >
-                                <MenuItem value="Shop">Shop One</MenuItem>
-                                <MenuItem value="Shop">Shop Two</MenuItem>
-                                <MenuItem value="Shop">Shop Three</MenuItem>
-                            </TextField>
+                            <Autocomplete
+                                options={shops}
+                                getOptionLabel={(option) => option.name}
+                                onChange={(event, value) => {
+                                    if (value) {
+                                        setWarehouses(value.name);
+                                    }
+                                }}
+                                renderInput={(params) => <TextField {...params} label="Select Shop" variant="outlined" />}
+                            />
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
@@ -222,16 +371,26 @@ const AddProduct = () => {
                                 value={status}
                                 onChange={(event) => setStatus(event.target.value)}
                             >
-                                <MenuItem value="Market">Market</MenuItem>
-                                <MenuItem value="Store">Store</MenuItem>
+                                <MenuItem value="In-stock">In-stock</MenuItem>
                             </TextField>
                         </Grid>
                     </Grid>
                     <Button type="submit" fullWidth variant="contained" color="primary" style={{ margin: '1rem 0' }}>
-                        Submit
+                        {spinner ? (
+                            <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        ) : (
+                            'Save'
+                        )}
                     </Button>
                 </form>
             </Container>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </MainCard>
     );
 };

@@ -4,6 +4,9 @@ import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 
+const Packages = Loadable(lazy(() => import('views/Packages')));
+const CreatePackage = Loadable(lazy(() => import('views/Packages/createPackage')));
+const UpdatePackage = Loadable(lazy(() => import('views/Packages/updatePackage')));
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 // user profile routes
@@ -16,6 +19,7 @@ const UpdateShop = Loadable(lazy(() => import('views/shop/updateShop')));
 // Product routing
 const Products = Loadable(lazy(() => import('views/products')));
 const AddProduct = Loadable(lazy(() => import('views/products/addProduct')));
+const ViewProduct = Loadable(lazy(() => import('views/products/viewProduct')));
 const UpdateProduct = Loadable(lazy(() => import('views/products/updateProduct')));
 // Category routing
 const Category = Loadable(lazy(() => import('views/category')));
@@ -40,6 +44,9 @@ const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
 const UtilsShadow = Loadable(lazy(() => import('views/utilities/Shadow')));
 const UtilsMaterialIcons = Loadable(lazy(() => import('views/utilities/MaterialIcons')));
 const UtilsTablerIcons = Loadable(lazy(() => import('views/utilities/TablerIcons')));
+
+// not found page
+const NotFound = Loadable(lazy(() => import('views/notFound')));
 
 // sample page routing
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
@@ -141,6 +148,10 @@ const MainRoutes = {
             element: <AddProduct />
         },
         {
+            path: 'view-product',
+            element: <ViewProduct />
+        },
+        {
             path: 'update-product',
             element: <UpdateProduct />
         },
@@ -195,6 +206,22 @@ const MainRoutes = {
         {
             path: 'Update-user',
             element: <UpdateUsers />
+        },
+        {
+            path: 'packages',
+            element: <Packages />
+        },
+        {
+            path: 'create-package',
+            element: <CreatePackage />
+        },
+        {
+            path: 'update-package',
+            element: <UpdatePackage />
+        },
+        {
+            path: '*',
+            element: <NotFound />
         }
     ]
 };

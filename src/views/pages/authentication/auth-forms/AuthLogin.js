@@ -6,9 +6,9 @@ import { useTheme } from '@mui/material/styles';
 import {
     Box,
     Button,
-    Checkbox,
+    // Checkbox,
     FormControl,
-    FormControlLabel,
+    // FormControlLabel,
     FormHelperText,
     Grid,
     IconButton,
@@ -33,6 +33,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { AuthContext } from 'context/context';
 import Connections from 'api';
+import { useNavigate } from 'react-router-dom';
 
 // import Google from 'assets/images/icons/social-google.svg';
 
@@ -43,12 +44,14 @@ const FirebaseLogin = ({ ...others }) => {
     const Sign = (status, user) => {
         SignIn(status, user);
     };
+    const navigate = useNavigate();
+
     const theme = useTheme();
     const scriptedRef = useScriptRef();
     // const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     // const customization = useSelector((state) => state.customization);
-    const [checked, setChecked] = useState(true);
 
+    const [logSpinner, setLogSpinner] = useState(false);
     // const googleHandler = async () => {
     //     console.error('Login');
     // };
@@ -147,7 +150,8 @@ const FirebaseLogin = ({ ...others }) => {
                             setSubmitting(false);
                         }
                     }
-                    var Api = Connections.url + Connections.login;
+                    setLogSpinner(true);
+                    var Api = Connections.api + Connections.login;
                     var headers = {
                         accept: 'application/json',
                         'Content-Type': 'application/json'
@@ -165,25 +169,23 @@ const FirebaseLogin = ({ ...others }) => {
                     })
                         .then((response) => response.json())
                         .then((response) => {
-                            if (!(response == '83')) {
+                            if (response.success) {
                                 setStatus({ success: true });
                                 setSubmitting(false);
-                                Sign('Signed', response);
-                            } else if (response.status == '83') {
-                                setStatus({ success: false });
-                                setErrors({ submit: err.message });
-                                setSubmitting(false);
+                                Sign('Signed', response.user);
+                                setLogSpinner(false);
                             } else {
                                 setStatus({ success: false });
                                 setErrors({ submit: err.message });
                                 setSubmitting(false);
+                                setLogSpinner(false);
                             }
                         })
                         .catch((err) => {
-                            console.log(err);
                             setStatus({ success: false });
                             setErrors({ submit: err.message });
                             setSubmitting(false);
+                            setLogSpinner(false);
                         });
                 }}
             >
@@ -244,7 +246,7 @@ const FirebaseLogin = ({ ...others }) => {
                             )}
                         </FormControl>
                         <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-                            <FormControlLabel
+                            {/* <FormControlLabel
                                 control={
                                     <Checkbox
                                         checked={checked}
@@ -254,8 +256,13 @@ const FirebaseLogin = ({ ...others }) => {
                                     />
                                 }
                                 label="Remember me"
-                            />
-                            <Typography variant="subtitle1" color="secondary" sx={{ textDecoration: 'none', cursor: 'pointer' }}>
+                            /> */}
+                            <Typography
+                                variant="subtitle1"
+                                color="primary"
+                                sx={{ textDecoration: 'none', cursor: 'pointer' }}
+                                onClick={() => navigate('/password')}
+                            >
                                 Forgot Password?
                             </Typography>
                         </Stack>
@@ -274,9 +281,15 @@ const FirebaseLogin = ({ ...others }) => {
                                     size="large"
                                     type="submit"
                                     variant="contained"
-                                    color="secondary"
+                                    color="primary"
                                 >
-                                    Sign in
+                                    {logSpinner ? (
+                                        <div className="spinner-border spinner-border-sm text-light " role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    ) : (
+                                        'Sign in'
+                                    )}
                                 </Button>
                             </AnimateButton>
                         </Box>

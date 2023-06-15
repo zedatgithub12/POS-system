@@ -1,65 +1,44 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {
     Avatar,
     Box,
-    Button,
+    Badge,
     ButtonBase,
-    CardActions,
-    Chip,
     ClickAwayListener,
     Divider,
     Grid,
     Paper,
     Popper,
     Stack,
-    TextField,
     Typography,
     useMediaQuery
 } from '@mui/material';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
-
+import io from 'socket.io-client';
+import { useNavigate } from 'react-router-dom';
+import { IconBell, IconBellRinging } from '@tabler/icons';
+import StockAlert from './StockAlert';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
-import NotificationList from './NotificationList';
-
-// assets
-import { IconBell } from '@tabler/icons';
+import Connections from 'api';
 
 // notification status options
-const status = [
-    {
-        value: 'all',
-        label: 'All Notification'
-    },
-    {
-        value: 'new',
-        label: 'New'
-    },
-    {
-        value: 'unread',
-        label: 'Unread'
-    },
-    {
-        value: 'other',
-        label: 'Other'
-    }
-];
 
 // ==============================|| NOTIFICATION ||============================== //
 
 const NotificationSection = () => {
     const theme = useTheme();
+    const navigate = useNavigate();
     const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
-
     const [open, setOpen] = useState(false);
-    const [value, setValue] = useState('');
+    const [notifications, setNotifications] = useState([]);
+    const userString = sessionStorage.getItem('user');
+    const users = JSON.parse(userString);
     /**
      * anchorRef is used on different componets and specifying one type leads to other components throwing an error
      * */
@@ -76,6 +55,12 @@ const NotificationSection = () => {
         setOpen(false);
     };
 
+    //unseen comment filtering
+    const unseenCount =
+        users.role === 'Admin'
+            ? notifications.filter((item) => item.status === 'unseen')
+            : notifications.filter((item) => item.salesstatus === 'unseen');
+
     const prevOpen = useRef(open);
     useEffect(() => {
         if (prevOpen.current === true && open === false) {
@@ -84,10 +69,57 @@ const NotificationSection = () => {
         prevOpen.current = open;
     }, [open]);
 
-    const handleChange = (event) => {
-        if (event?.target.value) setValue(event?.target.value);
+    const getNotification = () => {
+        var AdminApi = Connections.api + Connections.adminnotification;
+        var saleApi = Connections.api + Connections.salesnotification + users.store_id;
+        var Api = users.role === 'Admin' ? AdminApi : saleApi;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'GET',
+            headers: headers
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setNotifications(response.data);
+                } else {
+                    setNotifications(notifications);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     };
 
+    const handleOpenNotification = (notificationInfo) => {
+        navigate('/view-product', { state: { ...notificationInfo } });
+        setOpen(false);
+    };
+
+    useEffect(() => {
+        var AdminApi = Connections.api + Connections.adminnotification;
+        var saleApi = Connections.api + Connections.salesnotification + users.store_id;
+        var Api = users.role === 'Admin' ? AdminApi : saleApi;
+
+        const eventSource = new EventSource(Api);
+
+        eventSource.addEventListener('message', (event) => {
+            const data = JSON.parse(event.data);
+            setNotifications((notifications) => [...notifications, data]); // append new post to the existing array
+        });
+
+        const intervalId = setInterval(() => {
+            getNotification();
+        }, 5000);
+        return () => {
+            eventSource.close();
+            clearInterval(intervalId);
+        };
+    }, []);
     return (
         <>
             <Box
@@ -100,17 +132,30 @@ const NotificationSection = () => {
                 }}
             >
                 <ButtonBase sx={{ borderRadius: '12px' }}>
+                    {unseenCount.length > 0 && (
+                        <Badge
+                            badgeContent={unseenCount.length}
+                            color="error"
+                            sx={{
+                                position: 'absolute',
+                                top: 2,
+                                right: 2,
+                                zIndex: 1
+                            }}
+                        />
+                    )}
+
                     <Avatar
                         variant="rounded"
                         sx={{
                             ...theme.typography.commonAvatar,
                             ...theme.typography.mediumAvatar,
                             transition: 'all .2s ease-in-out',
-                            background: theme.palette.secondary.light,
-                            color: theme.palette.secondary.dark,
+                            color: theme.palette.primary.light,
+                            background: theme.palette.primary.dark,
                             '&[aria-controls="menu-list-grow"],&:hover': {
-                                background: theme.palette.secondary.dark,
-                                color: theme.palette.secondary.light
+                                color: theme.palette.primary.dark,
+                                background: theme.palette.background.default
                             }
                         }}
                         ref={anchorRef}
@@ -151,21 +196,8 @@ const NotificationSection = () => {
                                             <Grid container alignItems="center" justifyContent="space-between" sx={{ pt: 2, px: 2 }}>
                                                 <Grid item>
                                                     <Stack direction="row" spacing={2}>
-                                                        <Typography variant="subtitle1">All Notification</Typography>
-                                                        <Chip
-                                                            size="small"
-                                                            label="01"
-                                                            sx={{
-                                                                color: theme.palette.background.default,
-                                                                bgcolor: theme.palette.warning.dark
-                                                            }}
-                                                        />
+                                                        <Typography variant="subtitle1">Notifications</Typography>
                                                     </Stack>
-                                                </Grid>
-                                                <Grid item>
-                                                    <Typography component={Link} to="#" variant="subtitle2" color="primary">
-                                                        Mark as all read
-                                                    </Typography>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -174,40 +206,44 @@ const NotificationSection = () => {
                                                 style={{ height: '100%', maxHeight: 'calc(100vh - 205px)', overflowX: 'hidden' }}
                                             >
                                                 <Grid container direction="column" spacing={2}>
-                                                    <Grid item xs={12}>
-                                                        <Box sx={{ px: 2, pt: 0.25 }}>
-                                                            <TextField
-                                                                id="outlined-select-currency-native"
-                                                                select
-                                                                fullWidth
-                                                                value={value}
-                                                                onChange={handleChange}
-                                                                SelectProps={{
-                                                                    native: true
-                                                                }}
-                                                            >
-                                                                {status.map((option) => (
-                                                                    <option key={option.value} value={option.value}>
-                                                                        {option.label}
-                                                                    </option>
-                                                                ))}
-                                                            </TextField>
-                                                        </Box>
-                                                    </Grid>
                                                     <Grid item xs={12} p={0}>
                                                         <Divider sx={{ my: 0 }} />
                                                     </Grid>
                                                 </Grid>
-                                                <NotificationList />
+                                                {notifications.length > 0 ? (
+                                                    notifications.map((notice, index) => (
+                                                        <StockAlert
+                                                            key={index}
+                                                            type={notice.type}
+                                                            title={notice.title}
+                                                            date={notice.created_at}
+                                                            message={notice.message}
+                                                            status={notice.status}
+                                                            salesstatus={notice.salesstatus}
+                                                            onPress={() => handleOpenNotification(notice)}
+                                                        />
+                                                    ))
+                                                ) : (
+                                                    <Box
+                                                        padding={6}
+                                                        sx={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            flexDirection: 'column',
+                                                            color: theme.palette.grey[500]
+                                                        }}
+                                                    >
+                                                        <IconBellRinging size={30} />
+                                                        <Typography variant="body2" sx={{ marginTop: 2 }}>
+                                                            No Notification!
+                                                        </Typography>
+                                                    </Box>
+                                                )}
                                             </PerfectScrollbar>
                                         </Grid>
                                     </Grid>
                                     <Divider />
-                                    <CardActions sx={{ p: 1.25, justifyContent: 'center' }}>
-                                        <Button size="small" disableElevation>
-                                            View All
-                                        </Button>
-                                    </CardActions>
                                 </MainCard>
                             </ClickAwayListener>
                         </Paper>

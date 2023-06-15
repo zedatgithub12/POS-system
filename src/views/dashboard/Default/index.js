@@ -11,32 +11,58 @@ import TotalIncomeDarkCard from './TotalIncomeDarkCard';
 import TotalIncomeLightCard from './TotalIncomeLightCard';
 import TotalGrowthBarChart from './TotalGrowthBarChart';
 import { gridSpacing } from 'store/constant';
+import Connections from 'api';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
 const Dashboard = () => {
+    const userString = sessionStorage.getItem('user');
+    const user = JSON.parse(userString);
+
     const [isLoading, setLoading] = useState(true);
+    const [stat, setStat] = useState([]);
+    const [month] = useState('');
+    const [year] = useState('');
+
     useEffect(() => {
+        const fetchData = async () => {
+            var AdminApi = Connections.api + Connections.adminstat + `?month=${month}&year=${year}`;
+            var SalesApi = Connections.api + Connections.shopstat + `?shop=${user.store_name}&month=${month}&year=${year}`;
+            var Api = user.role === 'Admin' ? AdminApi : SalesApi;
+
+            const response = await fetch(Api);
+            const data = await response.json();
+            if (data.success) {
+                setStat(data.data);
+            }
+        };
+        fetchData();
         setLoading(false);
-    }, []);
+    }, [month, year]);
 
     return (
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
-                    <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <EarningCard isLoading={isLoading} />
-                    </Grid>
-                    <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <TotalOrderLineChartCard isLoading={isLoading} />
+                    <Grid item lg={8} md={12} sm={12} xs={12}>
+                        <TotalOrderLineChartCard
+                            isLoading={isLoading}
+                            dailySales={stat.dailySales ? stat.dailySales : 0}
+                            monthlysales={stat.monthlySales ? stat.monthlySales : 0}
+                            anualsales={stat.annualSales ? stat.annualSales : 0}
+                            todatesales={stat.todatesales ? stat.todatesales : 0}
+                        />
                     </Grid>
                     <Grid item lg={4} md={12} sm={12} xs={12}>
                         <Grid container spacing={gridSpacing}>
                             <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <TotalIncomeDarkCard isLoading={isLoading} />
+                                <TotalIncomeDarkCard isLoading={isLoading} totalProducts={stat.totalProducts ? stat.totalProducts : 0} />
                             </Grid>
                             <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <TotalIncomeLightCard isLoading={isLoading} />
+                                <TotalIncomeLightCard
+                                    isLoading={isLoading}
+                                    totalcustomers={stat.totalCustomers ? stat.totalCustomers : 0}
+                                />
                             </Grid>
                         </Grid>
                     </Grid>
@@ -48,7 +74,7 @@ const Dashboard = () => {
                         <TotalGrowthBarChart isLoading={isLoading} />
                     </Grid>
                     <Grid item xs={12} md={4}>
-                        <PopularCard isLoading={isLoading} />
+                        <PopularCard isLoading={isLoading} topProducts={stat.topProducts} />
                     </Grid>
                 </Grid>
             </Grid>

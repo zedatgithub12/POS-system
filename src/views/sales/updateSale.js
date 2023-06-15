@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // material-ui
 import {
@@ -22,40 +22,60 @@ import {
     Divider,
     Autocomplete
 } from '@mui/material';
-
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Delete } from '@mui/icons-material';
-// import { useDispatch } from 'react-redux';
-// import { addItem, removeItem, incrementQuantity, decrementQuantity } from 'cart/cartSlice';
-import forSale from 'data/itemsfosale';
 import Connections from 'api';
 
 // ==============================|| CREATE SALE PAGE ||============================== //
-const dummyNames = [{ customer: 'John Doe' }, { customer: 'Jane Doe' }, { customer: 'Bob Smith' }, { customer: 'Mary Johnson' }];
-
+const dummyNames = [{ name: 'Walking Customer' }, { name: 'Jane Doe' }, { name: 'Bob Smith' }, { name: 'Mary Johnson' }];
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const UpdateSale = () => {
     const navigate = useNavigate();
     const { state } = useLocation();
 
+    //fetch user info from session storage
+    const userString = sessionStorage.getItem('user');
+    const user = JSON.parse(userString);
     const item = state ? state : {};
     const GoBack = () => {
         navigate(-1);
     };
+
+    const [shops, setShops] = useState([]);
+    const [shopName, setShopsName] = useState('');
+    const [productData, setProductData] = useState([]);
     const [salesData, setSalesData] = useState(item);
-    const [grandTotal] = useState(item.grandtotal);
     const [saleTax, setSaleTax] = useState(item.tax);
     const [discount, setDiscount] = useState(item.discount);
     const [paymentStatus, setPaymentStatus] = useState(item.payment_status);
     const [paymentMethod, setPaymentMethod] = useState(item.payment_method);
     const [shop] = useState(item.shop);
-    const [customerName, setCustomerName] = useState(item.customer.name);
+    const [customerName, setCustomerName] = useState(item.customer);
     const [note, setNote] = useState(item.note);
+    const [spinner, setSpinner] = useState(false);
+    //
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
 
-    // const dispatch = useDispatch();
-
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
     const handleStatusChange = (event) => {
         setPaymentStatus(event.target.value);
     };
@@ -63,106 +83,237 @@ const UpdateSale = () => {
         setPaymentMethod(event.target.value);
     };
 
-    const handleAddToCart = (product) => {
-        // dispatch(addItem({ product }));
-        console.log(product);
-    };
+    // function handleAddToCart(itemToAdd) {
+    //     let newItem = {
+    //         id: itemToAdd.id,
+    //         itemName: itemToAdd.name,
+    //         itemCode: itemToAdd.code,
+    //         brand: itemToAdd.brand,
+    //         unit: itemToAdd.unit,
+    //         unitPrice: itemToAdd.price,
+    //         quantity: 1,
+    //         subtotal: itemToAdd.price
+    //     };
 
-    const handleIncrement = (itemId) => {
-        const updatedSalesData = salesData.map((sale) => {
-            const updatedItems = sale.items.map((item) => {
-                if (item.product.id === itemId) {
-                    return {
-                        ...item,
-                        quantity: item.quantity + 1,
-                        subtotal: (item.quantity + 1) * item.product.unitPrice
-                    };
-                }
-                return item;
-            });
-            const updatedGrandtotal = updatedItems.reduce((total, item) => total + item.subtotal, 0);
-            return {
-                ...sale,
-                items: updatedItems,
-                grandtotal: updatedGrandtotal
-            };
-        });
-        setSalesData(updatedSalesData);
-    };
+    //     // Parse the items string into a JavaScript array
+    //     const itemsArray = JSON.parse(salesData.items);
 
-    const handleDecrement = (itemId) => {
-        const updatedSalesData = salesData.map((sale) => {
-            const updatedItems = sale.items.map((item) => {
-                if (item.product.id === itemId && item.quantity > 1) {
-                    return {
-                        ...item,
-                        quantity: item.quantity - 1,
-                        subtotal: (item.quantity - 1) * item.product.unitPrice
-                    };
-                }
-                return item;
-            });
-            const updatedGrandtotal = updatedItems.reduce((total, item) => total + item.subtotal, 0);
-            return {
-                ...sale,
-                items: updatedItems,
-                grandtotal: updatedGrandtotal
-            };
-        });
-        setSalesData(updatedSalesData);
-    };
+    //     // Find the index of the object that needs to be updated (if it already exists in the array)
+    //     const index = itemsArray.find((item) => item.id === newItem.id);
 
-    const handleRemoveFromCart = (productToRemove) => {
-        const updatedSalesData = salesData.map((sale) => {
-            const updatedItems = sale.items.filter((item) => item.product.id !== productToRemove.id);
-            const updatedGrandtotal = updatedItems.reduce((total, item) => total + item.subtotal, 0);
-            return {
-                ...sale,
+    //     if (index) {
+    //         // If the item already exists in the array, update its quantity and subtotal
+    //         itemsArray[index].quantity++;
+    //         itemsArray[index].subtotal = itemsArray[index].quantity * itemToAdd.price;
+    //     } else {
+    //         // If the item doesn't exist in the array, add it to the end
+    //         itemsArray.push(newItem);
+    //     }
+
+    //     // Stringify the array back into a JSON string
+    //     const updatedItems = JSON.stringify(itemsArray);
+
+    //     const updatedSalesData = {
+    //         ...salesData,
+    //         items: updatedItems,
+    //         grandtotal: itemsArray.reduce((total, item) => total + item.subtotal, 0) + -salesData.discount
+    //     };
+
+    //     setSalesData(updatedSalesData);
+    // }
+
+    // Handle incrementing item quantity
+    function handleIncrement(itemId) {
+        let itemsArray = JSON.parse(salesData.items);
+
+        // Find the index of the object that needs to be updated
+        let index = itemsArray.findIndex((item) => item.id === itemId);
+
+        if (index !== -1) {
+            // If the item exists in the array, update its quantity and subtotal
+            itemsArray[index].quantity += 1;
+            itemsArray[index].subtotal = itemsArray[index].unitPrice * itemsArray[index].quantity;
+
+            // Stringify the array back into a JSON string
+            let updatedItems = JSON.stringify(itemsArray);
+
+            let updatedSalesData = {
+                ...salesData,
                 items: updatedItems,
-                grandtotal: updatedGrandtotal
+                grandtotal: itemsArray.reduce((total, item) => total + item.subtotal, 0) + -salesData.discount
             };
-        });
+
+            setSalesData(updatedSalesData);
+        }
+    }
+
+    // Handle decrementing item quantity
+    function handleDecrement(itemId) {
+        let itemsArray = JSON.parse(salesData.items);
+
+        // Find the index of the object that needs to be updated
+        let index = itemsArray.findIndex((item) => item.id === itemId);
+
+        if (index !== -1) {
+            // If the item exists in the array and its quantity is greater than 1, update its quantity and subtotal
+            if (itemsArray[index].quantity > 1) {
+                itemsArray[index].quantity -= 1;
+                itemsArray[index].subtotal = itemsArray[index].unitPrice * itemsArray[index].quantity;
+
+                // Stringify the array back into a JSON string
+                let updatedItems = JSON.stringify(itemsArray);
+
+                let updatedSalesData = {
+                    ...salesData,
+                    items: updatedItems,
+                    grandtotal: itemsArray.reduce((total, item) => total + item.subtotal, 0) + -salesData.discount
+                };
+
+                setSalesData(updatedSalesData);
+            }
+        }
+    }
+
+    // Handle removing item from cart
+    function handleRemoveFromCart(itemToRemove) {
+        let itemsArray = JSON.parse(salesData.items);
+
+        // Filter out the item to be removed
+        itemsArray = itemsArray.filter((item) => item.id !== itemToRemove.id);
+
+        // Stringify the array back into a JSON string
+        let updatedItems = JSON.stringify(itemsArray);
+
+        let updatedSalesData = {
+            ...salesData,
+            items: updatedItems,
+            grandtotal: itemsArray.reduce((total, item) => (total += item.subtotal), 0)
+        };
+
         setSalesData(updatedSalesData);
-    };
+    }
     const handleNoteChange = (event) => {
         setNote(event.target.value);
     };
 
-    const handleSave = () => {
+    const handleUpdate = () => {
         // Save sale to database
-        // alert('you make a sale');
-
-        var Api = Connections.url + Connections.createSale;
+        setSpinner(true);
+        var Api = Connections.api + Connections.updatesale + salesData.id;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
         };
 
         var Data = {
-            userid: 12, //this will be a value featched from session storage user.id
-            shop: 'shop', //this will be a shop salling user assigned as manager featched from session storage user.shop
-            customer: 'Kebede Nanno',
-            products: items,
+            user: user.name, //this will be a value featched from session storage user.id
+            shop: shopName, //this will be a shop salling user assigned as manager featched from session storage user.shop
+            customer: customerName,
+            products: JSON.parse(salesData.items),
             tax: saleTax,
             discount: discount,
-            grandTotal: grandTotal,
+            grandTotal: (salesData.grandtotal -= discount),
             payment_status: paymentStatus,
             payment_method: paymentMethod,
             note: note
         };
+
         fetch(Api, {
-            method: POST,
+            method: 'POST',
             headers: headers,
             body: JSON.stringify(Data)
         })
             .then((response) => response.json())
             .then((response) => {
-                console.log('Created sale', response);
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
             })
-            .catch((e) => {
-                console.log(e);
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error updating sale!'
+                });
+                setSpinner(false);
             });
     };
+    useEffect(() => {
+        const getShops = () => {
+            var Api = Connections.api + Connections.viewstore;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setShops(response.data);
+                    } else {
+                        setShops(shops);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error creatng shop!'
+                    });
+                });
+        };
+        const getProducts = () => {
+            var Api = Connections.api + Connections.viewproduct;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setProductData(response.data);
+                    } else {
+                        setProductData(productData);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error fetching product!'
+                    });
+                });
+        };
+        getProducts();
+        getShops();
+        return () => {};
+    }, [popup]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -189,23 +340,33 @@ const UpdateSale = () => {
                 <Grid item xs={12}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
-                            <TextField label="Shop" fullWidth value={shop} />
+                            <Autocomplete
+                                options={shops}
+                                getOptionLabel={(option) => option.name}
+                                onInputChange={(event, value) => {
+                                    if (value) {
+                                        setShopsName(value);
+                                    }
+                                }}
+                                defaultValue={{ name: shop }}
+                                renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" />}
+                            />
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <Autocomplete
                                 options={dummyNames}
-                                getOptionLabel={(option) => option.customer}
-                                onInputChange={(event, newValue) => {
-                                    setCustomerName(newValue);
+                                getOptionLabel={(option) => option.name}
+                                onInputChange={(event, value) => {
+                                    setCustomerName(value);
                                 }}
-                                defaultValue={{ customer: customerName }}
+                                defaultValue={{ name: customerName }}
                                 renderInput={(params) => <TextField {...params} label="Customer" variant="outlined" />}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        {/* <Grid item xs={12}>
                             <Autocomplete
-                                options={forSale}
-                                getOptionLabel={(option) => option.itemName}
+                                options={productData}
+                                getOptionLabel={(option) => option.name}
                                 onChange={(event, value) => {
                                     if (value) {
                                         handleAddToCart(value);
@@ -213,7 +374,7 @@ const UpdateSale = () => {
                                 }}
                                 renderInput={(params) => <TextField {...params} label="Search Product" variant="outlined" />}
                             />
-                        </Grid>
+                        </Grid> */}
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
                                 <Table>
@@ -230,24 +391,24 @@ const UpdateSale = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {item.items.map((item, index) => (
+                                        {JSON.parse(salesData.items).map((item, index) => (
                                             <TableRow key={index}>
-                                                <TableCell>{item.product.itemName}</TableCell>
-                                                <TableCell>{item.product.itemCode}</TableCell>
+                                                <TableCell>{item.itemName}</TableCell>
+                                                <TableCell>{item.itemCode}</TableCell>
 
-                                                <TableCell>{item.product.brand}</TableCell>
+                                                <TableCell>{item.brand}</TableCell>
                                                 <TableCell>
                                                     <Box display="flex" alignItems="center">
-                                                        <Button onClick={() => handleDecrement(item.product.id)}>-</Button>
+                                                        <Button onClick={() => handleDecrement(item.id)}>-</Button>
                                                         <Typography>{item.quantity}</Typography>
-                                                        <Button onClick={() => handleIncrement(item.product.id)}>+</Button>
+                                                        <Button onClick={() => handleIncrement(item.id)}>+</Button>
                                                     </Box>
                                                 </TableCell>
-                                                <TableCell>{item.product.unit}</TableCell>
-                                                <TableCell>{item.product.unitPrice}</TableCell>
-                                                <TableCell>{item.subtotal.toFixed(2)}</TableCell>
+                                                <TableCell>{item.unit}</TableCell>
+                                                <TableCell>{parseInt(item.unitPrice)}</TableCell>
+                                                <TableCell>{parseInt(item.subtotal).toFixed(2)}</TableCell>
                                                 <TableCell>
-                                                    <IconButton onClick={() => handleRemoveFromCart(item.product)}>
+                                                    <IconButton onClick={() => handleRemoveFromCart(item)}>
                                                         <Delete />
                                                     </IconButton>
                                                 </TableCell>
@@ -272,7 +433,9 @@ const UpdateSale = () => {
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell>Grand Total</TableCell>
-                                                <TableCell className="fw-semibold fs-4">{item.grandtotal.toFixed(2)} ETB</TableCell>
+                                                <TableCell className="fw-semibold fs-4">
+                                                    {parseInt(salesData.grandtotal).toFixed(2) - discount} ETB
+                                                </TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>
@@ -350,8 +513,14 @@ const UpdateSale = () => {
 
                         <Grid item xs={12}>
                             <Box mt={2} display="flex" justifyContent="flex-end">
-                                <Button variant="contained" color="primary" onClick={() => handleSave()}>
-                                    Save
+                                <Button variant="contained" color="primary" onClick={() => handleUpdate()}>
+                                    {spinner ? (
+                                        <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    ) : (
+                                        'Save'
+                                    )}
                                 </Button>
                                 <Box ml={1}>
                                     <Button variant="contained" color="secondary" onClick={GoBack}>
@@ -363,6 +532,11 @@ const UpdateSale = () => {
                     </Grid>
                 </Grid>
             </Grid>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </MainCard>
     );
 };

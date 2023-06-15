@@ -5,9 +5,17 @@ import dashboard from './dashboard';
 import Users from './users';
 
 // ==============================|| MENU ITEMS ||============================== //
+const userString = sessionStorage.getItem('user');
+const users = JSON.parse(userString);
+const user = users ? users : {};
 
-const menuItems = {
-    items: [dashboard, Users]
-};
+const menuItems =
+    user.role === 'Admin'
+        ? {
+              items: [dashboard, Users]
+          }
+        : {
+              items: [dashboard]
+          };
 
 export default menuItems;

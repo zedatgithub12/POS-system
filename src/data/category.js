@@ -1,7 +1,8 @@
 const CategoryData = [
     {
         id: 1,
-        name: 'Electronics'
+        name: 'Electronics',
+        description: 'Electronics devices category'
     },
     {
         id: 2,

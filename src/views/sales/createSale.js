@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // material-ui
 import {
@@ -22,7 +22,8 @@ import {
     Divider,
     Autocomplete
 } from '@mui/material';
-
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
@@ -30,27 +31,154 @@ import { useNavigate } from 'react-router-dom';
 import { Delete } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { addItem, removeItem, incrementQuantity, decrementQuantity } from 'cart/cartSlice';
-import forSale from 'data/itemsfosale';
 import Connections from 'api';
+import Quagga from 'quagga';
+import { useTheme } from '@mui/material/styles';
 
 // ==============================|| CREATE SALE PAGE ||============================== //
-const dummyNames = [{ customer: 'John Doe' }, { customer: 'Jane Doe' }, { customer: 'Bob Smith' }, { customer: 'Mary Johnson' }];
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const CreateSale = () => {
+    window.addEventListener('offline', listenForNetworkConnectivityChanges);
+    window.addEventListener('online', listenForNetworkConnectivityChanges);
+
+    function listenForNetworkConnectivityChanges() {
+        // Get the network status.
+        var networkStatus = navigator.connection.effectiveType;
+
+        // Check if there is a network connection.
+        if (networkStatus === 'cellular' || networkStatus === 'wifi') {
+            // Send the data to the online database.
+            var data = getIndexDbData();
+            updateOnlineDatabase(data);
+        } else {
+            // Save the data to the local indexdb database.
+            saveIndexDbData(data);
+            console.log('saving to local database');
+            console.log(getIndexDbData());
+        }
+    }
+
+    function getIndexDbData() {
+        // Get the indexdb database.
+        var db = window.indexedDB;
+
+        // Open the database.
+        var request = db.open('addis_chircharo', 1);
+
+        // Wait for the database to open.
+        request.onsuccess = function (event) {
+            // Get the data from the database.
+            var data = event.target.result.transaction.objectStore('data').getAllKeys();
+
+            // Return the data.
+            return data;
+        };
+    }
+
+    function updateOnlineDatabase(data) {
+        setSpinner(true);
+        var Api = Connections.api + Connections.createsale;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        fetch(Api, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(data)
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error creating sale!'
+                });
+                setSpinner(false);
+            });
+    }
+
+    function saveIndexDbData(data) {
+        // Get the indexdb database.
+        var db = window.indexedDB;
+
+        // Open the database.
+        var request = db.open('addis_chircharo', 1);
+
+        // Wait for the database to open.
+        request.onsuccess = function (event) {
+            // Save the data to the database.
+            var transaction = event.target.result.transaction;
+            var objectStore = transaction.objectStore('data');
+
+            objectStore.add(data);
+        };
+    }
+
+    const theme = useTheme();
     const navigate = useNavigate();
     const GoBack = () => {
         navigate(-1);
     };
+    //redux dispatch
+    const dispatch = useDispatch();
+    //fetch user info from session storage
+    const userString = sessionStorage.getItem('user');
+    const user = JSON.parse(userString);
+
+    const [shops, setShops] = useState([]);
+    const [CustomersData, setCustomersData] = useState([]);
+    const [productData, setProductData] = useState([]);
     const items = useSelector((state) => state.cart.items);
     const grandTotal = useSelector((state) => state.cart.grandTotal);
+    const [isScanning, setIsScanning] = useState(false);
     const [saleTax, setSaleTax] = useState(0);
     const [discount, setDiscount] = useState(0);
     const [paymentStatus, setPaymentStatus] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('');
+    const [shopName, setShopsName] = useState(user.role === 'Admin' ? '' : user.store_name);
     const [customerName, setCustomerName] = useState('');
     const [note, setNote] = useState('');
-
-    const dispatch = useDispatch();
+    const [spinner, setSpinner] = useState(false);
+    const sname = user.role === 'Admin' ? shops : user.store_name;
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
 
     const handleStatusChange = (event) => {
         setPaymentStatus(event.target.value);
@@ -77,20 +205,72 @@ const CreateSale = () => {
         setNote(event.target.value);
     };
 
+    const startScanner = () => {
+        Quagga.init(
+            {
+                inputStream: {
+                    name: 'Live',
+                    type: 'LiveStream',
+                    target: document.querySelector('#barcode'),
+                    constraints: {
+                        width: 40,
+                        height: 40,
+                        facingMode: 'environment',
+                        margin: 10
+                    }
+                },
+
+                decoder: {
+                    readers: ['code_128_reader'] // specify the barcode format
+                }
+            },
+            function (err) {
+                if (err) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is problem with initializing barcode scanner'
+                    });
+                    return;
+                }
+
+                Quagga.start();
+                setIsScanning(true);
+            }
+        );
+    };
+
+    Quagga.onDetected((data) => {
+        setIsScanning(false);
+        Quagga.stop();
+
+        const scannedItem = productData.find((item) => item.code === parseInt(data.codeResult.code));
+        if (scannedItem) {
+            handleAddToCart(scannedItem);
+        } else {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Unable to detect the barcode!'
+            });
+        }
+    });
+
     const handleSave = () => {
         // Save sale to database
-        // alert('you make a sale');
-
-        var Api = Connections.url + Connections.createSale;
+        setSpinner(true);
+        var Api = Connections.api + Connections.createsale;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
         };
 
         var Data = {
-            userid: 12, //this will be a value featched from session storage user.id
-            shop: 'shop', //this will be a shop salling user assigned as manager featched from session storage user.shop
-            customer: 'Kebede Nanno',
+            user: user.name, //this will be a value featched from session storage user.id
+            shop: shopName, //this will be a shop salling user assigned as manager featched from session storage user.shop
+            customer: customerName,
             products: items,
             tax: saleTax,
             discount: discount,
@@ -99,23 +279,147 @@ const CreateSale = () => {
             payment_method: paymentMethod,
             note: note
         };
+
         fetch(Api, {
-            method: POST,
+            method: 'POST',
             headers: headers,
             body: JSON.stringify(Data)
         })
             .then((response) => response.json())
             .then((response) => {
-                console.log('Created sale', items);
-                console.log(response);
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
             })
-            .catch((e) => {
-                console.log(e);
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error fetching sales!'
+                });
+                setSpinner(false);
             });
     };
+
+    useEffect(() => {
+        const getShops = () => {
+            var Api = Connections.api + Connections.viewstore;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setShops(response.data);
+                    } else {
+                        setShops(shops);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error fetching shop!'
+                    });
+                });
+        };
+
+        const getCustomers = () => {
+            var AdminApi = Connections.api + Connections.viewcustomer;
+            var SalesApi = Connections.api + Connections.viewstorecustomer + user.store_name;
+            var Api = user.role === 'Admin' ? AdminApi : SalesApi;
+
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setCustomersData(response.data);
+                    } else {
+                        setCustomersData(CustomersData);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error fetching customers!'
+                    });
+                });
+        };
+
+        const getProducts = () => {
+            var AdminApi = Connections.api + Connections.viewproduct;
+            var saleApi = Connections.api + Connections.viewstoreproduct + user.store_name;
+            var Api = user.role === 'Admin' ? AdminApi : saleApi;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setProductData(response.data);
+                    } else {
+                        setProductData(productData);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error fetching product!'
+                    });
+                });
+        };
+        getCustomers();
+        getProducts();
+
+        if (user.role === 'Admin') {
+            getShops();
+        }
+
+        return () => {};
+    }, []);
     return (
         <MainCard>
-            <Grid container spacing={gridSpacing}>
+            <Grid container spacing={gridSpacing} gutterBottom>
                 <Grid item xs={12}>
                     <Grid container alignItems="center" justifyContent="space-between">
                         <Grid item>
@@ -139,23 +443,35 @@ const CreateSale = () => {
                 <Grid item xs={12}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
-                            <TextField label="Shop" fullWidth />
+                            {user.role === 'Admin' ? (
+                                <Autocomplete
+                                    options={shops}
+                                    getOptionLabel={(option) => option.name}
+                                    onInputChange={(event, value) => {
+                                        if (value) {
+                                            setShopsName(value);
+                                        }
+                                    }}
+                                    renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" />}
+                                />
+                            ) : (
+                                <TextField disabled label="Shop" variant="outlined" value={user.store_name} />
+                            )}
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <Autocomplete
-                                options={dummyNames}
-                                getOptionLabel={(option) => option.customer}
-                                onInputChange={(event, newValue) => {
-                                    setCustomerName(newValue);
+                                options={CustomersData}
+                                getOptionLabel={(option) => option.name}
+                                onInputChange={(event, value) => {
+                                    setCustomerName(value);
                                 }}
-                                defaultValue={{ customer: customerName }}
                                 renderInput={(params) => <TextField {...params} label="Customer" variant="outlined" />}
                             />
                         </Grid>
                         <Grid item xs={12}>
                             <Autocomplete
-                                options={forSale}
-                                getOptionLabel={(option) => option.itemName}
+                                options={productData}
+                                getOptionLabel={(option) => option.name}
                                 onChange={(event, value) => {
                                     if (value) {
                                         handleAddToCart(value);
@@ -163,6 +479,12 @@ const CreateSale = () => {
                                 }}
                                 renderInput={(params) => <TextField {...params} label="Search Product" variant="outlined" />}
                             />
+                            <Box style={{ display: 'flex', alignItems: 'center' }}>
+                                <Button className="mt-2" onClick={() => startScanner()} disabled={isScanning}>
+                                    Scan Barcode
+                                </Button>
+                                <Typography sx={{ color: theme.palette.error.main }}>{isScanning ? 'Scanning...' : ''}</Typography>
+                            </Box>
                         </Grid>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
@@ -182,22 +504,22 @@ const CreateSale = () => {
                                     <TableBody>
                                         {items.map((item, index) => (
                                             <TableRow key={index}>
-                                                <TableCell>{item.product.itemName}</TableCell>
-                                                <TableCell>{item.product.itemCode}</TableCell>
+                                                <TableCell>{item.itemName}</TableCell>
+                                                <TableCell>{item.itemCode}</TableCell>
 
-                                                <TableCell>{item.product.brand}</TableCell>
+                                                <TableCell>{item.brand}</TableCell>
                                                 <TableCell>
                                                     <Box display="flex" alignItems="center">
-                                                        <Button onClick={() => handleDecrement(item.product.id)}>-</Button>
+                                                        <Button onClick={() => handleDecrement(item.id)}>-</Button>
                                                         <Typography>{item.quantity}</Typography>
-                                                        <Button onClick={() => handleIncrement(item.product.id)}>+</Button>
+                                                        <Button onClick={() => handleIncrement(item.id)}>+</Button>
                                                     </Box>
                                                 </TableCell>
-                                                <TableCell>{item.product.unit}</TableCell>
-                                                <TableCell>{item.product.unitPrice}</TableCell>
-                                                <TableCell>{item.subtotal.toFixed(2)}</TableCell>
+                                                <TableCell>{item.unit}</TableCell>
+                                                <TableCell>{item.unitPrice}</TableCell>
+                                                <TableCell>{parseInt(item.subtotal)}</TableCell>
                                                 <TableCell>
-                                                    <IconButton onClick={() => handleRemoveFromCart(item.product)}>
+                                                    <IconButton onClick={() => handleRemoveFromCart(item)}>
                                                         <Delete />
                                                     </IconButton>
                                                 </TableCell>
@@ -206,7 +528,13 @@ const CreateSale = () => {
                                     </TableBody>
                                 </Table>
                             </TableContainer>
+                            <Grid container>
+                                <Grid item xs={2} md={2} lg={2} xl={2}>
+                                    <div id="barcode" style={isScanning ? { height: 140 } : {}}></div>
+                                </Grid>
+                            </Grid>
                         </Grid>
+
                         <Grid item xs={12} md={6} className="m-auto">
                             <Box mt={2} className="border rounded mx-5">
                                 <TableContainer component={Paper}>
@@ -222,7 +550,12 @@ const CreateSale = () => {
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell>Grand Total</TableCell>
-                                                <TableCell className="fw-semibold fs-4">{grandTotal.toFixed(2)} ETB</TableCell>
+                                                <TableCell className="fw-semibold fs-4">
+                                                    {parseInt(grandTotal).toFixed(2)} ETB
+                                                    {/* <IconButton className="ms-3" onClick={() => setGrandTotal(grandTotal)}>
+                                                        <IconReload />
+                                                    </IconButton> */}
+                                                </TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>
@@ -291,7 +624,13 @@ const CreateSale = () => {
                         <Grid item xs={12}>
                             <Box mt={2} display="flex" justifyContent="flex-end">
                                 <Button variant="contained" color="primary" onClick={() => handleSave()}>
-                                    Save
+                                    {spinner ? (
+                                        <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    ) : (
+                                        'Save'
+                                    )}
                                 </Button>
                                 <Box ml={1}>
                                     <Button variant="contained" color="secondary" onClick={GoBack}>
@@ -303,6 +642,11 @@ const CreateSale = () => {
                     </Grid>
                 </Grid>
             </Grid>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </MainCard>
     );
 };

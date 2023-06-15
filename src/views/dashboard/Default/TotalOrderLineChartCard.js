@@ -17,7 +17,7 @@ import ChartDataYear from './chart-data/total-order-year-line-chart';
 
 // assets
 import LocalMallOutlinedIcon from '@mui/icons-material/LocalMallOutlined';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 // import { backgroundColor } from '@mui/system/palette';
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
@@ -64,10 +64,10 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 // ==============================|| DASHBOARD - TOTAL ORDER LINE CHART CARD ||============================== //
 
-const TotalOrderLineChartCard = ({ isLoading }) => {
+const TotalOrderLineChartCard = ({ isLoading, dailySales, monthlysales, anualsales, todatesales }) => {
     const theme = useTheme();
 
-    const [timeValue, setTimeValue] = useState(false);
+    const [timeValue, setTimeValue] = useState('day');
     const handleChangeTime = (event, newValue) => {
         setTimeValue(newValue);
     };
@@ -99,29 +99,59 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                     <Grid item>
                                         <Button
                                             disableElevation
-                                            variant={timeValue ? 'contained' : 'text'}
+                                            variant={timeValue === 'day' ? 'contained' : 'text'}
                                             size="small"
                                             color="inherit"
                                             sx={{
                                                 color: '#222',
-                                                backgroundColor: !timeValue ? theme.palette.warning.main : theme.palette.warning.light
+                                                backgroundColor:
+                                                    timeValue === 'day' ? theme.palette.warning.light : theme.palette.warning.dark
                                             }}
-                                            onClick={(e) => handleChangeTime(e, true)}
+                                            onClick={(e) => handleChangeTime(e, 'day')}
+                                        >
+                                            Today
+                                        </Button>
+                                        <Button
+                                            disableElevation
+                                            variant={timeValue === 'month' ? 'contained' : 'text'}
+                                            size="small"
+                                            color="inherit"
+                                            sx={{
+                                                color: '#222',
+                                                backgroundColor:
+                                                    timeValue === 'month' ? theme.palette.warning.light : theme.palette.warning.dark
+                                            }}
+                                            onClick={(e) => handleChangeTime(e, 'month')}
                                         >
                                             Month
                                         </Button>
                                         <Button
                                             disableElevation
-                                            variant={!timeValue ? 'contained' : 'text'}
+                                            variant={!timeValue === 'year' ? 'contained' : 'text'}
                                             size="small"
                                             color="inherit"
                                             sx={{
                                                 color: '#222',
-                                                backgroundColor: timeValue ? theme.palette.warning.dark : theme.palette.warning.main
+                                                backgroundColor:
+                                                    timeValue === 'year' ? theme.palette.warning.light : theme.palette.warning.dark
                                             }}
-                                            onClick={(e) => handleChangeTime(e, false)}
+                                            onClick={(e) => handleChangeTime(e, 'year')}
                                         >
                                             Year
+                                        </Button>
+                                        <Button
+                                            disableElevation
+                                            variant={!timeValue === 'todate' ? 'contained' : 'text'}
+                                            size="small"
+                                            color="inherit"
+                                            sx={{
+                                                color: '#222',
+                                                backgroundColor:
+                                                    timeValue === 'todate' ? theme.palette.warning.light : theme.palette.warning.dark
+                                            }}
+                                            onClick={(e) => handleChangeTime(e, 'todate')}
+                                        >
+                                            To Date
                                         </Button>
                                     </Grid>
                                 </Grid>
@@ -131,7 +161,7 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                     <Grid item xs={6}>
                                         <Grid container alignItems="center">
                                             <Grid item>
-                                                {timeValue ? (
+                                                {timeValue === 'day' ? (
                                                     <Typography
                                                         sx={{
                                                             fontSize: '2.125rem',
@@ -142,7 +172,33 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                                             color: '#222'
                                                         }}
                                                     >
-                                                        108
+                                                        {dailySales}
+                                                    </Typography>
+                                                ) : timeValue === 'month' ? (
+                                                    <Typography
+                                                        sx={{
+                                                            fontSize: '2.125rem',
+                                                            fontWeight: 500,
+                                                            mr: 1,
+                                                            mt: 1.75,
+                                                            mb: 0.75,
+                                                            color: '#222'
+                                                        }}
+                                                    >
+                                                        {monthlysales}
+                                                    </Typography>
+                                                ) : timeValue === 'year' ? (
+                                                    <Typography
+                                                        sx={{
+                                                            fontSize: '2.125rem',
+                                                            fontWeight: 500,
+                                                            mr: 1,
+                                                            mt: 1.75,
+                                                            mb: 0.75,
+                                                            color: '#222'
+                                                        }}
+                                                    >
+                                                        {anualsales}
                                                     </Typography>
                                                 ) : (
                                                     <Typography
@@ -155,22 +211,11 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                                             color: '#222'
                                                         }}
                                                     >
-                                                        961
+                                                        {todatesales}
                                                     </Typography>
                                                 )}
                                             </Grid>
-                                            <Grid item>
-                                                <Avatar
-                                                    sx={{
-                                                        ...theme.typography.smallAvatar,
-                                                        cursor: 'pointer',
-                                                        backgroundColor: theme.palette.warning.dark,
-                                                        color: theme.palette.dark.dark
-                                                    }}
-                                                >
-                                                    <ArrowDownwardIcon fontSize="inherit" sx={{ transform: 'rotate3d(1, 1, 1, 45deg)' }} />
-                                                </Avatar>
-                                            </Grid>
+
                                             <Grid item xs={12}>
                                                 <Typography
                                                     sx={{
@@ -185,7 +230,15 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
                                         </Grid>
                                     </Grid>
                                     <Grid item xs={6}>
-                                        {timeValue ? <Chart {...ChartDataMonth} /> : <Chart {...ChartDataYear} />}
+                                        {timeValue === 'day' ? (
+                                            <Chart {...ChartDataMonth} />
+                                        ) : timeValue === 'month' ? (
+                                            <Chart {...ChartDataYear} />
+                                        ) : timeValue === 'year' ? (
+                                            <Chart {...ChartDataMonth} />
+                                        ) : (
+                                            <Chart {...ChartDataYear} />
+                                        )}
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -198,7 +251,10 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
 };
 
 TotalOrderLineChartCard.propTypes = {
-    isLoading: PropTypes.bool
+    isLoading: PropTypes.bool,
+    dailySales: PropTypes.number,
+    monthlysales: PropTypes.number,
+    anualsales: PropTypes.number
 };
 
 export default TotalOrderLineChartCard;

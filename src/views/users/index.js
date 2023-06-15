@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // material-ui
 import {
     Grid,
@@ -24,6 +24,9 @@ import {
     Box,
     Collapse
 } from '@mui/material';
+
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
 import PropTypes from 'prop-types';
@@ -32,18 +35,36 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link } from 'react-router-dom';
 // import ProductDummy from 'data/products';
-import UsersData from 'data/users';
+// import UsersData from 'data/users';
+import Connections from 'api';
 
 // ==============================|| USERS PAGE ||============================== //
-
-const categories = ['All', 'admin', 'manager'];
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+const categories = ['Role', 'Admin', 'Sales'];
 
 const Users = () => {
+    const [userData, setUserData] = useState([]);
     const [searchText, setSearchText] = useState('');
-    const [roleFilter, setRoleFilter] = useState('All');
+    const [roleFilter, setRoleFilter] = useState('Role');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
 
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
     const handleSearchTextChange = (event) => {
         setSearchText(event.target.value);
     };
@@ -61,7 +82,7 @@ const Users = () => {
         setPage(0);
     };
 
-    const filteredData = UsersData.filter((user) => {
+    const filteredData = userData.filter((user) => {
         let isMatch = true;
 
         if (searchText) {
@@ -69,7 +90,7 @@ const Users = () => {
             isMatch = isMatch && (searchRegex.test(user.name) || searchRegex.test(user.email));
         }
 
-        if (roleFilter !== 'All') {
+        if (roleFilter !== 'Role') {
             isMatch = isMatch && user.role === roleFilter;
         }
 
@@ -77,7 +98,38 @@ const Users = () => {
     });
 
     const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
+    useEffect(() => {
+        const getUsers = () => {
+            var Api = Connections.api + Connections.viewuser;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setUserData(response.data);
+                    } else {
+                        setUserData(userData);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error featching  users!'
+                    });
+                });
+        };
+        getUsers();
+        return () => {};
+    }, [popup]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -109,7 +161,7 @@ const Users = () => {
                             color="primary"
                             value={searchText}
                             onChange={handleSearchTextChange}
-                            className="mb-4  "
+                            className="my-2"
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
@@ -123,12 +175,11 @@ const Users = () => {
 
                         <TextField
                             select
-                            label="Role"
                             variant="outlined"
                             color="primary"
                             value={roleFilter}
                             onChange={handleCategoryFilterChange}
-                            style={{ marginRight: '1rem', marginLeft: 6 }}
+                            className="my-2  ms-2"
                         >
                             {categories.map((category) => (
                                 <MenuItem key={category} value={category}>
@@ -152,7 +203,7 @@ const Users = () => {
                                 </TableHead>
                                 <TableBody>
                                     {paginatedData.map((user, index) => (
-                                        <ProductRow key={index} user={user} />
+                                        <UserRow key={index} user={user} />
                                     ))}
                                 </TableBody>
                             </Table>
@@ -169,12 +220,35 @@ const Users = () => {
                     </Box>
                 </Grid>
             </Grid>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </MainCard>
     );
 };
 
-const ProductRow = ({ user }) => {
+const UserRow = ({ user }) => {
     // const navigate = useNavigate();
+    const [name, setName] = useState(user.name);
+    const [email, setEmail] = useState(user.email);
+    const [role, setRole] = useState(user.role);
+    const [spinner, setSpinner] = useState(false);
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(!open);
@@ -187,7 +261,6 @@ const ProductRow = ({ user }) => {
         setDialogOpen(true);
     };
     const handleDialogClose = () => {
-        setSelectedProduct(null);
         setDialogOpen(false);
     };
     const DateSlice = (date) => {
@@ -198,11 +271,96 @@ const ProductRow = ({ user }) => {
     };
 
     const UpdateUser = () => {
-        alert('User will be Updated');
+        setSpinner(true);
+        var Api = Connections.api + Connections.updateuser + user.id;
+        const data = { name: name, email: email, role: role };
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        };
+        fetch(Api, requestOptions)
+            .then((response) => response.json())
+            .then((response) => {
+                // show success message
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                // show error message
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: response.message
+                });
+                setSpinner(false);
+            });
     };
-    const Delete = (id) => {
-        alert(id + 'will be deleted');
+    const handleDelete = (id) => {
+        // Do something with the deleted category
+        setSpinner(true);
+        var Api = Connections.api + Connections.deleteuser + id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'DELETE',
+            headers: headers
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                    handleDialogClose();
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: response.message
+                });
+                setSpinner(false);
+            });
     };
+
+    useEffect(() => {
+        return () => {};
+    }, [spinner, popup]);
 
     return (
         <>
@@ -217,7 +375,12 @@ const ProductRow = ({ user }) => {
                 </TableCell>
                 <TableCell component="th" scope="row">
                     {user.profile ? (
-                        <img src={user.picture} alt="user" style={{ width: 60, height: 60 }} className="img-fluid rounded m-auto me-2" />
+                        <img
+                            src={Connections.images + user.profile}
+                            alt="user"
+                            style={{ width: 40, height: 40 }}
+                            className="rounded-circle m-auto me-2 border"
+                        />
                     ) : (
                         <img
                             src="http://placehold.it/120x120&text=image"
@@ -250,15 +413,35 @@ const ProductRow = ({ user }) => {
 
                             <Grid container gridSpacing>
                                 <Grid item xs={12} sm={3} className="ms-0">
-                                    <TextField fullWidth placeholder="Name" color="primary" value={user.name} />
+                                    <TextField
+                                        fullWidth
+                                        placeholder="Name"
+                                        type="text"
+                                        color="primary"
+                                        value={name}
+                                        onChange={(event) => setName(event.target.value)}
+                                    />
                                 </Grid>
                                 <Grid item xs={12} sm={3} className="ms-3">
-                                    <TextField fullWidth color="primary" placeholder="Email" value={user.email} />
+                                    <TextField
+                                        fullWidth
+                                        color="primary"
+                                        placeholder="Email"
+                                        type="email"
+                                        value={email}
+                                        onChange={(event) => setEmail(event.target.value)}
+                                    />
                                 </Grid>
                                 <Grid item xs={12} sm={2} className="ms-3">
-                                    <TextField select fullWidth label="User Role" color="primary">
+                                    <TextField
+                                        select
+                                        fullWidth
+                                        label="User Role"
+                                        color="primary"
+                                        value={role}
+                                        onChange={(event) => setRole(event.target.value)}
+                                    >
                                         <MenuItem value="Admin">Admin</MenuItem>
-                                        <MenuItem value="Manager">Manager</MenuItem>
                                         <MenuItem value="Sales">Sales</MenuItem>
                                     </TextField>
                                 </Grid>
@@ -270,7 +453,13 @@ const ProductRow = ({ user }) => {
                                     color="primary"
                                     className="text-decoration-none mt-3 ms-1"
                                 >
-                                    Update
+                                    {spinner ? (
+                                        <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    ) : (
+                                        'Update'
+                                    )}
                                 </Button>
                             </Grid>
                         </Box>
@@ -279,24 +468,37 @@ const ProductRow = ({ user }) => {
             </TableRow>
 
             <Dialog open={dialogOpen} onClose={handleDialogClose}>
-                <DialogTitle>Delete Product</DialogTitle>
+                <DialogTitle>Delete User</DialogTitle>
                 <DialogContent>Do you want to delete {selectedProduct ? selectedProduct.name : ''} ?</DialogContent>
                 <DialogActions>
                     <Button variant="text" color="primary" onClick={handleDialogClose}>
                         Cancel
                     </Button>
-                    <Button variant="text" color="error" onClick={() => Delete(selectedProduct ? selectedProduct.id : '0')}>
-                        Yes
+                    <Button variant="text" color="error" onClick={() => handleDelete(selectedProduct.id)}>
+                        {spinner ? (
+                            <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        ) : (
+                            'Yes'
+                        )}
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 };
-ProductRow.propTypes = {
+UserRow.propTypes = {
     user: PropTypes.shape({
         profile: PropTypes.bool,
         picture: PropTypes.string,
+        id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
         email: PropTypes.string.isRequired,
         role: PropTypes.string.isRequired,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // material-ui
 import {
     Grid,
@@ -27,28 +27,54 @@ import {
     InputLabel,
     Select
 } from '@mui/material';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link } from 'react-router-dom';
-import CustomersData from 'data/customers';
+//import CustomersData from 'data/customers';
 import PropTypes from 'prop-types';
+import Connections from 'api';
+
 // ==============================|| CUSTOMERS PAGE ||============================== //
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const Customers = () => {
+    //fetch user info from session storage
+    const userString = sessionStorage.getItem('user');
+    const user = JSON.parse(userString);
+
+    const [CustomersData, setCustomersData] = useState([]);
     const [searchText, setSearchText] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('All');
+    const [shopFilter, setShopFilter] = useState('Shop');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
 
     const handleSearchTextChange = (event) => {
         setSearchText(event.target.value);
     };
 
-    const handleCategoryFilterChange = (event) => {
-        setCategoryFilter(event.target.value);
+    const handleShopFilterChange = (event) => {
+        setShopFilter(event.target.value);
     };
 
     const handleChangePage = (event, newPage) => {
@@ -60,23 +86,59 @@ const Customers = () => {
         setPage(0);
     };
 
-    const filteredData = CustomersData.filter((product) => {
+    const filteredData = CustomersData.filter((customers) => {
         let isMatch = true;
 
         if (searchText) {
             const searchRegex = new RegExp(searchText, 'i');
-            isMatch = isMatch && (searchRegex.test(product.name) || searchRegex.test(product.code));
+            isMatch = isMatch && (searchRegex.test(customers.name) || searchRegex.test(customers.name));
         }
 
-        if (categoryFilter !== 'All') {
-            isMatch = isMatch && product.category === categoryFilter;
+        if (shopFilter !== 'Shop') {
+            isMatch = isMatch && customers.shop === shopFilter;
         }
 
         return isMatch;
     });
 
+    //
     const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
+    useEffect(() => {
+        const getCustomers = () => {
+            var AdminApi = Connections.api + Connections.viewcustomer;
+            var SalesApi = Connections.api + Connections.viewstorecustomer + user.store_name;
+            var Api = user.role === 'Admin' ? AdminApi : SalesApi;
+
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setCustomersData(response.data);
+                    } else {
+                        setCustomersData(CustomersData);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error creatng shop!'
+                    });
+                });
+        };
+        getCustomers();
+        return () => {};
+    }, [popup]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -120,17 +182,18 @@ const Customers = () => {
                             }}
                         />
 
-                        <FormControl className="ms-2">
-                            <InputLabel>Shops</InputLabel>
-                            <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
-                                <MenuItem value="All">All</MenuItem>
-                                {Array.from(new Set(CustomersData.map((sale) => sale.shop))).map((shop) => (
-                                    <MenuItem key={shop} value={shop}>
-                                        {shop}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                        {user.role === 'Admin' && (
+                            <FormControl className="ms-2">
+                                <Select value={shopFilter} onChange={handleShopFilterChange}>
+                                    <MenuItem value="Shop">Shop</MenuItem>
+                                    {Array.from(new Set(CustomersData.map((sale) => sale.shop))).map((shop) => (
+                                        <MenuItem key={shop} value={shop}>
+                                            {shop}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        )}
 
                         <TableContainer component={Paper} className="shadow-sm">
                             <Table aria-label="product table">
@@ -164,12 +227,35 @@ const Customers = () => {
                     </Box>
                 </Grid>
             </Grid>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </MainCard>
     );
 };
 
 const CustomerRow = ({ customer }) => {
     // const navigate = useNavigate();
+
+    const [name, setName] = useState(customer.name);
+    const [phone, setPhone] = useState(customer.phone);
+    const [spinner, setSpinner] = useState(false);
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(!open);
@@ -182,8 +268,8 @@ const CustomerRow = ({ customer }) => {
         setDialogOpen(true);
     };
     const handleDialogClose = () => {
-        setSelectedProduct(null);
         setDialogOpen(false);
+        handleClose();
     };
     const DateSlice = (date) => {
         var year = date.slice(0, 4);
@@ -191,12 +277,99 @@ const CustomerRow = ({ customer }) => {
         var day = date.slice(8, 10);
         return day + '/' + month + '/' + year;
     };
-    const UpdateUser = () => {
-        alert('User will be Updated');
+    const UpdateCustomer = () => {
+        setSpinner(true);
+        var Api = Connections.api + Connections.updatecustomer + customer.id;
+        const data = { name: name, phone: phone };
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        };
+        fetch(Api, requestOptions)
+            .then((response) => response.json())
+            .then((response) => {
+                // show success message
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                // show error message
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: response.message
+                });
+                setSpinner(false);
+            });
     };
-    const Delete = (id) => {
-        alert(id + 'will be deleted');
+
+    const handleDelete = (id) => {
+        // Do something with the deleted category
+        setSpinner(true);
+        var Api = Connections.api + Connections.deletecustomer + id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'DELETE',
+            headers: headers
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                    handleDeleteDialogClose();
+                    handleDialogClose();
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: response.message
+                });
+                setSpinner(false);
+            });
     };
+
+    useEffect(() => {
+        return () => {};
+    }, [spinner]);
 
     return (
         <>
@@ -234,20 +407,38 @@ const CustomerRow = ({ customer }) => {
 
                             <Grid container gridSpacing>
                                 <Grid item xs={12} sm={3} className="ms-0">
-                                    <TextField fullWidth placeholder="Name" color="primary" value={customer.name} />
+                                    <TextField
+                                        fullWidth
+                                        placeholder="Name"
+                                        color="primary"
+                                        value={name}
+                                        onChange={(event) => setName(event.target.value)}
+                                    />
                                 </Grid>
                                 <Grid item xs={12} sm={3} className="ms-3">
-                                    <TextField fullWidth placeholder="phone" color="primary" value={customer.phone} />
+                                    <TextField
+                                        fullWidth
+                                        placeholder="phone"
+                                        color="primary"
+                                        value={phone}
+                                        onChange={(event) => setPhone(event.target.value)}
+                                    />
                                 </Grid>
                             </Grid>
                             <Grid item>
                                 <Button
-                                    onClick={() => UpdateUser()}
+                                    onClick={() => UpdateCustomer()}
                                     variant="contained"
                                     color="primary"
                                     className="text-decoration-none mt-3 ms-1"
                                 >
-                                    Update
+                                    {spinner ? (
+                                        <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    ) : (
+                                        'Update'
+                                    )}
                                 </Button>
                             </Grid>
                         </Box>
@@ -262,11 +453,22 @@ const CustomerRow = ({ customer }) => {
                     <Button variant="text" color="primary" onClick={handleDialogClose}>
                         Cancel
                     </Button>
-                    <Button variant="text" color="error" onClick={() => Delete(selectedProduct ? selectedProduct.name : '0')}>
-                        Yes
+                    <Button variant="text" color="error" onClick={() => handleDelete(selectedProduct.id)}>
+                        {spinner ? (
+                            <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        ) : (
+                            'Yes'
+                        )}
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 };

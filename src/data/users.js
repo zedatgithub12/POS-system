@@ -1,11 +1,13 @@
 const UsersData = [
     {
         id: 1,
+        profile: 'img_24324',
         name: 'Abebech Teferi',
         email: 'abebech.teferi@example.com',
+        role: 'admin',
         email_verified_at: '2021-01-01 00:00:00',
         password: 'password1',
-        role: 'admin',
+        remember_token: 'jdnvffdmvddss',
         created_at: '2021-01-01 00:00:00',
         updated_at: '2021-01-01 00:00:00'
     },
