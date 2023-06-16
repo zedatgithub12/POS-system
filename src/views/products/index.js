@@ -24,11 +24,14 @@ import {
     Box,
     Collapse,
     FormControl,
+    FormControlLabel,
+    Checkbox,
     Select,
     List,
     ListItem,
     ListItemText
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
@@ -54,7 +57,7 @@ const Products = () => {
     const [categoryFilter, setCategoryFilter] = useState('Category');
     const [brandFilter, setBrandFilter] = useState('Brand');
     const [shopFilter, setShopFilter] = useState('Shop');
-    const [statusFilter, setStatusFilter] = useState('Status');
+    const [statusFilter, setStatusFilter] = useState('In-stock');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
     const [productData, setProductData] = useState([]);
@@ -306,13 +309,17 @@ const Products = () => {
 const ProductRow = ({ product }) => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
-
+    const theme = useTheme();
     const navigate = useNavigate();
+    const [checked, setChecked] = useState(false);
+    const [spinner, setSpinner] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState([]);
+    const [dialogOpen, setDialogOpen] = useState(false);
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(!open);
     };
-    const [spinner, setSpinner] = useState(false);
+
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -328,8 +335,6 @@ const ProductRow = ({ product }) => {
             status: false
         });
     };
-    const [selectedProduct, setSelectedProduct] = useState([]);
-    const [dialogOpen, setDialogOpen] = useState(false);
 
     const handleTrashClick = (product) => {
         setSelectedProduct(product);
@@ -338,6 +343,10 @@ const ProductRow = ({ product }) => {
     const handleDialogClose = () => {
         setSelectedProduct(null);
         setDialogOpen(false);
+    };
+
+    const handleCheckboxChange = (event) => {
+        setChecked(event.target.checked);
     };
 
     const Delete = () => {
@@ -405,6 +414,55 @@ const ProductRow = ({ product }) => {
                 severity: 'error',
                 message: 'Please enter the new price'
             });
+        } else if (checked) {
+            setUpdating(true);
+            var Api = Connections.api + Connections.updateallprice;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            var data = {
+                productid: product.id,
+                productcode: product.code,
+                name: product.shop,
+                from: product.price,
+                to: inputValue
+            };
+
+            fetch(Api, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(data)
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        setUpdating(false);
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setUpdating(false);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error updating price'
+                    });
+                    setUpdating(false);
+                });
         } else {
             setUpdating(true);
             var Api = Connections.api + Connections.updateprice;
@@ -611,29 +669,46 @@ const ProductRow = ({ product }) => {
                                         Price Updates
                                     </Typography>
                                     {users.role === 'Admin' && (
-                                        <form onSubmit={handleSubmit}>
-                                            <TextField
-                                                label="Change to"
-                                                variant="outlined"
-                                                size="small"
-                                                value={inputValue}
-                                                className="mt-2"
-                                                onChange={handleInputChange}
-                                                InputProps={{
-                                                    endAdornment: (
-                                                        <IconButton type="submit">
-                                                            {updating ? (
-                                                                <div className="spinner-border spinner-border-sm text-dark " role="status">
-                                                                    <span className="visually-hidden">Loading...</span>
-                                                                </div>
-                                                            ) : (
-                                                                <IconCheck />
-                                                            )}
-                                                        </IconButton>
-                                                    )
-                                                }}
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={checked}
+                                                        onChange={handleCheckboxChange}
+                                                        name="checked"
+                                                        color="primary"
+                                                    />
+                                                }
+                                                label="All"
+                                                className="mt-2 ms-2"
                                             />
-                                        </form>
+                                            <form onSubmit={handleSubmit}>
+                                                <TextField
+                                                    label="Change to"
+                                                    variant="outlined"
+                                                    size="small"
+                                                    value={inputValue}
+                                                    className="mt-2 me-4"
+                                                    onChange={handleInputChange}
+                                                    InputProps={{
+                                                        endAdornment: (
+                                                            <IconButton type="submit">
+                                                                {updating ? (
+                                                                    <div
+                                                                        className="spinner-border spinner-border-sm text-dark "
+                                                                        role="status"
+                                                                    >
+                                                                        <span className="visually-hidden">Loading...</span>
+                                                                    </div>
+                                                                ) : (
+                                                                    <IconCheck />
+                                                                )}
+                                                            </IconButton>
+                                                        )
+                                                    }}
+                                                />
+                                            </form>
+                                        </Box>
                                     )}
 
                                     {prices ? (

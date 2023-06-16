@@ -261,59 +261,101 @@ const CreateSale = () => {
     const handleSave = () => {
         // Save sale to database
         setSpinner(true);
-        var Api = Connections.api + Connections.createsale;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
+        if (shopName === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please Select Shop!'
+            });
+            setSpinner(false);
+        } else if (customerName === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please Select Customer!'
+            });
+            setSpinner(false);
+        } else if (items.length === 0) {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please Select Items To be Sold!'
+            });
+            setSpinner(false);
+        } else if (paymentStatus === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please Select Payment Status!'
+            });
+            setSpinner(false);
+        } else if (paymentStatus === 'Paid' && paymentMethod === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please Select Payment Method!'
+            });
+            setSpinner(false);
+        } else {
+            var Api = Connections.api + Connections.createsale;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
 
-        var Data = {
-            user: user.name, //this will be a value featched from session storage user.id
-            shop: shopName, //this will be a shop salling user assigned as manager featched from session storage user.shop
-            customer: customerName,
-            products: items,
-            tax: saleTax,
-            discount: discount,
-            grandTotal: grandTotal,
-            payment_status: paymentStatus,
-            payment_method: paymentMethod,
-            note: note
-        };
+            var Data = {
+                user: user.name, //this will be a value featched from session storage user.id
+                shop: shopName, //this will be a shop salling user assigned as manager featched from session storage user.shop
+                customer: customerName,
+                products: items,
+                tax: saleTax,
+                discount: discount,
+                grandTotal: grandTotal,
+                payment_status: paymentStatus,
+                payment_method: paymentMethod,
+                note: note
+            };
 
-        fetch(Api, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(Data)
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'success',
-                        message: response.message
-                    });
-                    setSpinner(false);
-                } else {
+            fetch(Api, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(Data)
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    }
+                })
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: response.message
+                        message: 'There is error fetching sales!'
                     });
                     setSpinner(false);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error fetching sales!'
                 });
-                setSpinner(false);
-            });
+        }
     };
 
     useEffect(() => {

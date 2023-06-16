@@ -62,6 +62,7 @@ const Connections = {
     //price updates
     priceupdates: '/priceupdates/',
     updateprice: '/updateprice',
+    updateallprice: '/updateallprice',
 
     //Notifaction Api's
     adminnotification: '/adminnotification',

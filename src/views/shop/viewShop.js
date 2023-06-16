@@ -231,10 +231,6 @@ const ViewShop = () => {
         setLoading(false);
     }, [month, year, spinner, popup, shop]);
 
-    // const username = users.find((user) => {
-    //     return user.id === shop.manager;
-    // });
-
     return (
         <>
             <MainCard>
