@@ -4,9 +4,14 @@ import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 
+//package routing
 const Packages = Loadable(lazy(() => import('views/Packages')));
 const CreatePackage = Loadable(lazy(() => import('views/Packages/createPackage')));
 const UpdatePackage = Loadable(lazy(() => import('views/Packages/updatePackage')));
+
+//package selling routing
+const SalePackage = Loadable(lazy(() => import('views/package-sales/sale-package')));
+
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 // user profile routes
@@ -219,6 +224,11 @@ const MainRoutes = {
             path: 'update-package',
             element: <UpdatePackage />
         },
+        {
+            path: 'sale-package',
+            element: <SalePackage />
+        },
+
         {
             path: '*',
             element: <NotFound />
