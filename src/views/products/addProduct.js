@@ -63,6 +63,7 @@ const AddProduct = () => {
     const [productUnit, setProductUnit] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [productQuantity, setProductQuantity] = useState('');
+    const [productMinQuantity, setProductMinQuantity] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [warehouses, setWarehouses] = useState('');
     const [status, setStatus] = useState('');
@@ -89,6 +90,7 @@ const AddProduct = () => {
         data.append('unit', productUnit);
         data.append('price', productPrice);
         data.append('quantity', productQuantity);
+        data.append('min_quantity', productMinQuantity);
         data.append('description', productDescription);
         data.append('shop', warehouses);
         data.append('status', status);
@@ -338,6 +340,16 @@ const AddProduct = () => {
                                 color="primary"
                                 value={productQuantity}
                                 onChange={(event) => setProductQuantity(event.target.value)}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Min Quantity"
+                                color="primary"
+                                value={productMinQuantity}
+                                onChange={(event) => setProductMinQuantity(event.target.value)}
                                 required
                             />
                         </Grid>

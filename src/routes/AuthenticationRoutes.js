@@ -10,7 +10,6 @@ const AuthLogin = Loadable(lazy(() => import('views/pages/authentication/authent
 const AuthRegister = Loadable(lazy(() => import('views/pages/authentication/authentication3/Register')));
 const Forgot_Password = Loadable(lazy(() => import('views/password')));
 const Reset_Password = Loadable(lazy(() => import('views/password/reset')));
-const NotFound = Loadable(lazy(() => import('views/notFound')));
 // password changing page
 
 // ==============================|| AUTHENTICATION ROUTING ||============================== //

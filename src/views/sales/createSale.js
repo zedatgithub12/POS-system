@@ -164,7 +164,6 @@ const CreateSale = () => {
     const [customerName, setCustomerName] = useState('');
     const [note, setNote] = useState('');
     const [spinner, setSpinner] = useState(false);
-    const sname = user.role === 'Admin' ? shops : user.store_name;
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',

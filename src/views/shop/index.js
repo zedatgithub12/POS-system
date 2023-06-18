@@ -3,7 +3,6 @@ import {
     Grid,
     Typography,
     Button,
-    Divider,
     Card,
     CardContent,
     CardMedia,

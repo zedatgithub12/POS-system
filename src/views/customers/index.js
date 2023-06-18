@@ -24,7 +24,6 @@ import {
     Box,
     Collapse,
     FormControl,
-    InputLabel,
     Select
 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
@@ -474,6 +473,7 @@ const CustomerRow = ({ customer }) => {
 };
 CustomerRow.propTypes = {
     customer: PropTypes.shape({
+        id: PropTypes.number.isRequired,
         name: PropTypes.string.isRequired,
         phone: PropTypes.string.isRequired,
         shop: PropTypes.string.isRequired,

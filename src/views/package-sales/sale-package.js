@@ -10,7 +10,6 @@ import {
     TableHead,
     TableRow,
     Paper,
-    IconButton,
     Button,
     Box,
     Typography,
@@ -28,12 +27,7 @@ import MuiAlert from '@mui/material/Alert';
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate } from 'react-router-dom';
-import { Delete } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { addItem, removeItem, incrementQuantity, decrementQuantity } from 'cart/cartSlice';
 import Connections from 'api';
-import Quagga from 'quagga';
-import { useTheme } from '@mui/material/styles';
 
 // ==============================|| CREATE SALE PAGE ||============================== //
 
@@ -41,13 +35,11 @@ const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 const SalePackage = () => {
-    const theme = useTheme();
     const navigate = useNavigate();
     const GoBack = () => {
         navigate(-1);
     };
-    //redux dispatch
-    const dispatch = useDispatch();
+
     //fetch user info from session storage
     const userString = sessionStorage.getItem('user');
     const user = JSON.parse(userString);

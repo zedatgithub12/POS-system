@@ -18,7 +18,6 @@ import {
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import io from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import { IconBell, IconBellRinging } from '@tabler/icons';
 import StockAlert from './StockAlert';
@@ -26,7 +25,7 @@ import StockAlert from './StockAlert';
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import Connections from 'api';
-
+import PropTypes from 'prop-types';
 // notification status options
 
 // ==============================|| NOTIFICATION ||============================== //
@@ -70,6 +69,8 @@ const NotificationSection = () => {
     }, [open]);
 
     const getNotification = () => {
+        const Controller = new AbortController();
+        const signal = Controller.signal;
         var AdminApi = Connections.api + Connections.adminnotification;
         var saleApi = Connections.api + Connections.salesnotification + users.store_id;
         var Api = users.role === 'Admin' ? AdminApi : saleApi;
@@ -80,7 +81,8 @@ const NotificationSection = () => {
         // Make the API call using fetch()
         fetch(Api, {
             method: 'GET',
-            headers: headers
+            headers: headers,
+            signal: signal
         })
             .then((response) => response.json())
             .then((response) => {
@@ -93,6 +95,9 @@ const NotificationSection = () => {
             .catch((error) => {
                 console.log(error);
             });
+        return () => {
+            Controller.abort();
+        };
     };
 
     const handleOpenNotification = (notificationInfo) => {
@@ -119,7 +124,7 @@ const NotificationSection = () => {
             eventSource.close();
             clearInterval(intervalId);
         };
-    }, []);
+    }, [users.role, users.store_id]);
     return (
         <>
             <Box
@@ -253,5 +258,10 @@ const NotificationSection = () => {
         </>
     );
 };
-
+NotificationSection.propTypes = {
+    users: PropTypes.shape({
+        role: PropTypes.string.isRequired,
+        store_id: PropTypes.string.isRequired
+    }).isRequired
+};
 export default NotificationSection;

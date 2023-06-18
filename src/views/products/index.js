@@ -31,7 +31,6 @@ import {
     ListItem,
     ListItemText
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
@@ -309,7 +308,6 @@ const Products = () => {
 const ProductRow = ({ product }) => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
-    const theme = useTheme();
     const navigate = useNavigate();
     const [checked, setChecked] = useState(false);
     const [spinner, setSpinner] = useState(false);
@@ -642,12 +640,20 @@ const ProductRow = ({ product }) => {
                                                 <TableCell>{product.code}</TableCell>
                                             </TableRow>
                                             <TableRow>
-                                                <TableCell>Cost</TableCell>
-                                                <TableCell>{product.cost}</TableCell>
+                                                <TableCell>Origional Quantity</TableCell>
+                                                <TableCell>{product.origional_quantity}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>Min Quantity</TableCell>
+                                                <TableCell>{product.min_quantity}</TableCell>
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell>Unit</TableCell>
                                                 <TableCell>{product.unit}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>Cost</TableCell>
+                                                <TableCell>{product.cost}</TableCell>
                                             </TableRow>
 
                                             <TableRow>
@@ -782,6 +788,8 @@ ProductRow.propTypes = {
         brand: PropTypes.string.isRequired,
         price: PropTypes.number.isRequired,
         quantity: PropTypes.number.isRequired,
+        min_quantity: PropTypes.number.isRequired,
+        origional_quantity: PropTypes.number.isRequired,
         status: PropTypes.string.isRequired,
         code: PropTypes.string.isRequired,
         cost: PropTypes.number.isRequired,

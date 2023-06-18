@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 // material-ui
 import {
     Grid,
-    Typography,
-    Divider,
     Table,
     TableBody,
     TableCell,
@@ -22,7 +20,6 @@ import {
     FormControl,
     Checkbox,
     Select,
-    InputLabel,
     Dialog,
     DialogTitle,
     DialogContent,
@@ -32,11 +29,10 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { MoreVert } from '@mui/icons-material';
 import { IconSearch } from '@tabler/icons';
-import { useTheme } from '@mui/material/styles';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Connections from 'api';
 
 // ==============================|| SALES PAGE ||============================== //
@@ -46,10 +42,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const StockScreen = () => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
-
-    const theme = useTheme();
     const navigate = useNavigate();
-    const [active, setActive] = useState(true);
     const [anchorEl, setAnchorEl] = useState(null);
 
     //stock states
@@ -258,40 +251,9 @@ const StockScreen = () => {
                     });
                 });
         };
-        const getSoldPackage = () => {
-            var AdminApi = Connections.api + Connections.viewpackagesale;
-            var SalesApi = Connections.api + Connections.viewstorepackagesale + users.store_name;
-            var Api = users.role === 'Admin' ? AdminApi : SalesApi;
-
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            // Make the API call using fetch()
-            fetch(Api, {
-                method: 'GET',
-                headers: headers
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setSoldPackage(response.data);
-                    } else {
-                        setSoldPackage(soldPackage);
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: 'There is error fetching sold packages!'
-                    });
-                });
-        };
-        active ? getSales() : getSoldPackage();
+        getSales();
         return () => {};
-    }, [popup, active]);
+    }, [popup]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>

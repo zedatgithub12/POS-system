@@ -10,7 +10,6 @@ import {
     TableHead,
     TableRow,
     Paper,
-    IconButton,
     Button,
     Box,
     Typography,
@@ -51,7 +50,7 @@ const UpdateSoldPackage = () => {
     const [shops, setShops] = useState([]);
     const [shopName, setShopsName] = useState('');
     const [CustomersData, setCustomersData] = useState([]);
-    const [salesData, setSalesData] = useState(item);
+    const [salesData] = useState(item);
     const [saleTax, setSaleTax] = useState(item.tax);
     const [discount, setDiscount] = useState(item.discount);
     const [paymentStatus, setPaymentStatus] = useState(item.payment_status);
@@ -60,7 +59,6 @@ const UpdateSoldPackage = () => {
     const [customerName, setCustomerName] = useState(item.customer);
     const [note, setNote] = useState(item.note);
     const [spinner, setSpinner] = useState(false);
-    //
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',

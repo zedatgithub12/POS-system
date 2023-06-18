@@ -1,5 +1,5 @@
 // material-ui
-import { Grid, Divider, Box, Paper, Button, Typography, Table, TableBody, TableRow, TableCell, TableHead } from '@mui/material';
+import { Grid, Divider, Box, Button, Typography, Table, TableBody, TableRow, TableCell, TableHead } from '@mui/material';
 import Connections from 'api';
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -76,7 +76,7 @@ const ViewProduct = () => {
                         setIsLoading(true);
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     setIsLoading(true);
                 });
         };

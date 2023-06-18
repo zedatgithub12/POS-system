@@ -1,13 +1,11 @@
 // material-ui
 import { Grid, Box, Button, Typography } from '@mui/material';
 import notfound from 'assets/images/notfound.png';
-import { useNavigate } from 'react-router-dom';
 import Logo from 'ui-component/Logo';
 
 // ==============================|| PAGE NOT FOUND ||============================== //
 
 const NotFound = () => {
-    const navigate = useNavigate();
     return (
         <Box>
             <Box paddingX={4} sx={{ background: '#0781f2' }}>

@@ -4,7 +4,7 @@ import { Avatar, Divider, Grid, List, ListItem, ListItemAvatar, ListItemSecondar
 
 // assets
 import { IconBuildingStore, IconChartInfographic } from '@tabler/icons';
-
+import PropTypes from 'prop-types';
 // styles
 const ListItemWrapper = styled('div')(({ theme }) => ({
     cursor: 'pointer',
@@ -129,6 +129,15 @@ const StockAlert = ({ type, title, date, message, status, onPress, salesstatus }
             <Divider />
         </List>
     );
+};
+StockAlert.propTypes = {
+    type: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    date: PropTypes.instanceOf(Date).isRequired,
+    message: PropTypes.string.isRequired,
+    status: PropTypes.oneOf(['seen', 'unseen']).isRequired,
+    onPress: PropTypes.func.isRequired,
+    salesstatus: PropTypes.oneOf(['seen', 'unseen']).isRequired
 };
 
 export default StockAlert;

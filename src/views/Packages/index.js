@@ -24,10 +24,7 @@ import {
     Box,
     Collapse,
     FormControl,
-    Select,
-    List,
-    ListItem,
-    ListItemText
+    Select
 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -40,7 +37,6 @@ import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Connections from 'api';
-import packages from 'assets/images/packages.svg';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 // ==============================|| PACKAGES PAGE ||============================== //
 
@@ -489,18 +485,15 @@ const ProductRow = ({ product }) => {
 ProductRow.propTypes = {
     product: PropTypes.shape({
         id: PropTypes.number,
-        picture: PropTypes.string,
         name: PropTypes.string.isRequired,
+        shopname: PropTypes.string.isRequired,
         category: PropTypes.string.isRequired,
-        brand: PropTypes.string.isRequired,
         price: PropTypes.number.isRequired,
         quantity: PropTypes.number.isRequired,
         status: PropTypes.string.isRequired,
         code: PropTypes.string.isRequired,
-        cost: PropTypes.number.isRequired,
         unit: PropTypes.string.isRequired,
-        shop: PropTypes.string.isRequired,
-        description: PropTypes.string.isRequired
+        shop: PropTypes.string.isRequired
     }).isRequired
 };
 export default Packages;

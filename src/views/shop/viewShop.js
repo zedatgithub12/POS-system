@@ -14,7 +14,6 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import PopularCard from 'views/dashboard/Default/PopularCard';
-import EarningCard from 'views/dashboard/Default/EarningCard';
 import TotalOrderLineChartCard from 'views/dashboard/Default/TotalOrderLineChartCard';
 import TotalIncomeDarkCard from 'views/dashboard/Default/TotalIncomeDarkCard';
 import TotalIncomeLightCard from 'views/dashboard/Default/TotalIncomeLightCard';
@@ -89,12 +88,6 @@ const ViewShop = () => {
     };
     const CloseShop = () => {
         setOpen(false);
-    };
-    const DateSlice = (date) => {
-        var year = date.slice(0, 4);
-        var month = date.slice(5, 7);
-        var day = date.slice(8, 10);
-        return day + '/' + month + '/' + year;
     };
 
     const handleShopFilterChange = (event) => {
@@ -543,15 +536,17 @@ const ViewShop = () => {
                             <Grid item>
                                 <Typography variant="body2">Created at</Typography>
                             </Grid>
-                            <Grid item>
-                                <Typography variant="h5">
-                                    {activeShops.created_at.slice(8, 10) +
-                                        '/' +
-                                        activeShops.created_at.slice(5, 7) +
-                                        '/' +
-                                        activeShops.created_at.slice(0, 4)}
-                                </Typography>
-                            </Grid>
+                            {activeShops.created_at && (
+                                <Grid item>
+                                    <Typography variant="h5">
+                                        {activeShops.created_at.slice(8, 10) +
+                                            '/' +
+                                            activeShops.created_at.slice(5, 7) +
+                                            '/' +
+                                            activeShops.created_at.slice(0, 4)}
+                                    </Typography>
+                                </Grid>
+                            )}
                         </Grid>
 
                         <Grid
