@@ -264,7 +264,7 @@ const SalePackage = () => {
 
         const getPackages = () => {
             var AdminApi = Connections.api + Connections.viewpackages;
-            var saleApi = Connections.api + Connections.viewstorepackage + user.store_name;
+            var saleApi = Connections.api + Connections.viewstorepackage + user.store_id;
             var Api = user.role === 'Admin' ? AdminApi : saleApi;
             var headers = {
                 accept: 'application/json',

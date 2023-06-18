@@ -11,6 +11,8 @@ const UpdatePackage = Loadable(lazy(() => import('views/Packages/updatePackage')
 
 //package selling routing
 const SalePackage = Loadable(lazy(() => import('views/package-sales/sale-package')));
+const UpdateSoldPackage = Loadable(lazy(() => import('views/package-sales/update-sold-package')));
+const ViewSoldPackage = Loadable(lazy(() => import('views/package-sales/view-sold-package')));
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -227,6 +229,14 @@ const MainRoutes = {
         {
             path: 'sale-package',
             element: <SalePackage />
+        },
+        {
+            path: 'update-sold-package',
+            element: <UpdateSoldPackage />
+        },
+        {
+            path: 'view-sold-package',
+            element: <ViewSoldPackage />
         },
 
         {

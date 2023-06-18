@@ -15,8 +15,9 @@ import {
     Typography,
     Button
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { AccountCircleOutlined, ReceiptOutlined, CreditCardOutlined, InfoOutlined } from '@mui/icons-material';
-
+import { IconBuildingStore } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -25,6 +26,7 @@ import { gridSpacing } from 'store/constant';
 // ==============================|| VIEW SALE PAGE ||============================== //
 
 const ViewSale = () => {
+    const theme = useTheme();
     const navigate = useNavigate();
     const { state } = useLocation();
 
@@ -41,7 +43,7 @@ const ViewSale = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Sale Detail </Typography>
+                                    <Typography variant="h3">{item.reference} Detail </Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -58,37 +60,28 @@ const ViewSale = () => {
                 </Grid>
                 <Grid item xs={12}>
                     <Box>
-                        <Grid item xs={12} className="">
-                            <Typography className="p-2 py-2 fs-6 fw-semibold fst-italic mx-auto" alignSelf="center">
-                                Sale Detail : {item.reference}
-                            </Typography>
-                        </Grid>
                         <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6}>
-                                <Paper variant="outlined">
-                                    <Typography className="px-3 py-2 fs-6 fw-semibold">Customer Information</Typography>
-                                    <Box p={2} display="flex" alignItems="center">
-                                        <Avatar className="bg-light">
-                                            <AccountCircleOutlined />
-                                        </Avatar>
-                                        <Box ml={2}>
-                                            <Typography variant="h6">{item.customer}</Typography>
-                                        </Box>
-                                    </Box>
-                                </Paper>
-                            </Grid>
                             <Grid item xs={12} sm={6}>
                                 <Paper variant="outlined">
                                     <Typography className="px-3 py-2 fs-6  fw-semibold">Invoice Info</Typography>
                                     <Box p={1} ml={2} display="flex" alignItems="center">
                                         <Avatar className="bg-light">
+                                            <IconBuildingStore />
+                                        </Avatar>
+                                        <Box ml={2}>
+                                            <Typography variant="h6">Shop</Typography>
+                                            <Typography color="text.secondary">{item.shop}</Typography>
+                                        </Box>
+                                    </Box>
+                                    <Box p={1} ml={2} display="flex" alignItems="center">
+                                        <Avatar className="bg-light">
                                             <ReceiptOutlined />
                                         </Avatar>
                                         <Box ml={2}>
-                                            <Typography variant="h6">
-                                                Sold #{item.date} || {item.time}
+                                            <Typography variant="h6">Sold at</Typography>
+                                            <Typography color="text.secondary">
+                                                Date {item.date} | Time {item.time.slice(0, 5)}
                                             </Typography>
-                                            <Typography color="text.secondary">{item.shop}</Typography>
                                         </Box>
                                     </Box>
                                     <Box p={1} ml={2} display="flex" alignItems="center">
@@ -113,12 +106,27 @@ const ViewSale = () => {
                                     )}
                                 </Paper>
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid item xs={12} sm={6}>
                                 <Paper variant="outlined">
+                                    <Typography className="px-3 py-2 fs-6 fw-semibold">Customer Information</Typography>
+                                    <Box p={2} display="flex" alignItems="center">
+                                        <Avatar className="bg-light">
+                                            <AccountCircleOutlined />
+                                        </Avatar>
+                                        <Box ml={2}>
+                                            <Typography variant="h6">{item.customer}</Typography>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Paper>
                                     <Box p={2}>
-                                        <Typography variant="h6">Product Summary</Typography>
-                                        <Divider />
-                                        <TableContainer>
+                                        <Typography variant="h5" sx={{ margin: 2 }}>
+                                            Product Summary
+                                        </Typography>
+
+                                        <TableContainer sx={{ bgcolor: theme.palette.primary.light, borderRadius: 2, padding: 2 }}>
                                             <Table size="small">
                                                 <TableHead>
                                                     <TableRow>
@@ -151,23 +159,30 @@ const ViewSale = () => {
                             </Grid>
 
                             <Grid container xs={12}>
-                                <Grid item xs={7}></Grid>
-                                <Grid item xs={4} className="py-4 my-5 border shadow-sm rounded">
-                                    <TableContainer>
+                                <Grid item xs={12} sm={8} lg={6} xl={6} sx={{ paddingY: 4, margin: 4, borderRadius: 4 }}>
+                                    <TableContainer component="paper" variant="outlined">
                                         <Table size="small">
                                             <TableBody>
                                                 <TableRow>
                                                     <TableCell>Total Tax</TableCell>
-                                                    <TableCell align="right">{parseInt(item.tax).toFixed(2)}%</TableCell>
+                                                    <TableCell align="right" sx={{ color: theme.palette.primary.main }}>
+                                                        {parseInt(item.tax).toFixed(2)}%
+                                                    </TableCell>
                                                 </TableRow>
                                                 <TableRow>
                                                     <TableCell>Total Discount</TableCell>
-                                                    <TableCell align="right">ETB {parseInt(item.discount).toFixed(2)}</TableCell>
+                                                    <TableCell align="right" sx={{ color: theme.palette.primary.main }}>
+                                                        {parseInt(item.discount).toFixed(2)} ETB
+                                                    </TableCell>
                                                 </TableRow>
                                                 <TableRow>
                                                     <TableCell className="border-bottom-0 fw-semibold">Grand Total</TableCell>
-                                                    <TableCell align="right" className="border-bottom-0 fw-semibold fs-5">
-                                                        ETB {parseInt(item.grandtotal).toFixed(2)}
+                                                    <TableCell
+                                                        align="right"
+                                                        className="border-bottom-0 fw-semibold fs-5"
+                                                        sx={{ color: theme.palette.primary.main }}
+                                                    >
+                                                        {parseInt(item.grandtotal).toFixed(2)} ETB
                                                     </TableCell>
                                                 </TableRow>
                                             </TableBody>
@@ -177,9 +192,9 @@ const ViewSale = () => {
                             </Grid>
 
                             <Grid item xs={12}>
-                                <Paper variant="outlined">
+                                <Paper>
                                     <Box p={2}>
-                                        <Typography variant="h6">Additional Note</Typography>
+                                        <Typography variant="h5">Additional Note</Typography>
                                         <Divider />
                                         <Typography className="py-3">{item.note}</Typography>
                                     </Box>

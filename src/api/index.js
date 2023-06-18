@@ -37,6 +37,9 @@ const Connections = {
     createpackagesale: '/createpackagesale',
     viewpackagesale: '/viewsoldpackages',
     viewstorepackagesale: '/viewstorepackagesale/',
+    updatepackagesale: '/updatepackagesale/',
+    deletepackagesale: '/deletepackagesale/',
+
     //category api's
     addcategory: '/addcategory',
     viewcategory: '/viewcategory',

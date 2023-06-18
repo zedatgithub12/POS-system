@@ -1,6 +1,6 @@
 import React, { useState, forwardRef, useEffect } from 'react';
 // material-ui
-import { Grid, Typography, Button, Divider, TextField, MenuItem } from '@mui/material';
+import { Grid, Typography, Button, Divider, TextField, MenuItem, FormControl, Select } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -36,6 +36,10 @@ const ViewShop = () => {
     const GoBack = () => {
         navigate(-1);
     };
+
+    const [shops, setShops] = useState([]);
+    const [activeShops, setActiveShops] = useState([]);
+    const [shopFilter, setShopFilter] = useState(shop.name);
     const [isLoading, setLoading] = useState(true);
     const [stat, setStat] = useState([]);
     const [month] = useState('');
@@ -59,6 +63,7 @@ const ViewShop = () => {
     const handleAddDialogClose = () => {
         setAddDialogOpen(false);
     };
+
     const handleSnackClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -90,6 +95,10 @@ const ViewShop = () => {
         var month = date.slice(5, 7);
         var day = date.slice(8, 10);
         return day + '/' + month + '/' + year;
+    };
+
+    const handleShopFilterChange = (event) => {
+        setShopFilter(event.target.value);
     };
 
     const AddManager = () => {
@@ -189,14 +198,47 @@ const ViewShop = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const response = await fetch(Connections.api + Connections.shopstat + `?shop=${shop.name}&month=${month}&year=${year}`);
+            const response = await fetch(Connections.api + Connections.shopstat + `?shop=${shopFilter}&month=${month}&year=${year}`);
             const data = await response.json();
             if (data.success) {
                 setStat(data.data);
+                setActiveShops(data.data.shopInfo);
                 setLoading(false);
             }
         };
 
+        fetchData();
+    }, [month, year, popup, shopFilter]);
+
+    useEffect(() => {
+        const getShops = () => {
+            var Api = Connections.api + Connections.viewstore;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setShops(response.data);
+                    } else {
+                        setShops(shops);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error creatng shop!'
+                    });
+                });
+        };
         const getUsers = () => {
             var Api = Connections.api + Connections.viewuser;
             var headers = {
@@ -227,10 +269,10 @@ const ViewShop = () => {
         };
 
         getUsers();
-        fetchData();
-        setLoading(false);
-    }, [month, year, spinner, popup, shop]);
+        getShops();
 
+        return () => {};
+    }, []);
     return (
         <>
             <MainCard>
@@ -239,9 +281,15 @@ const ViewShop = () => {
                         <Grid container alignItems="center" justifyContent="space-between">
                             <Grid item>
                                 <Grid container direction="column" spacing={1}>
-                                    <Grid item>
-                                        <Typography variant="h3">{shop.name}</Typography>
-                                    </Grid>
+                                    <FormControl className="ms-2 my-2 ">
+                                        <Select value={shopFilter} onChange={handleShopFilterChange}>
+                                            {Array.from(new Set(shops.map((item) => item.name))).map((shop) => (
+                                                <MenuItem key={shop} value={shop}>
+                                                    {shop}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
                                 </Grid>
                             </Grid>
                             <Grid item>
@@ -357,8 +405,8 @@ const ViewShop = () => {
                             <Grid item>
                                 <img
                                     src={
-                                        shop.profile_image
-                                            ? Connections.images + shop.profile_image
+                                        activeShops.profile_image
+                                            ? Connections.images + activeShops.profile_image
                                             : Connections.images + '646137991fd91.jpg'
                                     }
                                     alt="Shop Profile Preview"
@@ -380,7 +428,7 @@ const ViewShop = () => {
                                 <Typography variant="body2">Shop Address</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h5">{shop.address}</Typography>
+                                <Typography variant="h5">{activeShops.address}</Typography>
                             </Grid>
                         </Grid>
                         <Grid
@@ -396,7 +444,7 @@ const ViewShop = () => {
                                 <Typography variant="body2">Category</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h5">{shop.category}</Typography>
+                                <Typography variant="h5">{activeShops.category}</Typography>
                             </Grid>
                         </Grid>
                         <Grid
@@ -412,7 +460,7 @@ const ViewShop = () => {
                                 <Typography variant="body2">Region</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h5">{shop.region}</Typography>
+                                <Typography variant="h5">{activeShops.region}</Typography>
                             </Grid>
                         </Grid>
                         <Grid
@@ -428,7 +476,7 @@ const ViewShop = () => {
                                 <Typography variant="body2">City</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h5">{shop.city}</Typography>
+                                <Typography variant="h5">{activeShops.city}</Typography>
                             </Grid>
                         </Grid>
                         <Grid
@@ -444,7 +492,7 @@ const ViewShop = () => {
                                 <Typography variant="body2">Subcity</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h5">{shop.address}</Typography>
+                                <Typography variant="h5">{activeShops.address}</Typography>
                             </Grid>
                         </Grid>
                         <Grid
@@ -461,7 +509,7 @@ const ViewShop = () => {
                             </Grid>
                             <Grid item>
                                 <Typography variant="h5">
-                                    {shop.manager ? shop.manager : <Button onClick={() => handleAddDialogOpen()}>Add</Button>}
+                                    {activeShops.manager ? activeShops.manager : <Button onClick={() => handleAddDialogOpen()}>Add</Button>}
                                 </Typography>
                             </Grid>
                         </Grid>
@@ -479,7 +527,7 @@ const ViewShop = () => {
                                 <Typography variant="body2"> Phone</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h5">{shop.phone}</Typography>
+                                <Typography variant="h5">{activeShops.phone}</Typography>
                             </Grid>
                         </Grid>
 
@@ -496,7 +544,13 @@ const ViewShop = () => {
                                 <Typography variant="body2">Created at</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h5">{DateSlice(shop.created_at)}</Typography>
+                                <Typography variant="h5">
+                                    {activeShops.created_at.slice(8, 10) +
+                                        '/' +
+                                        activeShops.created_at.slice(5, 7) +
+                                        '/' +
+                                        activeShops.created_at.slice(0, 4)}
+                                </Typography>
                             </Grid>
                         </Grid>
 
@@ -514,7 +568,7 @@ const ViewShop = () => {
                                     className="me-3 w-25"
                                     onClick={() =>
                                         navigate('/update-shop', {
-                                            state: { ...shop }
+                                            state: { ...activeShops }
                                         })
                                     }
                                 >

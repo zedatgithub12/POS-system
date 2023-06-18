@@ -374,7 +374,7 @@ const CreatePackage = () => {
                                                         <Box padding={3}>
                                                             <img src={packages} alt="Add Item" width="40%" height="40%" />
                                                             <Typography variant="h4" color="textSecondary" sx={{ marginY: 4 }}>
-                                                                Add Package Item
+                                                                Add Item to Package
                                                             </Typography>
                                                         </Box>
                                                     </TableCell>
