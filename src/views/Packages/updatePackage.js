@@ -86,7 +86,8 @@ const UpdatePackage = () => {
         // Make the API call using fetch()
         fetch(Api, {
             method: 'GET',
-            headers: headers
+            headers: headers,
+            cache: 'no-cache'
         })
             .then((response) => response.json())
             .then((response) => {
@@ -198,7 +199,8 @@ const UpdatePackage = () => {
             fetch(Api, {
                 method: 'put',
                 headers: headers,
-                body: JSON.stringify(Data)
+                body: JSON.stringify(Data),
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -241,7 +243,8 @@ const UpdatePackage = () => {
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -453,7 +456,7 @@ const UpdatePackage = () => {
                                 </Grid>
                             </Grid>
                             <Box paddingTop={5}>
-                                <Button variant="text" color="error" sx={{ paddingX: 4, marginRight: 2 }}>
+                                <Button onClick={GoBack} variant="text" color="error" sx={{ paddingX: 4, marginRight: 2 }}>
                                     Cancel
                                 </Button>
                                 <Button type="submit" variant="contained" color="primary" sx={{ paddingX: 4 }}>

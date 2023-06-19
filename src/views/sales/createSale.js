@@ -89,7 +89,8 @@ const CreateSale = () => {
         fetch(Api, {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            cache: 'no-cache'
         })
             .then((response) => response.json())
             .then((response) => {
@@ -323,7 +324,8 @@ const CreateSale = () => {
             fetch(Api, {
                 method: 'POST',
                 headers: headers,
-                body: JSON.stringify(Data)
+                body: JSON.stringify(Data),
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -367,7 +369,8 @@ const CreateSale = () => {
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -399,7 +402,8 @@ const CreateSale = () => {
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -430,7 +434,8 @@ const CreateSale = () => {
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {

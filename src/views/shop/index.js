@@ -102,7 +102,8 @@ const Shops = () => {
             fetch(Api, {
                 method: 'GET',
                 headers: headers,
-                signal: signal
+                signal: signal,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {

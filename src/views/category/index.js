@@ -86,7 +86,8 @@ const Category = () => {
         fetch(Api, {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            cache: 'no-cache'
         })
             .then((response) => response.json())
             .then((response) => {
@@ -267,7 +268,8 @@ const Category = () => {
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {

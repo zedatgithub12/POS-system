@@ -29,7 +29,7 @@ const Dashboard = () => {
             var SalesApi = Connections.api + Connections.shopstat + `?shop=${user.store_name}&month=${month}&year=${year}`;
             var Api = user.role === 'Admin' ? AdminApi : SalesApi;
 
-            const response = await fetch(Api);
+            const response = await fetch(Api, { method: 'GET', cache: 'no-cache' });
             const data = await response.json();
             if (data.success) {
                 setStat(data.data);

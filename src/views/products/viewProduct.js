@@ -64,7 +64,8 @@ const ViewProduct = () => {
 
             const req = fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             });
             req.then((response) => response.json())
                 .then((response) => {

@@ -109,7 +109,8 @@ const UpdateSoldPackage = () => {
         fetch(Api, {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify(Data)
+            body: JSON.stringify(Data),
+            cache: 'no-cache'
         })
             .then((response) => response.json())
             .then((response) => {
@@ -151,7 +152,8 @@ const UpdateSoldPackage = () => {
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -183,7 +185,8 @@ const UpdateSoldPackage = () => {
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {

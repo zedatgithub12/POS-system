@@ -110,7 +110,8 @@ const ViewShop = () => {
         fetch(Api, {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            cache: 'no-cache'
         })
             .then((response) => response.json())
             .then((response) => {
@@ -157,7 +158,8 @@ const ViewShop = () => {
         // Make the API call using fetch()
         fetch(Api, {
             method: 'DELETE',
-            headers: headers
+            headers: headers,
+            cache: 'no-cache'
         })
             .then((response) => response.json())
             .then((response) => {
@@ -191,7 +193,9 @@ const ViewShop = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const response = await fetch(Connections.api + Connections.shopstat + `?shop=${shopFilter}&month=${month}&year=${year}`);
+            const response = await fetch(Connections.api + Connections.shopstat + `?shop=${shopFilter}&month=${month}&year=${year}`, {
+                cache: 'no-cache'
+            });
             const data = await response.json();
             if (data.success) {
                 setStat(data.data);
@@ -213,7 +217,8 @@ const ViewShop = () => {
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -241,7 +246,8 @@ const ViewShop = () => {
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {

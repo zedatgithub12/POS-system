@@ -129,7 +129,8 @@ const Products = () => {
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -359,7 +360,8 @@ const ProductRow = ({ product }) => {
         // Make the API call using fetch()
         fetch(Api, {
             method: 'DELETE',
-            headers: headers
+            headers: headers,
+            cache: 'no-cache'
         })
             .then((response) => response.json())
             .then((response) => {
@@ -430,7 +432,8 @@ const ProductRow = ({ product }) => {
             fetch(Api, {
                 method: 'POST',
                 headers: headers,
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -478,7 +481,8 @@ const ProductRow = ({ product }) => {
             fetch(Api, {
                 method: 'POST',
                 headers: headers,
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -521,7 +525,8 @@ const ProductRow = ({ product }) => {
             };
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
