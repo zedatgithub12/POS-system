@@ -1,8 +1,8 @@
 const Connections = {
-    // api: 'http://localhost:8000/api',
-    // images: 'http://localhost:8000/api/images/',
-    api: 'https://addischircharo.com/backend/api',
-    images: 'https://addischircharo.com/backend/api/images/',
+    api: 'http://localhost:8000/api',
+    images: 'http://localhost:8000/api/images/',
+    // api: 'https://addischircharo.com/backend/api',
+    // images: 'https://addischircharo.com/backend/api/images/',
     login: '/login',
     forgotpassword: '/forgotpassword',
     resetpassword: '/resetpassword',
@@ -45,6 +45,12 @@ const Connections = {
     viewcategory: '/viewcategory',
     editcategory: '/editcategory/',
     deletecategory: '/deletecategory/',
+
+    //sub category api's
+    addsubcategory: '/addsubcategory',
+    viewsubcategory: '/viewsubcategory',
+    editsubcategory: '/editsubcategory/',
+    deletesubcategory: '/deletesubcategory/',
 
     //sales api
     createsale: '/createsale',

@@ -49,10 +49,26 @@ const getDashboardItems = (role) => {
         {
             id: 'category',
             title: 'Category',
-            type: 'item',
+            type: 'collapse',
             url: '/categories',
             icon: icons.IconCategory,
-            breadcrumbs: false
+            breadcrumbs: false,
+            children: [
+                {
+                    id: 'maincategory',
+                    title: 'Category',
+                    type: 'item',
+                    url: '/categories',
+                    breadcrumbs: false
+                },
+                {
+                    id: 'subcategory',
+                    title: 'Sub Category',
+                    type: 'item',
+                    url: '/sub-categories',
+                    breadcrumbs: false
+                }
+            ]
         },
         {
             id: 'sales',
