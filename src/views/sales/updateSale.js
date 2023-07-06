@@ -51,8 +51,6 @@ const UpdateSale = () => {
     const [shopName, setShopsName] = useState('');
     const [CustomersData, setCustomersData] = useState([]);
     const [salesData, setSalesData] = useState(item);
-    const [saleTax, setSaleTax] = useState(item.tax);
-    const [discount, setDiscount] = useState(item.discount);
     const [paymentStatus, setPaymentStatus] = useState(item.payment_status);
     const [paymentMethod, setPaymentMethod] = useState(item.payment_method);
     const [shop] = useState(item.shop);
@@ -139,7 +137,7 @@ const UpdateSale = () => {
             let updatedSalesData = {
                 ...salesData,
                 items: updatedItems,
-                grandtotal: itemsArray.reduce((total, item) => total + item.subtotal, 0) + -salesData.discount
+                grandtotal: itemsArray.reduce((total, item) => total + item.subtotal, 0)
             };
 
             setSalesData(updatedSalesData);
@@ -165,7 +163,7 @@ const UpdateSale = () => {
                 let updatedSalesData = {
                     ...salesData,
                     items: updatedItems,
-                    grandtotal: itemsArray.reduce((total, item) => total + item.subtotal, 0) + -salesData.discount
+                    grandtotal: itemsArray.reduce((total, item) => total + item.subtotal, 0)
                 };
 
                 setSalesData(updatedSalesData);
@@ -209,9 +207,7 @@ const UpdateSale = () => {
             shop: shopName, //this will be a shop salling user assigned as manager featched from session storage user.shop
             customer: customerName,
             products: JSON.parse(salesData.items),
-            tax: saleTax,
-            discount: discount,
-            grandTotal: (salesData.grandtotal -= discount),
+            grandTotal: salesData.grandtotal,
             payment_status: paymentStatus,
             payment_method: paymentMethod,
             note: note
@@ -429,17 +425,9 @@ const UpdateSale = () => {
                                     <Table>
                                         <TableBody>
                                             <TableRow>
-                                                <TableCell>Tax</TableCell>
-                                                <TableCell>{saleTax}%</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell>Discount</TableCell>
-                                                <TableCell>{discount} ETB</TableCell>
-                                            </TableRow>
-                                            <TableRow>
                                                 <TableCell>Grand Total</TableCell>
                                                 <TableCell className="fw-semibold fs-4">
-                                                    {parseInt(salesData.grandtotal).toFixed(2) - discount} ETB
+                                                    {parseInt(salesData.grandtotal).toFixed(2)} ETB
                                                 </TableCell>
                                             </TableRow>
                                         </TableBody>
@@ -451,23 +439,6 @@ const UpdateSale = () => {
                         <Grid item xs={12} md={6}>
                             <Box mt={2}>
                                 <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            label="Sale Tax (%)"
-                                            onChange={(event) => setSaleTax(event.target.value)}
-                                            fullWidth
-                                            value={saleTax}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            label="Discount (ETB)"
-                                            onChange={(event) => setDiscount(event.target.value)}
-                                            fullWidth
-                                            value={discount}
-                                        />
-                                    </Grid>
-
                                     <Grid item xs={12} sm={6}>
                                         <FormControl fullWidth>
                                             <InputLabel id="payment-status-label">Payment Status</InputLabel>

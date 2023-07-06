@@ -363,11 +363,16 @@ const StockScreen = () => {
                                                     <MenuItem onClick={() => navigate('/view-sale', { state: { ...selectedItem } })}>
                                                         View Sale
                                                     </MenuItem>
-                                                    <MenuItem onClick={() => navigate('/update-sale', { state: { ...selectedItem } })}>
-                                                        Edit Sale
-                                                    </MenuItem>
+
                                                     {users.role === 'Admin' && (
-                                                        <MenuItem onClick={() => handleTrashClick(selectedItem)}>Delete Sale</MenuItem>
+                                                        <>
+                                                            <MenuItem
+                                                                onClick={() => navigate('/update-sale', { state: { ...selectedItem } })}
+                                                            >
+                                                                Edit Sale
+                                                            </MenuItem>
+                                                            <MenuItem onClick={() => handleTrashClick(selectedItem)}>Delete Sale</MenuItem>
+                                                        </>
                                                     )}
                                                 </Menu>
                                             </TableCell>

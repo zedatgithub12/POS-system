@@ -157,8 +157,6 @@ const CreateSale = () => {
     const items = useSelector((state) => state.cart.items);
     const grandTotal = useSelector((state) => state.cart.grandTotal);
     const [isScanning, setIsScanning] = useState(false);
-    const [saleTax, setSaleTax] = useState(0);
-    const [discount, setDiscount] = useState(0);
     const [paymentStatus, setPaymentStatus] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('');
     const [shopName, setShopsName] = useState(user.role === 'Admin' ? '' : user.store_name);
@@ -313,8 +311,6 @@ const CreateSale = () => {
                 shop: shopName, //this will be a shop salling user assigned as manager featched from session storage user.shop
                 customer: customerName,
                 products: items,
-                tax: saleTax,
-                discount: discount,
                 grandTotal: grandTotal,
                 payment_status: paymentStatus,
                 payment_method: paymentMethod,
@@ -587,14 +583,6 @@ const CreateSale = () => {
                                     <Table>
                                         <TableBody>
                                             <TableRow>
-                                                <TableCell>Tax</TableCell>
-                                                <TableCell>{saleTax}%</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell>Discount</TableCell>
-                                                <TableCell>{discount} ETB</TableCell>
-                                            </TableRow>
-                                            <TableRow>
                                                 <TableCell>Grand Total</TableCell>
                                                 <TableCell className="fw-semibold fs-4">
                                                     {parseInt(grandTotal).toFixed(2)} ETB
@@ -612,13 +600,6 @@ const CreateSale = () => {
                         <Grid item xs={12} md={6}>
                             <Box mt={2}>
                                 <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField label="Sale Tax (%)" onChange={(event) => setSaleTax(event.target.value)} fullWidth />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField label="Discount (ETB)" onChange={(event) => setDiscount(event.target.value)} fullWidth />
-                                    </Grid>
-
                                     <Grid item xs={12} sm={6}>
                                         <FormControl fullWidth>
                                             <InputLabel id="payment-status-label">Payment Status</InputLabel>

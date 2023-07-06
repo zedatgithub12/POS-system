@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { AccountCircleOutlined, ReceiptOutlined, CreditCardOutlined, InfoOutlined } from '@mui/icons-material';
-import { IconBuildingStore } from '@tabler/icons';
+import { IconBuildingStore, IconCoins, IconMoneybag } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -63,6 +63,19 @@ const ViewSale = () => {
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
                                 <Paper variant="outlined">
+                                    <Typography className="px-3 py-2 fs-6 fw-semibold">Customer Information</Typography>
+                                    <Box p={2} display="flex" alignItems="center">
+                                        <Avatar className="bg-light">
+                                            <AccountCircleOutlined />
+                                        </Avatar>
+                                        <Box ml={2}>
+                                            <Typography variant="h6">{item.customer}</Typography>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <Paper variant="outlined">
                                     <Typography className="px-3 py-2 fs-6  fw-semibold">Invoice Info</Typography>
                                     <Box p={1} ml={2} display="flex" alignItems="center">
                                         <Avatar className="bg-light">
@@ -104,21 +117,18 @@ const ViewSale = () => {
                                             </Box>
                                         </Box>
                                     )}
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <Paper variant="outlined">
-                                    <Typography className="px-3 py-2 fs-6 fw-semibold">Customer Information</Typography>
-                                    <Box p={2} display="flex" alignItems="center">
+                                    <Box p={1} ml={2} display="flex" alignItems="center">
                                         <Avatar className="bg-light">
-                                            <AccountCircleOutlined />
+                                            <IconCoins />
                                         </Avatar>
                                         <Box ml={2}>
-                                            <Typography variant="h6">{item.customer}</Typography>
+                                            <Typography variant="h6">Grand Total</Typography>
+                                            <Typography color="text.secondary"> {parseInt(item.grandtotal).toFixed(2)} ETB</Typography>
                                         </Box>
                                     </Box>
                                 </Paper>
                             </Grid>
+
                             <Grid item xs={12}>
                                 <Paper>
                                     <Box p={2}>
@@ -156,39 +166,6 @@ const ViewSale = () => {
                                         </TableContainer>
                                     </Box>
                                 </Paper>
-                            </Grid>
-
-                            <Grid container xs={12}>
-                                <Grid item xs={12} sm={8} lg={6} xl={6} sx={{ paddingY: 4, margin: 4, borderRadius: 4 }}>
-                                    <TableContainer component="paper" variant="outlined">
-                                        <Table size="small">
-                                            <TableBody>
-                                                <TableRow>
-                                                    <TableCell>Total Tax</TableCell>
-                                                    <TableCell align="right" sx={{ color: theme.palette.primary.main }}>
-                                                        {parseInt(item.tax).toFixed(2)}%
-                                                    </TableCell>
-                                                </TableRow>
-                                                <TableRow>
-                                                    <TableCell>Total Discount</TableCell>
-                                                    <TableCell align="right" sx={{ color: theme.palette.primary.main }}>
-                                                        {parseInt(item.discount).toFixed(2)} ETB
-                                                    </TableCell>
-                                                </TableRow>
-                                                <TableRow>
-                                                    <TableCell className="border-bottom-0 fw-semibold">Grand Total</TableCell>
-                                                    <TableCell
-                                                        align="right"
-                                                        className="border-bottom-0 fw-semibold fs-5"
-                                                        sx={{ color: theme.palette.primary.main }}
-                                                    >
-                                                        {parseInt(item.grandtotal).toFixed(2)} ETB
-                                                    </TableCell>
-                                                </TableRow>
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer>
-                                </Grid>
                             </Grid>
 
                             <Grid item xs={12}>

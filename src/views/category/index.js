@@ -303,7 +303,7 @@ const Category = () => {
                             <Grid item>
                                 <Grid container direction="column" spacing={1}>
                                     <Grid item>
-                                        <Typography variant="h3">Category</Typography>
+                                        <Typography variant="h3">Main Category</Typography>
                                     </Grid>
                                 </Grid>
                             </Grid>

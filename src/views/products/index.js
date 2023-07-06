@@ -54,12 +54,17 @@ const Products = () => {
 
     const [searchText, setSearchText] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('Category');
+    const [subCategoryFilter, setSubCategoryFilter] = useState('Sub Category');
     const [brandFilter, setBrandFilter] = useState('Brand');
     const [shopFilter, setShopFilter] = useState('Shop');
     const [statusFilter, setStatusFilter] = useState('In-stock');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
     const [productData, setProductData] = useState([]);
+
+    const handleSubCategoryFilterChange = (event) => {
+        setSubCategoryFilter(event.target.value);
+    };
 
     const handleSearchTextChange = (event) => {
         setSearchText(event.target.value);
@@ -101,7 +106,9 @@ const Products = () => {
         if (categoryFilter !== 'Category') {
             isMatch = isMatch && product.category === categoryFilter;
         }
-
+        if (subCategoryFilter !== 'Sub Category') {
+            isMatch = isMatch && product.sub_category === subCategoryFilter;
+        }
         if (brandFilter !== 'Brand') {
             isMatch = isMatch && product.brand === brandFilter;
         }
@@ -232,6 +239,16 @@ const Products = () => {
                                 ))}
                             </Select>
                         </FormControl>
+                        <FormControl className="ms-2 mt-2 ">
+                            <Select value={subCategoryFilter} onChange={handleSubCategoryFilterChange}>
+                                <MenuItem value="Sub Category">Sub Category</MenuItem>
+                                {Array.from(new Set(productData.map((product) => product.sub_category))).map((category) => (
+                                    <MenuItem key={category} value={category}>
+                                        {category}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
 
                         <FormControl className="ms-2 mt-2 ">
                             <Select value={brandFilter} onChange={handleBrandFilterChange}>
@@ -274,6 +291,7 @@ const Products = () => {
                                         <TableCell></TableCell>
                                         <TableCell>Name</TableCell>
                                         <TableCell>Category</TableCell>
+                                        <TableCell>Sub Category</TableCell>
                                         <TableCell>Brand</TableCell>
 
                                         <TableCell>Price</TableCell>
@@ -566,28 +584,10 @@ const ProductRow = ({ product }) => {
                     </IconButton>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                    {product.picture ? (
-                        <LazyLoadImage
-                            alt={product}
-                            effect="blur"
-                            delayTime={500}
-                            src={Connections.images + product.picture}
-                            style={{ width: 60, height: 60 }}
-                            className="img-fluid rounded m-auto me-2"
-                        />
-                    ) : (
-                        <LazyLoadImage
-                            alt={product}
-                            effect="blur"
-                            delayTime={500}
-                            src="http://placehold.it/120x120&text=image"
-                            style={{ width: 60, height: 60 }}
-                            className="img-fluid rounded m-auto me-2"
-                        />
-                    )}
                     {product.name}
                 </TableCell>
                 <TableCell>{product.category}</TableCell>
+                <TableCell>{product.sub_category}</TableCell>
                 <TableCell>{product.brand}</TableCell>
 
                 <TableCell>{product.price} Birr</TableCell>

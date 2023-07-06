@@ -1,20 +1,5 @@
 // material-ui
-import {
-    Grid,
-    Typography,
-    Button,
-    Divider,
-    TextField,
-    Container,
-    // Box,
-    // FormControlLabel,
-    // Checkbox,
-    // InputLabel,
-    // Select,
-    MenuItem,
-    Autocomplete
-    // FormHelperText
-} from '@mui/material';
+import { Grid, Typography, Button, Divider, TextField, Container, FormControl, MenuItem, Select, Autocomplete } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -51,12 +36,11 @@ const AddProduct = () => {
     const [CategoryData, setCategoryData] = useState([]);
     //shops data
     const [shops, setShops] = useState([]);
-    //
-
     const [productPicture, setProductPicture] = useState(null);
     const [picturePreview, setPicturePreview] = useState(null);
     const [productName, setProductName] = useState('');
-    const [productCategory, setProductCategory] = useState('');
+    const [productCategory, setProductCategory] = useState('Main Category');
+    const [productSubCategory, setProductSubCategory] = useState('Sub Category');
     const [brand, setBrand] = useState('');
     const [productCode, setProductCode] = useState('');
     const [productCost, setProductCost] = useState('');
@@ -65,9 +49,21 @@ const AddProduct = () => {
     const [productQuantity, setProductQuantity] = useState('');
     const [productMinQuantity, setProductMinQuantity] = useState('');
     const [productDescription, setProductDescription] = useState('');
-    const [warehouses, setWarehouses] = useState('');
+    const [warehouses, setWarehouses] = useState('Shops');
     const [status, setStatus] = useState('');
     const [spinner, setSpinner] = useState(false);
+
+    const handleCategoryChange = (event) => {
+        setProductCategory(event.target.value);
+    };
+
+    const handleSubCategoryChange = (event) => {
+        setProductSubCategory(event.target.value);
+    };
+
+    const handleShopChange = (event) => {
+        setWarehouses(event.target.value);
+    };
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -84,6 +80,7 @@ const AddProduct = () => {
         data.append('picture', productPicture);
         data.append('name', productName);
         data.append('category', productCategory);
+        data.append('sub_category', productSubCategory);
         data.append('brand', brand);
         data.append('code', productCode);
         data.append('cost', productCost);
@@ -93,7 +90,7 @@ const AddProduct = () => {
         data.append('min_quantity', productMinQuantity);
         data.append('description', productDescription);
         data.append('shop', warehouses);
-        data.append('status', status);
+        data.append('status', 'In-stock');
 
         // Make the API call using fetch()
         fetch(Api, {
@@ -146,7 +143,7 @@ const AddProduct = () => {
 
     useEffect(() => {
         const getCatgeory = () => {
-            var Api = Connections.api + Connections.viewcategory;
+            var Api = Connections.api + Connections.viewsubcategory;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -276,16 +273,29 @@ const AddProduct = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <Autocomplete
-                                options={CategoryData}
-                                getOptionLabel={(option) => option.name}
-                                onChange={(event, value) => {
-                                    if (value) {
-                                        setProductCategory(value.name);
-                                    }
-                                }}
-                                renderInput={(params) => <TextField {...params} label="Select Category" variant="outlined" />}
-                            />
+                            <FormControl fullWidth required>
+                                <Select value={productCategory} onChange={handleCategoryChange}>
+                                    <MenuItem value="Main Category">Main Category</MenuItem>
+                                    {Array.from(new Set(CategoryData.map((product) => product.main_category))).map((category) => (
+                                        <MenuItem key={category} value={category}>
+                                            {category}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth>
+                                <Select value={productSubCategory} onChange={handleSubCategoryChange}>
+                                    <MenuItem value="Sub Category">Sub Category</MenuItem>
+                                    {Array.from(new Set(CategoryData.map((product) => product.sub_category))).map((category) => (
+                                        <MenuItem key={category} value={category}>
+                                            {category}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
@@ -356,6 +366,18 @@ const AddProduct = () => {
                                 required
                             />
                         </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth>
+                                <Select value={warehouses} onChange={handleShopChange}>
+                                    <MenuItem value="Shops"> Select Shop</MenuItem>
+                                    {Array.from(new Set(shops.map((stores) => stores.name))).map((shop) => (
+                                        <MenuItem key={shop} value={shop}>
+                                            {shop}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
@@ -364,30 +386,6 @@ const AddProduct = () => {
                                 value={productDescription}
                                 onChange={(event) => setProductDescription(event.target.value)}
                             />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <Autocomplete
-                                options={shops}
-                                getOptionLabel={(option) => option.name}
-                                onChange={(event, value) => {
-                                    if (value) {
-                                        setWarehouses(value.name);
-                                    }
-                                }}
-                                renderInput={(params) => <TextField {...params} label="Select Shop" variant="outlined" />}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                select
-                                fullWidth
-                                label="Status"
-                                color="primary"
-                                value={status}
-                                onChange={(event) => setStatus(event.target.value)}
-                            >
-                                <MenuItem value="In-stock">In-stock</MenuItem>
-                            </TextField>
                         </Grid>
                     </Grid>
                     <Button type="submit" fullWidth variant="contained" color="primary" style={{ margin: '1rem 0' }}>

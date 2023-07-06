@@ -42,7 +42,7 @@ const Sales = () => {
                                     color="primary"
                                     sx={{ textDecoration: 'none' }}
                                 >
-                                    Create Stock Sell
+                                    Create Sell
                                 </Button>
                             </Grid>
                         ) : (
@@ -54,7 +54,7 @@ const Sales = () => {
                                     color="primary"
                                     sx={{ textDecoration: 'none' }}
                                 >
-                                    Create Package Sell
+                                    Create Sell
                                 </Button>
                             </Grid>
                         )}

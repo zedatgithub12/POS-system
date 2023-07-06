@@ -137,13 +137,22 @@ const ViewProduct = () => {
                                                 <TableCell>{product.shop}</TableCell>
                                             </TableRow>
                                             <TableRow>
+                                                <TableCell>Category</TableCell>
+                                                <TableCell>{product.category}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>Sub Category</TableCell>
+                                                <TableCell>{product.sub_category}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
                                                 <TableCell>Quantity</TableCell>
                                                 <TableCell>{product.quantity}</TableCell>
                                             </TableRow>
                                             <TableRow>
-                                                <TableCell>Category</TableCell>
-                                                <TableCell>{product.category}</TableCell>
+                                                <TableCell>Min Quantity</TableCell>
+                                                <TableCell>{product.min_quantity}</TableCell>
                                             </TableRow>
+
                                             <TableRow>
                                                 <TableCell> Brand</TableCell>
                                                 <TableCell>{product.brand}</TableCell>

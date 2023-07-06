@@ -16,7 +16,11 @@ import {
     TextField,
     Button,
     DialogActions,
-    TablePagination
+    TablePagination,
+    Autocomplete,
+    FormControl,
+    MenuItem,
+    Select
 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -48,6 +52,8 @@ const SubCategory = () => {
             status: false
         });
     };
+
+    //category data
     const [CategoryData, setCategoryData] = useState([]);
     const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -62,6 +68,32 @@ const SubCategory = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [spinner, setSpinner] = useState(false);
 
+    const [categoryFilter, setCategoryFilter] = useState('Main Category');
+
+    const handleCategoryFilterChange = (event) => {
+        setCategoryFilter(event.target.value);
+    };
+
+    const filteredData = CategoryData.filter((category) => {
+        let isMatch = true;
+
+        if (categoryFilter !== 'Main Category') {
+            isMatch = isMatch && category.main_category === categoryFilter;
+        }
+
+        return isMatch;
+    });
+
+    const uniqueCategories = new Set();
+
+    // Loop through the CategoryData array and add each main_category value to the Set
+    CategoryData.forEach((category) => {
+        uniqueCategories.add(category.main_category);
+    });
+
+    // Convert the Set back to an array
+    const uniqueCategoryArray = Array.from(uniqueCategories);
+
     const handleAddDialogOpen = () => {
         setAddDialogOpen(true);
     };
@@ -70,56 +102,72 @@ const SubCategory = () => {
         setAddDialogOpen(false);
     };
     const addNewCategory = () => {
-        setSpinner(true);
-        var Api = Connections.api + Connections.addsubcategory;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
+        if (addCategory === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please select main category'
+            });
+        } else if (addCategoryDesc === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please enter sub category name'
+            });
+        } else {
+            setSpinner(true);
+            var Api = Connections.api + Connections.addsubcategory;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
 
-        const data = {
-            main: addCategory,
-            sub: addCategoryDesc
-        };
+            const data = {
+                main: addCategory,
+                sub: addCategoryDesc
+            };
 
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(data),
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'success',
-                        message: response.message
-                    });
-                    setSpinner(false);
-                    setCategoryData(CategoryData);
-                    handleAddDialogClose();
-                } else {
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(data),
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                        setCategoryData(CategoryData);
+                        handleAddDialogClose();
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    }
+                })
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: response.message
+                        message: 'There is error adding category!'
                     });
                     setSpinner(false);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error adding category!'
                 });
-                setSpinner(false);
-            });
+        }
     };
     const handleEditDialogOpen = (category) => {
         setSelectedCategory(category);
@@ -290,7 +338,7 @@ const SubCategory = () => {
         return () => {};
     }, [popup]);
 
-    const filteredCategories = CategoryData.filter((category) => category.main_category.toLowerCase().includes(searchTerm.toLowerCase()));
+    const filteredCategories = filteredData.filter((category) => category.sub_category.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const categoriesToShow = filteredCategories.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
@@ -328,7 +376,7 @@ const SubCategory = () => {
                             <TextField
                                 label="Search Categories"
                                 color="primary"
-                                className="ms-2"
+                                className="ms-2 mt-2 "
                                 value={searchTerm}
                                 onChange={handleSearchTermChange}
                                 InputProps={{
@@ -339,11 +387,22 @@ const SubCategory = () => {
                                     )
                                 }}
                             />
+                            <FormControl className="ms-2 mt-2 ">
+                                <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
+                                    <MenuItem value="Main Category">Main Category</MenuItem>
+                                    {Array.from(new Set(CategoryData.map((product) => product.main_category))).map((category) => (
+                                        <MenuItem key={category} value={category}>
+                                            {category}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
                             <List>
                                 {categoriesToShow.map((category) => (
                                     <ListItem key={category.id} className="bg-light rounded m-2 py-3">
                                         <ListItemText
-                                            primary={category.main_category}
+                                            primary={category.sub_category}
                                             secondary={
                                                 <React.Fragment>
                                                     <Typography
@@ -352,7 +411,7 @@ const SubCategory = () => {
                                                         variant="body2"
                                                         color="text.primary"
                                                     >
-                                                        {category.sub_category}
+                                                        {category.main_category}
                                                     </Typography>
                                                 </React.Fragment>
                                             }
@@ -386,14 +445,17 @@ const SubCategory = () => {
                 <DialogTitle>Add Category</DialogTitle>
 
                 <DialogContent>
-                    <TextField
-                        margin="dense"
-                        label="Main Category"
-                        color="primary"
-                        value={addCategory}
-                        onChange={(e) => setAddCategory(e.target.value)}
-                        fullWidth
-                        required
+                    <Autocomplete
+                        options={uniqueCategoryArray}
+                        getOptionLabel={(option) => option}
+                        onChange={(event, value) => {
+                            if (value) {
+                                setAddCategory(value);
+                            }
+                        }}
+                        renderInput={(params) => (
+                            <TextField {...params} margin="dense" label="Main Category" variant="outlined" fullWidth required />
+                        )}
                     />
                     <TextField
                         margin="dense"
@@ -424,13 +486,18 @@ const SubCategory = () => {
             <Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
                 <DialogTitle>Edit Category</DialogTitle>
                 <DialogContent>
-                    <TextField
-                        margin="dense"
-                        label="Main Category"
-                        color="primary"
+                    <Autocomplete
+                        options={uniqueCategoryArray}
+                        getOptionLabel={(option) => option}
                         value={newCategoryName}
-                        onChange={(e) => setNewCategoryName(e.target.value)}
-                        fullWidth
+                        onChange={(event, value) => {
+                            if (value) {
+                                setNewCategoryName(value);
+                            }
+                        }}
+                        renderInput={(params) => (
+                            <TextField {...params} margin="dense" label="Main Category" variant="outlined" fullWidth required />
+                        )}
                     />
                     <TextField
                         margin="dense"

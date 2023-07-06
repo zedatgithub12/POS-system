@@ -382,13 +382,20 @@ const PackageScreen = () => {
                                                     >
                                                         View Sale
                                                     </MenuItem>
-                                                    <MenuItem
-                                                        onClick={() => navigate('/update-sold-package', { state: { ...selectedPItem } })}
-                                                    >
-                                                        Edit Sale
-                                                    </MenuItem>
+
                                                     {users.role === 'Admin' && (
-                                                        <MenuItem onClick={() => handlePTrashClick(selectedPItem)}>Delete Sale</MenuItem>
+                                                        <>
+                                                            <MenuItem
+                                                                onClick={() =>
+                                                                    navigate('/update-sold-package', { state: { ...selectedPItem } })
+                                                                }
+                                                            >
+                                                                Edit Sale
+                                                            </MenuItem>
+                                                            <MenuItem onClick={() => handlePTrashClick(selectedPItem)}>
+                                                                Delete Sale
+                                                            </MenuItem>
+                                                        </>
                                                     )}
                                                 </Menu>
                                             </TableCell>
