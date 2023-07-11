@@ -325,7 +325,7 @@ const PackageScreen = () => {
                             </Select>
                         </FormControl>
                         <TableContainer component={Paper}>
-                            <Table className="" aria-label="Sales Table">
+                            <Table aria-label="Sales Table">
                                 <TableHead>
                                     <TableRow>
                                         <TableCell padding="checkbox">

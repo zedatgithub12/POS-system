@@ -1,0 +1,20 @@
+.donut-chart {
+    /* Add your chart styles here */
+    color: black;
+    border-color: brown;
+}
+
+.apexcharts-datalabels-name {
+    /* Add styles for the name/text inside the donut */
+    background-color: black;
+}
+
+.apexcharts-datalabels-value {
+    /* Add styles for the value/text inside the donut */
+    background-color: blue;
+}
+
+.apexcharts-datalabels-total {
+    /* Add styles for the total label/text inside the donut */
+    background-color: aquamarine
+}
