@@ -179,12 +179,12 @@ const Products = () => {
                                 <>
                                     <Button
                                         component={Link}
-                                        to="/create-package"
+                                        to="/tranfer-stock"
                                         variant="outlined"
                                         color="primary"
                                         sx={{ textDecoration: 'none', marginRight: 2 }}
                                     >
-                                        Create Package
+                                        Transfer Stock
                                     </Button>
 
                                     <Button

@@ -4,6 +4,9 @@ import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 
+//Transfer Stock rounting
+const TranferStock = Loadable(lazy(() => import('views/Transfer-stock')));
+
 //package routing
 const Packages = Loadable(lazy(() => import('views/Packages')));
 const CreatePackage = Loadable(lazy(() => import('views/Packages/createPackage')));
@@ -244,6 +247,11 @@ const MainRoutes = {
         {
             path: 'view-sold-package',
             element: <ViewSoldPackage />
+        },
+
+        {
+            path: 'tranfer-stock',
+            element: <TranferStock />
         },
 
         {
