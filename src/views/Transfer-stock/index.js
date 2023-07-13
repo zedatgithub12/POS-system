@@ -1,237 +1,104 @@
-import { useState, useEffect, forwardRef } from 'react';
-
+import React, { useState, useEffect } from 'react';
 // material-ui
 import {
     Grid,
-    Divider,
-    Box,
-    Paper,
-    Autocomplete,
-    InputAdornment,
-    Button,
-    IconButton,
     Typography,
-    TextField,
-    TableContainer,
+    Divider,
     Table,
     TableBody,
-    TableRow,
     TableCell,
-    TableHead
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    IconButton,
+    TextField,
+    InputAdornment,
+    MenuItem,
+    TablePagination,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button,
+    Box,
+    Collapse,
+    FormControl,
+    Select
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
+import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import Connections from 'api';
-import { Delete } from '@mui/icons-material';
-import packages from 'assets/images/packages.svg';
-// ==============================|| Transfer Stock ||============================== //
+import 'react-lazy-load-image-component/src/effects/blur.css';
+// ==============================|| PACKAGES PAGE ||============================== //
 
-const Alert = forwardRef(function Alert(props, ref) {
+const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-const TranferStock = () => {
-    const navigate = useNavigate();
-    const GoBack = () => {
-        navigate(-1);
-    };
-    const theme = useTheme();
-
+const Transfers = () => {
     const userString = sessionStorage.getItem('user');
-    const user = JSON.parse(userString);
-    const [shopId, setShopId] = useState(null);
-    const [shopName, setShopsName] = useState();
-    const [shops, setShops] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [productData, setProductData] = useState([]);
-    const [Items, setItems] = useState([]);
-    const [name, setName] = useState('');
-    const [Price, setPrice] = useState();
-    const [date, setDate] = useState();
-    const [spinner, setSpinner] = useState(false);
-    const [popup, setPopup] = useState({
-        status: false,
-        severity: 'info',
-        message: ''
+    const users = JSON.parse(userString);
+
+    const [searchText, setSearchText] = useState('');
+    const [shopFilter, setShopFilter] = useState('Shop');
+    const [statusFilter, setStatusFilter] = useState('Status');
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(12);
+    const [packages, setPackages] = useState([]);
+
+    const handleSearchTextChange = (event) => {
+        setSearchText(event.target.value);
+    };
+
+    const handleShopFilterChange = (event) => {
+        setShopFilter(event.target.value);
+    };
+
+    const handleStatusFilterChange = (event) => {
+        setStatusFilter(event.target.value);
+    };
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const filteredData = packages.filter((product) => {
+        let isMatch = true;
+
+        if (searchText) {
+            const searchRegex = new RegExp(searchText, 'i');
+            isMatch = isMatch && (searchRegex.test(product.name) || searchRegex.test(product.code));
+        }
+
+        if (shopFilter !== 'Shop') {
+            isMatch = isMatch && product.shopname.includes(shopFilter);
+        }
+
+        if (statusFilter !== 'Status') {
+            isMatch = isMatch && product.status === statusFilter;
+        }
+
+        return isMatch;
     });
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setPopup({
-            ...popup,
-            status: false
-        });
-    };
 
-    const handleShopSelection = (value) => {
-        setShopId(value.id);
-        setShopsName(value.name);
-        getProducts(value.name);
-    };
-    const getProducts = (shop) => {
-        setLoading(true);
-        var Api = Connections.api + Connections.viewstoreproduct + shop;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'GET',
-            headers: headers,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setProductData(response.data);
-                    setLoading(false);
-                } else {
-                    setProductData([]);
-                    setLoading(false);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error fetching product!'
-                });
-                setLoading(false);
-            });
-    };
-    const handleAddToCart = (product) => {
-        const existingItem = Items.find((item) => item.id === product.id);
-
-        if (existingItem) {
-            // If it does, update the quantity of the existing item
-            const updatedItems = Items.map((item) => {
-                if (item.id === product.id) {
-                    return { ...item, quantity: item.quantity + 1 };
-                }
-                return item;
-            });
-            setItems(updatedItems);
-        } else {
-            setItems([...Items, { id: product.id, name: product.name, code: product.code, unit: product.unit, quantity: 1 }]);
-        }
-    };
-
-    const handleRemoveFromCart = (product) => {
-        const updatedItems = Items.filter((item) => item.id !== product.id);
-        setItems(updatedItems);
-    };
-    const handleIncrement = (id) => {
-        const updatedItems = Items.map((item) => {
-            if (item.id === id) {
-                return { ...item, quantity: item.quantity + 1 };
-            }
-            return item;
-        });
-        setItems(updatedItems);
-    };
-
-    const handleDecrement = (id) => {
-        const updatedItems = Items.map((item) => {
-            if (item.id === id && item.quantity > 0) {
-                return { ...item, quantity: item.quantity - 1 };
-            }
-            return item;
-        });
-        setItems(updatedItems);
-    };
-
-    const handleDateChange = (event) => {
-        setDate(event.target.value);
-    };
-    //submit data to api
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        setSpinner(true);
-        if (!shopName) {
-            setPopup({
-                ...popup,
-                status: true,
-                severity: 'error',
-                message: 'Please select shop!'
-            });
-            setSpinner(false);
-        }
-        if (Items.length == 0) {
-            setPopup({
-                ...popup,
-                status: true,
-                severity: 'error',
-                message: 'Please add items to package first!'
-            });
-            setSpinner(false);
-        } else {
-            // Handle form submission here
-            // Declare the data to be sent to the API
-            var Api = Connections.api + Connections.addpackage;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            var Data = {
-                shop: shopName,
-                shopid: shopId,
-                userid: user.id,
-                name: name,
-                items: Items,
-                price: Price,
-                expiredate: date
-            };
-
-            // Make the API call using fetch()
-            fetch(Api, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(Data),
-                cache: 'no-cache'
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'success',
-                            message: response.message
-                        });
-                        setSpinner(false);
-                    } else {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: response.message
-                        });
-                        setSpinner(false);
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: 'There is error creating package!'
-                    });
-                    setSpinner(false);
-                });
-        }
-    };
     useEffect(() => {
-        const getShops = () => {
-            var Api = Connections.api + Connections.viewstore;
+        const getPackages = () => {
+            var AdminApi = Connections.api + Connections.viewpackages;
+            var saleApi = Connections.api + Connections.viewstorepackage + users.store_name;
+            var Api = users.role === 'Admin' ? AdminApi : saleApi;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -245,9 +112,9 @@ const TranferStock = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        setShops(response.data);
+                        setPackages(response.data);
                     } else {
-                        setShops(shops);
+                        setPackages([]);
                     }
                 })
                 .catch(() => {
@@ -255,17 +122,15 @@ const TranferStock = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error fetching shop!'
+                        message: 'There is error fetching product!'
                     });
                 });
         };
 
-        if (user.role === 'Admin') {
-            getShops();
-        }
-
+        getPackages();
         return () => {};
     }, []);
+    const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
     return (
         <MainCard>
@@ -275,14 +140,28 @@ const TranferStock = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Transfer Stock</Typography>
+                                    <Typography variant="h3">Transfers</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
                         <Grid item>
-                            <Button onClick={GoBack} variant="outlined" color="primary" sx={{ textDecoration: 'none' }}>
-                                Back
-                            </Button>
+                            {users.role === 'Admin' ? (
+                                <>
+                                    <Button
+                                        component={Link}
+                                        to="/make-transfer"
+                                        variant="contained"
+                                        sx={{
+                                            textDecoration: 'none',
+                                            '&:hover': {
+                                                color: 'white'
+                                            }
+                                        }}
+                                    >
+                                        Make New Transfer
+                                    </Button>
+                                </>
+                            ) : null}
                         </Grid>
                     </Grid>
                 </Grid>
@@ -290,73 +169,271 @@ const TranferStock = () => {
                 <Grid item xs={12}>
                     <Divider />
                 </Grid>
-
                 <Grid item xs={12}>
-                    <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleSubmit}>
-                        <Grid container>
-                            <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Grid item xs={12} sm={6}>
-                                    <Autocomplete
-                                        required
-                                        options={shops}
-                                        getOptionLabel={(option) => option.name}
-                                        onChange={(event, value) => {
-                                            if (value) {
-                                                handleShopSelection(value);
-                                            }
-                                        }}
-                                        renderInput={(params) => <TextField {...params} label="Sending Shop" variant="outlined" />}
-                                        noOptionsText="Loading..."
-                                    />
-                                </Grid>
+                    <Box paddingX="2" className="shadow-1 p-4 rounded ">
+                        <TextField
+                            label="Search"
+                            variant="outlined"
+                            color="primary"
+                            value={searchText}
+                            onChange={handleSearchTextChange}
+                            className="mb-2 mt-2"
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton>
+                                            <IconSearch />
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
 
-                                <Grid item xs={12} sm={5}>
-                                    <Autocomplete
-                                        required
-                                        options={shops}
-                                        getOptionLabel={(option) => option.name}
-                                        onChange={(event, value) => {
-                                            if (value) {
-                                                handleShopSelection(value);
-                                            }
-                                        }}
-                                        renderInput={(params) => <TextField {...params} label="Receiving Shop" variant="outlined" />}
-                                        noOptionsText="Loading..."
-                                    />
-                                </Grid>
-                            </Grid>
+                        {users.role === 'Admin' && (
+                            <FormControl className="ms-2 my-2 ">
+                                <Select value={shopFilter} onChange={handleShopFilterChange}>
+                                    <MenuItem value="Shop">Sending Shop</MenuItem>
+                                    {Array.from(new Set(packages.map((item) => item.shopname))).map((shop) => (
+                                        <MenuItem key={shop} value={shop}>
+                                            {shop}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        )}
 
-                            <Grid container>
-                                <Grid item xs={12} sm={6}>
-                                    <Autocomplete
-                                        key={productData.id}
-                                        disabled={shopId ? false : true}
-                                        options={productData}
-                                        getOptionLabel={(option) => option.name}
-                                        onChange={(event, value) => {
-                                            if (value) {
-                                                handleAddToCart(value);
-                                            }
-                                        }}
-                                        sx={{ marginTop: 2 }}
-                                        renderInput={(params) => <TextField {...params} label="Select Product" variant="outlined" />}
-                                        noOptionsText={loading ? <CircularProgress size={20} /> : 'No item in this shop'}
-                                    />
-                                </Grid>
-                                {loading && (
-                                    <Grid
-                                        item
-                                        xs={12}
-                                        sm={6}
-                                        sx={{ color: '#ffbb00', display: 'flex', alignItems: 'center', paddingLeft: 1 }}
-                                    >
-                                        <CircularProgress size={20} />
-                                    </Grid>
+                        <FormControl className="ms-2 my-2 ">
+                            <Select value={statusFilter} onChange={handleStatusFilterChange}>
+                                <MenuItem value="Status">Status</MenuItem>
+                                {Array.from(new Set(packages.map((item) => item.status))).map((status) => (
+                                    <MenuItem key={status} value={status}>
+                                        {status}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <TableContainer component={Paper} className="shadow-sm">
+                            <Table aria-label="product table">
+                                <TableHead className="bg-light">
+                                    <TableRow>
+                                        <TableCell></TableCell>
+                                        <TableCell>Sending Shop</TableCell>
+                                        <TableCell>Received Shop</TableCell>
+                                        <TableCell>Date</TableCell>
+                                        <TableCell>Time</TableCell>
+                                        <TableCell>Made by</TableCell>
+                                        <TableCell>Status</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                {paginatedData.length > 0 ? (
+                                    <TableBody>
+                                        {paginatedData.map((product, index) => (
+                                            <ProductRow key={index} product={product} />
+                                        ))}
+                                    </TableBody>
+                                ) : (
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell colSpan={5} align="center" sx={{ borderBottom: 0 }}>
+                                                <Box padding={3}>
+                                                    <img src={packages} alt="No Packages" width="40%" height="40%" />
+                                                </Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
                                 )}
-                            </Grid>
+                            </Table>
+                            <TablePagination
+                                rowsPerPageOptions={[15, 25, 50]}
+                                component="div"
+                                count={filteredData.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                            />
+                        </TableContainer>
+                    </Box>
+                </Grid>
+            </Grid>
+        </MainCard>
+    );
+};
+
+const ProductRow = ({ product }) => {
+    const userString = sessionStorage.getItem('user');
+    const users = JSON.parse(userString);
+    const theme = useTheme();
+
+    const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => {
+        setOpen(!open);
+    };
+    const [spinner, setSpinner] = useState(false);
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
+    const [selectedProduct, setSelectedProduct] = useState([]);
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+    const handleTrashClick = (product) => {
+        setSelectedProduct(product);
+        setDialogOpen(true);
+    };
+    const handleDialogClose = () => {
+        setSelectedProduct(null);
+        setDialogOpen(false);
+    };
+
+    const Delete = () => {
+        // Do something with the deleted category
+        setSpinner(true);
+        var Api = Connections.api + Connections.deletepackage + selectedProduct.id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'DELETE',
+            headers: headers,
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+
+                    setSpinner(false);
+                    handleDialogClose();
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error deleting product!'
+                });
+                setSpinner(false);
+            });
+    };
+
+    useEffect(() => {
+        return () => {};
+    }, [spinner]);
+
+    return (
+        <>
+            <TableRow
+                hover
+                className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary rounded' : 'border-0 rounded'}
+            >
+                <TableCell>
+                    <IconButton aria-label="expand row" size="small" onClick={handleOpen}>
+                        {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                    </IconButton>
+                </TableCell>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>{product.shopname}</TableCell>
+
+                <TableCell>{product.price} Birr</TableCell>
+                <TableCell>{product.expiredate}</TableCell>
+
+                <TableCell>
+                    {product.status === 'inactive' ? (
+                        <Box
+                            sx={{
+                                bgcolor: theme.palette.error.light,
+                                color: theme.palette.error.dark,
+                                textTransform: 'capitalize',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: 4,
+                                textAlign: 'center'
+                            }}
+                        >
+                            {product.status}
+                        </Box>
+                    ) : (
+                        <Box
+                            sx={{
+                                bgcolor: theme.palette.success.light,
+                                color: theme.palette.success.dark,
+                                textTransform: 'capitalize',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: 4,
+                                textAlign: 'center'
+                            }}
+                        >
+                            {product.status}
+                        </Box>
+                    )}
+                </TableCell>
+                <>
+                    <TableCell>
+                        {users.role === 'Admin' ? (
+                            <>
+                                <IconButton
+                                    aria-label="Edit row"
+                                    size="small"
+                                    onClick={() =>
+                                        navigate('/update-transfer', {
+                                            state: { ...product }
+                                        })
+                                    }
+                                >
+                                    <IconEdit />
+                                </IconButton>
+                                <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
+                                    <IconTrash />
+                                </IconButton>
+                            </>
+                        ) : null}
+                    </TableCell>
+                </>
+            </TableRow>
+            <TableRow
+                className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary' : 'border-0'}
+                sx={{ bgcolor: theme.palette.primary.light }}
+            >
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                        <Grid container>
                             <Grid item xs={12}>
-                                <TableContainer component={Paper} sx={{ bgcolor: theme.palette.primary.light, marginY: 3 }}>
-                                    <Table>
+                                <Box margin={1}>
+                                    <Typography variant="h5" gutterBottom sx={{ paddingLeft: 2, color: theme.palette.primary.dark }}>
+                                        Transfered Items
+                                    </Typography>
+                                    <Table size="small" aria-label="product details">
                                         <TableHead>
                                             <TableRow>
                                                 <TableCell>Item Name</TableCell>
@@ -364,93 +441,65 @@ const TranferStock = () => {
 
                                                 <TableCell>Quantity</TableCell>
                                                 <TableCell>Unit</TableCell>
-                                                <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
-                                        {Items.length > 0 ? (
-                                            <TableBody>
-                                                {Items.map((item, index) => (
-                                                    <TableRow key={index}>
-                                                        <TableCell>{item.name}</TableCell>
-                                                        <TableCell>{item.code}</TableCell>
-
-                                                        <TableCell>
-                                                            <Box display="flex" alignItems="center">
-                                                                <Button onClick={() => handleDecrement(item.id)}>-</Button>
-                                                                <Typography>{item.quantity}</Typography>
-                                                                <Button onClick={() => handleIncrement(item.id)}>+</Button>
-                                                            </Box>
-                                                        </TableCell>
-                                                        <TableCell>{item.unit}</TableCell>
-
-                                                        <TableCell>
-                                                            <IconButton onClick={() => handleRemoveFromCart(item)}>
-                                                                <Delete />
-                                                            </IconButton>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        ) : (
-                                            <TableBody>
-                                                <TableRow>
-                                                    <TableCell colSpan={6} align="center" sx={{ borderBottom: 0 }}>
-                                                        <Box padding={3}>
-                                                            <img src={packages} alt="Add Item" width="40%" height="40%" />
-                                                            <Typography variant="h4" color="textSecondary" sx={{ marginY: 4 }}>
-                                                                Add Item to Package
-                                                            </Typography>
-                                                        </Box>
-                                                    </TableCell>
+                                        <TableBody>
+                                            {JSON.parse(product.items).map((item, index) => (
+                                                <TableRow key={index}>
+                                                    <TableCell>{item.name}</TableCell>
+                                                    <TableCell>{item.code}</TableCell>
+                                                    <TableCell>{item.quantity}</TableCell>
+                                                    <TableCell>{item.unit}</TableCell>
                                                 </TableRow>
-                                            </TableBody>
-                                        )}
+                                            ))}
+                                        </TableBody>
                                     </Table>
-                                </TableContainer>
+                                </Box>
                             </Grid>
-                            <Grid container>
-                                <Grid
-                                    item
-                                    xs={12}
-                                    sm={6}
-                                    sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginRight: 1 }}
-                                >
-                                    <TextField
-                                        fullWidth
-                                        type="text"
-                                        label="Note"
-                                        value={name}
-                                        minRows={4}
-                                        onChange={(event) => setName(event.target.value)}
-                                        sx={{ marginTop: 2 }}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Box paddingTop={5}>
-                                <Button onClick={GoBack} variant="text" color="error" sx={{ paddingX: 4, marginRight: 2 }}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit" variant="contained" color="primary" sx={{ paddingX: 4 }}>
-                                    {spinner ? (
-                                        <div className="spinner-border spinner-border-sm text-dark " role="status">
-                                            <span className="visually-hidden">Loading...</span>
-                                        </div>
-                                    ) : (
-                                        'Start Transfer'
-                                    )}
-                                </Button>
-                            </Box>
                         </Grid>
-                    </form>
-                </Grid>
-            </Grid>
+                    </Collapse>
+                </TableCell>
+            </TableRow>
+
+            <Dialog open={dialogOpen} onClose={handleDialogClose}>
+                <DialogTitle>Delete Record</DialogTitle>
+                <DialogContent>Do you want to delete {selectedProduct ? selectedProduct.name : ''} ?</DialogContent>
+                <DialogActions>
+                    <Button variant="text" color="primary" onClick={handleDialogClose}>
+                        Cancel
+                    </Button>
+                    <Button variant="text" color="error" onClick={() => Delete(selectedProduct.id)}>
+                        {spinner ? (
+                            <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        ) : (
+                            'Yes'
+                        )}
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
                     {popup.message}
                 </Alert>
             </Snackbar>
-        </MainCard>
+        </>
     );
 };
 
-export default TranferStock;
+ProductRow.propTypes = {
+    product: PropTypes.shape({
+        id: PropTypes.number,
+        name: PropTypes.string.isRequired,
+        shopname: PropTypes.string.isRequired,
+        category: PropTypes.string.isRequired,
+        price: PropTypes.number.isRequired,
+        quantity: PropTypes.number.isRequired,
+        status: PropTypes.string.isRequired,
+        code: PropTypes.string.isRequired,
+        unit: PropTypes.string.isRequired,
+        shop: PropTypes.string.isRequired
+    }).isRequired
+};
+export default Transfers;

@@ -33,10 +33,26 @@ const getDashboardItems = (role) => {
         {
             id: 'stocks',
             title: 'Stocks',
-            type: 'item',
+            type: 'collapse',
             url: '/products',
             icon: icons.IconBox,
-            breadcrumbs: false
+            breadcrumbs: false,
+            children: [
+                {
+                    id: 'stocks',
+                    title: 'Stocks',
+                    type: 'item',
+                    url: '/products',
+                    breadcrumbs: false
+                },
+                {
+                    id: 'tranfer-stock',
+                    title: 'Transfer Stock',
+                    type: 'item',
+                    url: '/transfer-stock',
+                    breadcrumbs: false
+                }
+            ]
         },
         {
             id: 'packages',
