@@ -1,6 +1,7 @@
 // material-ui
 import {
     Grid,
+    Box,
     Typography,
     Button,
     Card,
@@ -12,6 +13,10 @@ import {
     Select,
     CircularProgress
 } from '@mui/material';
+import Tab from '@mui/material/Tab';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -38,6 +43,12 @@ const Shops = () => {
         severity: 'info',
         message: ''
     });
+
+    const [value, setValue] = React.useState('1');
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
@@ -134,118 +145,129 @@ const Shops = () => {
     }, []);
     return (
         <MainCard>
-            <Grid container spacing={gridSpacing}>
-                <Grid item xs={12}>
-                    <Grid container alignItems="center" justifyContent="space-between">
-                        <Grid item>
-                            <Grid container direction="column" spacing={1}>
-                                <Grid item>
-                                    <Typography variant="h3">Shops</Typography>
-                                </Grid>
+            <Grid item xs={12}>
+                <Grid container alignItems="center" justifyContent="space-between">
+                    <Grid item>
+                        <Grid container direction="column" spacing={1}>
+                            <Grid item>
+                                <Typography variant="h3">Shops</Typography>
                             </Grid>
                         </Grid>
-                        <Grid item>
-                            <Button component={Link} to="/create-shop" variant="outlined" color="primary" sx={{ textDecoration: 'none' }}>
-                                Create Shop
-                            </Button>
-                        </Grid>
+                    </Grid>
+                    <Grid item>
+                        <Button component={Link} to="/create-shop" variant="outlined" color="primary" sx={{ textDecoration: 'none' }}>
+                            Create Shop
+                        </Button>
                     </Grid>
                 </Grid>
-
-                <FormControl className="ms-4 mt-2 ">
-                    <Select value={category} onChange={handleCategoryFilterChange}>
-                        <MenuItem value="Category">Category</MenuItem>
-                        {Array.from(new Set(filteredData.map((shops) => shops.category))).map((category) => (
-                            <MenuItem key={category} value={category}>
-                                {category}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-
-                <FormControl className="ms-2 mt-2 ">
-                    <Select value={region} onChange={handleRegionFilterChange}>
-                        <MenuItem value="Region">Region</MenuItem>
-                        {Array.from(new Set(filteredData.map((shops) => shops.region))).map((region) => (
-                            <MenuItem key={region} value={region}>
-                                {region}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-
-                <FormControl className="ms-2 my-2 ">
-                    <Select value={city} onChange={handleCityFilterChange}>
-                        <MenuItem value="City">City</MenuItem>
-                        {Array.from(new Set(filteredData.map((shop) => shop.city))).map((city) => (
-                            <MenuItem key={city} value={city}>
-                                {city}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-
-                <FormControl className="ms-2 my-2 ">
-                    <Select value={subcity} onChange={handleSubcityFilterChange}>
-                        <MenuItem value="Subcity">Subcity</MenuItem>
-                        {Array.from(new Set(filteredData.map((shop) => shop.subcity))).map((subcity) => (
-                            <MenuItem key={subcity} value={subcity}>
-                                {subcity}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <Grid item xs={12} className="mt-1"></Grid>
-                <Grid item lg={4} md={6} sm={6} xs={12} spacing={2}></Grid>
-
-                {loading ? (
-                    <Grid container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 5 }}>
-                        <CircularProgress />
-                    </Grid>
-                ) : (
-                    <Grid container spacing={gridSpacing} alignItems="center" style={{ paddingLeft: 20 }}>
-                        {filteredData.map((shop, index) => (
-                            <Grid
-                                item
-                                sm={3}
-                                key={index}
-                                onClick={() =>
-                                    navigate('/view-shop', {
-                                        state: { ...shop }
-                                    })
-                                }
-                                style={{ textDecoration: 'none' }}
-                            >
-                                <Card variant="outlined">
-                                    <CardActionArea>
-                                        <CardMedia
-                                            component="img"
-                                            height="140"
-                                            image={
-                                                shop.profile_image
-                                                    ? Connections.images + shop.profile_image
-                                                    : Connections.images + '646137991fd91.jpg'
-                                            }
-                                            alt={shop.name}
-                                        />
-                                        <CardContent>
-                                            <Typography gutterBottom variant="h5" component="div">
-                                                {shop.name}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                {shop.address}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                {shop.phone}
-                                            </Typography>
-                                        </CardContent>
-                                    </CardActionArea>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
-                )}
             </Grid>
+            <TabContext value={value}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <TabList onChange={handleChange} aria-label="Shop Tabs">
+                        <Tab label="Listing" value="1" />
+                        <Tab label="Map" value="2" />
+                    </TabList>
+                </Box>
+                <TabPanel value="1">
+                    <Grid container spacing={gridSpacing}>
+                        <Grid item xs={12} className="mt-1"></Grid>
+                        <FormControl className="ms-4 mt-2">
+                            <Select value={category} onChange={handleCategoryFilterChange}>
+                                <MenuItem value="Category">Category</MenuItem>
+                                {Array.from(new Set(filteredData.map((shops) => shops.category))).map((category) => (
+                                    <MenuItem key={category} value={category}>
+                                        {category}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        <FormControl className="ms-2 mt-2 ">
+                            <Select value={region} onChange={handleRegionFilterChange}>
+                                <MenuItem value="Region">Region</MenuItem>
+                                {Array.from(new Set(filteredData.map((shops) => shops.region))).map((region) => (
+                                    <MenuItem key={region} value={region}>
+                                        {region}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        <FormControl className="ms-2 my-2 ">
+                            <Select value={city} onChange={handleCityFilterChange}>
+                                <MenuItem value="City">City</MenuItem>
+                                {Array.from(new Set(filteredData.map((shop) => shop.city))).map((city) => (
+                                    <MenuItem key={city} value={city}>
+                                        {city}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        <FormControl className="ms-2 my-2 ">
+                            <Select value={subcity} onChange={handleSubcityFilterChange}>
+                                <MenuItem value="Subcity">Subcity</MenuItem>
+                                {Array.from(new Set(filteredData.map((shop) => shop.subcity))).map((subcity) => (
+                                    <MenuItem key={subcity} value={subcity}>
+                                        {subcity}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <Grid item xs={12}></Grid>
+
+                        {loading ? (
+                            <Grid container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 5 }}>
+                                <CircularProgress />
+                            </Grid>
+                        ) : (
+                            <Grid container spacing={gridSpacing} alignItems="center" style={{ paddingLeft: 20 }}>
+                                {filteredData.map((shop, index) => (
+                                    <Grid
+                                        item
+                                        sm={3}
+                                        key={index}
+                                        onClick={() =>
+                                            navigate('/view-shop', {
+                                                state: { ...shop }
+                                            })
+                                        }
+                                        style={{ textDecoration: 'none' }}
+                                    >
+                                        <Card variant="outlined">
+                                            <CardActionArea>
+                                                <CardMedia
+                                                    component="img"
+                                                    height="140"
+                                                    image={
+                                                        shop.profile_image
+                                                            ? Connections.images + shop.profile_image
+                                                            : Connections.images + '646137991fd91.jpg'
+                                                    }
+                                                    alt={shop.name}
+                                                />
+                                                <CardContent>
+                                                    <Typography gutterBottom variant="h5" component="div">
+                                                        {shop.name}
+                                                    </Typography>
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        {shop.address}
+                                                    </Typography>
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        {shop.phone}
+                                                    </Typography>
+                                                </CardContent>
+                                            </CardActionArea>
+                                        </Card>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        )}
+                    </Grid>
+                </TabPanel>
+                <TabPanel value="2">Map</TabPanel>
+            </TabContext>
+
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
                     {popup.message}
