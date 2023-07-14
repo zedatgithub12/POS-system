@@ -26,6 +26,7 @@ const ViewProduct = () => {
 
     const [product, setProduct] = useState({});
     const [availablity, setAvailablity] = useState([]);
+    const [replanishment, setReplanishment] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
@@ -72,6 +73,8 @@ const ViewProduct = () => {
                     if (response.success) {
                         setProduct(response.product);
                         setAvailablity(response.items);
+                        setReplanishment(response.replanishments);
+                        console.log(replanishment);
                         setIsLoading(false);
                     } else {
                         setIsLoading(true);
@@ -204,9 +207,31 @@ const ViewProduct = () => {
                                         />
                                     )}
                                 </Box>
-                                <Box paddingX={4} marginTop={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                {/* <Box paddingX={4} marginTop={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                     <Barcode value={product.code} />
-                                </Box>
+                                </Box> */}
+                                <Typography sx={{ fontSize: theme.typography.h4, marginTop: 6, marginLeft: 2 }}>
+                                    Replanishment History
+                                </Typography>
+
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Date</TableCell>
+                                            <TableCell>Existing</TableCell>
+                                            <TableCell>Added</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {replanishment.map((item, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell>{item.created_at.slice(0, 10)}</TableCell>
+                                                <TableCell>{item.existing_amount}</TableCell>
+                                                <TableCell>{item.added_amount}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
                             </Grid>
                         </Grid>
                     </Grid>

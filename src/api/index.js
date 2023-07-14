@@ -77,6 +77,12 @@ const Connections = {
     updateprice: '/updateprice',
     updateallprice: '/updateallprice',
 
+    //replanishments
+    newreplanishment: '/newreplanishment',
+    singlereplanishment: '/singlereplanishment',
+    allreplanishments: '/allreplanishments',
+    deleterecord: '/deleterecord',
+
     //Notifaction Api's
     adminnotification: '/adminnotification',
     salesnotification: '/salesnotification/',

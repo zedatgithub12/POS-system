@@ -91,6 +91,23 @@ const Products = () => {
     const [spinner, setSpinner] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const [open, setOpen] = useState(false);
+
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
     const handleReplanishClick = () => {
         setOpenReplanishDialog(true);
         getShops();
@@ -167,6 +184,7 @@ const Products = () => {
     const handleShopSelection = (value) => {
         setShopId(value.id);
         setShopsName(value.name);
+        setSelectedStock([]);
         getStock(value.name);
     };
     const getStock = (shop) => {
@@ -215,38 +233,47 @@ const Products = () => {
             });
             setSpinner(false);
         }
-        if (Items.length == 0) {
+        if (!selectedStock) {
             setPopup({
                 ...popup,
                 status: true,
                 severity: 'error',
-                message: 'Please add items to list first!'
+                message: 'Please select stock first!'
+            });
+            setSpinner(false);
+        }
+        if (!addedAmount) {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please enter the amount to be added!'
             });
             setSpinner(false);
         } else {
             // Handle form submission here
             // Declare the data to be sent to the API
-            var Api = Connections.api + Connections.addpackage;
+            var Api = Connections.api + Connections.newreplanishment;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
             };
             var Data = {
-                shop: shopName,
                 shopid: shopId,
-                userid: user.id,
-                name: name,
-                items: Items,
-                price: Price,
-                expiredate: date
+                shopname: shopName,
+                stock_id: selectedStock.id,
+                stock_name: selectedStock.name,
+                stock_code: selectedStock.code,
+                existing_amount: selectedStock.quantity,
+                added_amount: addedAmount,
+                userid: users.id
             };
 
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'POST',
                 headers: headers,
-                body: JSON.stringify(Data),
-                cache: 'no-cache'
+                body: JSON.stringify(Data)
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -273,7 +300,7 @@ const Products = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error making transfer!'
+                        message: 'There is error replanishing stock item!'
                     });
                     setSpinner(false);
                 });
@@ -538,7 +565,7 @@ const Products = () => {
             <Dialog open={openReplanishDialog} onClose={handleDialogClose}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <DialogTitle sx={{ fontSize: theme.typography.h3 }}>Replanish Stock </DialogTitle>
-                    <Button variant="text" color="primary" onClick={handleDialogClose}>
+                    <Button variant="text" color="dark" onClick={handleDialogClose}>
                         <IconX />
                     </Button>
                 </Box>
@@ -608,14 +635,16 @@ const Products = () => {
                                     sx={{
                                         display: 'flex',
                                         alignItems: 'center',
+                                        justifyContent: 'space-between',
                                         padding: 2,
                                         marginY: 2,
                                         backgroundColor: theme.palette.primary.light,
                                         borderRadius: 2
                                     }}
                                 >
-                                    <Typography sx={{ fontSize: theme.typography.h5 }}>
-                                        Current amount {selectedStock.quantity} - {selectedStock.unit}
+                                    <Typography sx={{ fontSize: theme.typography.h5 }}>Current amount</Typography>
+                                    <Typography sx={{ fontSize: theme.typography.h4 }}>
+                                        {selectedStock.quantity} - {selectedStock.unit}
                                     </Typography>
                                 </Grid>
                             </Grid>
@@ -652,6 +681,12 @@ const Products = () => {
                     </form>
                 </DialogContent>
             </Dialog>
+
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </MainCard>
     );
 };
