@@ -47,7 +47,7 @@ const getDashboardItems = (role) => {
                 },
                 {
                     id: 'tranfer-stock',
-                    title: 'Transfer Stock',
+                    title: 'Stock Transfers',
                     type: 'item',
                     url: '/transfer-stock',
                     breadcrumbs: false

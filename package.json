@@ -19,6 +19,7 @@
         "dexie": "^3.2.4",
         "formik": "^2.2.9",
         "framer-motion": "^10.12.4",
+        "google-map-react": "^2.2.1",
         "idb": "^7.1.1",
         "laravel-echo": "^1.15.1",
         "lodash": "^4.17.21",

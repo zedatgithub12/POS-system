@@ -83,6 +83,12 @@ const Connections = {
     allreplanishments: '/allreplanishments',
     deleterecord: '/deleterecord',
 
+    //tranfers
+    alltransfers: '/alltransfers',
+    transfer: '/transfer',
+    updatetransfer: '/updatetransfer/',
+    deletetransfer: '/deletetransfer/',
+
     //Notifaction Api's
     adminnotification: '/adminnotification',
     salesnotification: '/salesnotification/',

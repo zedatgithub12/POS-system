@@ -53,9 +53,7 @@ const TransferStock = () => {
     const [loading, setLoading] = useState(false);
     const [productData, setProductData] = useState([]);
     const [Items, setItems] = useState([]);
-    const [name, setName] = useState('');
-    const [Price, setPrice] = useState();
-    const [date, setDate] = useState();
+    const [note, setNote] = useState('');
     const [spinner, setSpinner] = useState(false);
     const [popup, setPopup] = useState({
         status: false,
@@ -160,9 +158,6 @@ const TransferStock = () => {
         setItems(updatedItems);
     };
 
-    const handleDateChange = (event) => {
-        setDate(event.target.value);
-    };
     //submit data to api
 
     const handleSubmit = (event) => {
@@ -188,27 +183,26 @@ const TransferStock = () => {
         } else {
             // Handle form submission here
             // Declare the data to be sent to the API
-            var Api = Connections.api + Connections.addpackage;
+            var Api = Connections.api + Connections.transfer;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
             };
             var Data = {
-                shop: shopName,
-                shopid: shopId,
-                userid: user.id,
-                name: name,
+                sendershopid: shopId,
+                sendershopname: shopName,
+                receivershopid: receivingShopId,
+                receivershopname: receivingshopName,
                 items: Items,
-                price: Price,
-                expiredate: date
+                note: note,
+                userid: user.id
             };
 
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'POST',
                 headers: headers,
-                body: JSON.stringify(Data),
-                cache: 'no-cache'
+                body: JSON.stringify(Data)
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -219,6 +213,7 @@ const TransferStock = () => {
                             severity: 'success',
                             message: response.message
                         });
+
                         setSpinner(false);
                     } else {
                         setPopup({
@@ -431,10 +426,10 @@ const TransferStock = () => {
                                         fullWidth
                                         type="text"
                                         label="Note"
-                                        value={name}
+                                        value={note}
                                         multiline
                                         rows={6}
-                                        onChange={(event) => setName(event.target.value)}
+                                        onChange={(event) => setNote(event.target.value)}
                                         sx={{ marginTop: 2 }}
                                     />
                                 </Grid>

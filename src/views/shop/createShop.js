@@ -10,10 +10,20 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate } from 'react-router-dom';
 import Connections from 'api';
+import GoogleMapReact from 'google-map-react';
+import pin from 'assets/images/icons/marker.svg';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
+
+// Custom marker component
+const Marker = () => (
+    <div className="marker">
+        <img src={pin} alt="marker" width={30} height={30} />
+    </div>
+);
+
 const CreateShop = () => {
     const theme = useTheme();
     const navigate = useNavigate();
@@ -44,12 +54,19 @@ const CreateShop = () => {
         city: '',
         subcity: '',
         address: '',
+        latitude: '',
+        longitude: '',
         description: '',
         phone: '',
         shopProfile: null,
         shopProfilePreview: null
     });
+    const [selectedLocation, setSelectedLocation] = useState({ lat: null, lng: null });
 
+    const handleMapClick = ({ lat, lng }) => {
+        setSelectedLocation({ lat, lng });
+        setFormData({ ...formData, latitude: lat, longitude: lng });
+    };
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setFormData((prevState) => ({ ...prevState, [name]: value }));
@@ -79,6 +96,8 @@ const CreateShop = () => {
         data.append('city', formData.city);
         data.append('subcity', formData.subcity);
         data.append('address', formData.address);
+        data.append('latitude', formData.latitude);
+        data.append('longitude', formData.longitude);
         data.append('description', formData.description);
         data.append('phone', formData.phone);
         data.append('profile_image', formData.shopProfile);
@@ -191,6 +210,28 @@ const CreateShop = () => {
                                             required
                                         />
                                     </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            multiline
+                                            rows={4}
+                                            rowsMax={12}
+                                            fullWidth
+                                            label="Description"
+                                            name="description"
+                                            onChange={handleInputChange}
+                                            value={formData.description}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            fullWidth
+                                            label="Phone"
+                                            name="phone"
+                                            onChange={handleInputChange}
+                                            value={formData.phone}
+                                            required
+                                        />
+                                    </Grid>
                                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                         <TextField
                                             label="Region"
@@ -232,29 +273,22 @@ const CreateShop = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
-                                        <TextField
-                                            multiline
-                                            rows={6}
-                                            rowsMax={12}
-                                            fullWidth
-                                            label="Description"
-                                            name="description"
-                                            onChange={handleInputChange}
-                                            value={formData.description}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            fullWidth
-                                            label="Phone"
-                                            name="phone"
-                                            onChange={handleInputChange}
-                                            value={formData.phone}
-                                            required
-                                        />
+                                        <Typography sx={{ paddingBottom: 1 }}>Select location on the map</Typography>
+                                        <Box sx={{ height: 400, width: '100%' }}>
+                                            <GoogleMapReact
+                                                defaultCenter={{ lat: 9.0108, lng: 38.7617 }} // Set the default center of the map
+                                                defaultZoom={12} // Set default zoom level
+                                                onClick={handleMapClick} // Call handleMapClick function when the map is clicked
+                                            >
+                                                {/* Marker to show the selected location */}
+                                                {selectedLocation.lat && selectedLocation.lng && (
+                                                    <Marker lat={selectedLocation.lat} lng={selectedLocation.lng} />
+                                                )}
+                                            </GoogleMapReact>
+                                        </Box>
                                     </Grid>
 
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} sx={{ marginTop: 2 }}>
                                         <Button type="submit" variant="contained" color="primary">
                                             {spinner ? (
                                                 <div className="spinner-border spinner-border-sm text-dark " role="status">

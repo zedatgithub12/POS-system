@@ -25,6 +25,7 @@ import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Connections from 'api';
+import ShopMap from './maps';
 // ==============================|| SHOP LISTING PAGE ||============================== //
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -164,7 +165,7 @@ const Shops = () => {
             <TabContext value={value}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <TabList onChange={handleChange} aria-label="Shop Tabs">
-                        <Tab label="Listing" value="1" />
+                        <Tab label="Card Listing" value="1" />
                         <Tab label="Map" value="2" />
                     </TabList>
                 </Box>
@@ -265,7 +266,9 @@ const Shops = () => {
                         )}
                     </Grid>
                 </TabPanel>
-                <TabPanel value="2">Map</TabPanel>
+                <TabPanel value="2">
+                    <ShopMap shopData={shops} />
+                </TabPanel>
             </TabContext>
 
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>

@@ -308,6 +308,7 @@ const UpdatePackage = () => {
                                             handleShopSelection(value);
                                         }
                                     }}
+                                    defaultValue={{ name: shopName }}
                                     renderInput={(params) => (
                                         <TextField {...params} label="Shop" variant="outlined" value={shopName} defaultValue={shopName} />
                                     )}
@@ -456,9 +457,6 @@ const UpdatePackage = () => {
                                 </Grid>
                             </Grid>
                             <Box paddingTop={5}>
-                                <Button onClick={GoBack} variant="text" color="error" sx={{ paddingX: 4, marginRight: 2 }}>
-                                    Cancel
-                                </Button>
                                 <Button type="submit" variant="contained" color="primary" sx={{ paddingX: 4 }}>
                                     {spinner ? (
                                         <div className="spinner-border spinner-border-sm text-dark " role="status">
@@ -467,6 +465,9 @@ const UpdatePackage = () => {
                                     ) : (
                                         'Update'
                                     )}
+                                </Button>
+                                <Button onClick={GoBack} variant="text" color="error" sx={{ paddingX: 4, marginRight: 2 }}>
+                                    Cancel
                                 </Button>
                             </Box>
                         </Grid>

@@ -9,16 +9,25 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link, useLocation } from 'react-router-dom';
 import Connections from 'api';
+import GoogleMapReact from 'google-map-react';
+import pin from 'assets/images/icons/marker.svg';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
+
+const Marker = () => (
+    <div className="marker">
+        <img src={pin} alt="marker" width={30} height={30} />
+    </div>
+);
 const UpdateShop = () => {
     const { state } = useLocation();
-
     const [spinner, setSpinner] = useState(false);
     const [users, setUsers] = useState([]);
-    const [managername, setManagerName] = useState(state.manager ? state.manager : '');
+    const [managername, setManagerName] = useState(state.manager);
+    const [managerId, setManagerId] = useState(state.manager_id);
+
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -36,6 +45,11 @@ const UpdateShop = () => {
         });
     };
 
+    const ChangeManager = (event) => {
+        setManagerName(event.target.value.name);
+        setManagerId(event.target.value.id);
+    };
+
     const [formData, setFormData] = useState({
         shopName: state.name ? state.name : '',
         category: state.category ? state.category : '',
@@ -43,12 +57,20 @@ const UpdateShop = () => {
         city: state.city ? state.city : '',
         subcity: state.subcity ? state.subcity : '',
         address: state.address ? state.address : '',
+        latitude: state.latitude ? state.latitude : 9.0108,
+        longitude: state.longitude ? state.longitude : 38.7617,
         description: state.description ? state.description : '',
         phone: state.phone ? state.phone : '',
         shopProfile: state.profile_image ? state.profile_image : null,
         shopProfilePreview: state.profile_image ? state.profile_image : null
     });
 
+    const [selectedLocation, setSelectedLocation] = useState({ lat: null, lng: null });
+
+    const handleMapClick = ({ lat, lng }) => {
+        setSelectedLocation({ lat, lng });
+        setFormData({ ...formData, latitude: lat, longitude: lng });
+    };
     const handleSubmit = (event) => {
         event.preventDefault();
         // Handle form submission here
@@ -58,13 +80,15 @@ const UpdateShop = () => {
 
         const data = new FormData();
         data.append('name', formData.shopName);
-        data.append('manager_id', managername.id);
-        data.append('manager', managername.name);
+        data.append('manager_id', managerId);
+        data.append('manager', managername);
         data.append('category', formData.category);
         data.append('region', formData.region);
         data.append('city', formData.city);
         data.append('subcity', formData.subcity);
         data.append('address', formData.address);
+        data.append('latitude', formData.latitude);
+        data.append('longitude', formData.longitude);
         data.append('description', formData.description);
         data.append('phone', formData.phone);
         data.append('profile_image', formData.shopProfile);
@@ -72,8 +96,7 @@ const UpdateShop = () => {
         // Make the API call using fetch()
         fetch(Api, {
             method: 'POST',
-            body: data,
-            cache: 'no-cache'
+            body: data
         })
             .then((response) => response.json())
             .then((response) => {
@@ -227,13 +250,35 @@ const UpdateShop = () => {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
+                                        fullWidth
+                                        label="Category"
+                                        name="category"
+                                        onChange={handleInputChange}
+                                        value={formData.category}
                                         required
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        multiline
+                                        rows={6}
+                                        rowsMax={12}
+                                        fullWidth
+                                        label="Description"
+                                        name="description"
+                                        onChange={handleInputChange}
+                                        value={formData.description}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <TextField
                                         fullWidth
                                         select
                                         label="Manager"
                                         className="mt-3"
-                                        value={managername.name}
-                                        onChange={(event) => setManagerName(event.target.value)}
+                                        value={managername.name ? managername.name : state.manager}
+                                        onChange={(event) => ChangeManager(event)}
                                     >
                                         {users.map((option) => (
                                             <MenuItem key={option.id} value={option} defaultValue={option.name === state.manager}>
@@ -242,13 +287,14 @@ const UpdateShop = () => {
                                         ))}
                                     </TextField>
                                 </Grid>
+
                                 <Grid item xs={12}>
                                     <TextField
                                         fullWidth
-                                        label="Category"
-                                        name="category"
+                                        label="Phone"
+                                        name="phone"
                                         onChange={handleInputChange}
-                                        value={formData.category}
+                                        value={formData.phone}
                                         required
                                     />
                                 </Grid>
@@ -293,29 +339,22 @@ const UpdateShop = () => {
                                         required
                                     />
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        multiline
-                                        rows={6}
-                                        rowsMax={12}
-                                        fullWidth
-                                        label="Description"
-                                        name="description"
-                                        onChange={handleInputChange}
-                                        value={formData.description}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        label="Phone"
-                                        name="phone"
-                                        onChange={handleInputChange}
-                                        value={formData.phone}
-                                        required
-                                    />
-                                </Grid>
 
+                                <Grid item xs={12}>
+                                    <Typography sx={{ paddingBottom: 1 }}>Location on the map</Typography>
+                                    <Box sx={{ height: 400, width: '100%' }}>
+                                        <GoogleMapReact
+                                            defaultCenter={{ lat: 9.0108, lng: 38.7617 }} // Set the default center of the map
+                                            defaultZoom={12} // Set default zoom level
+                                            onClick={handleMapClick} // Call handleMapClick function when the map is clicked
+                                        >
+                                            {/* Marker to show the selected location */}
+                                            {formData.latitude && formData.longitude && (
+                                                <Marker lat={formData.latitude} lng={formData.longitude} />
+                                            )}
+                                        </GoogleMapReact>
+                                    </Box>
+                                </Grid>
                                 <Grid item xs={12}>
                                     <Button type="submit" variant="contained" color="primary">
                                         {spinner ? (
