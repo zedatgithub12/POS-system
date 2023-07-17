@@ -90,9 +90,6 @@ const Products = () => {
     const [addedAmount, setAddedAmount] = useState();
     const [spinner, setSpinner] = useState(false);
     const [loading, setLoading] = useState(false);
-
-    const [open, setOpen] = useState(false);
-
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -563,8 +560,15 @@ const Products = () => {
                 </Grid>
             </Grid>
             <Dialog open={openReplanishDialog} onClose={handleDialogClose}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <DialogTitle sx={{ fontSize: theme.typography.h3 }}>Replanish Stock </DialogTitle>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        backgroundColor: theme.palette.primary.main
+                    }}
+                >
+                    <DialogTitle sx={{ fontSize: theme.typography.h4 }}>Replanish Stock </DialogTitle>
                     <Button variant="text" color="dark" onClick={handleDialogClose}>
                         <IconX />
                     </Button>

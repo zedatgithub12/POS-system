@@ -1,447 +1,301 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, forwardRef } from 'react';
 import './DonutChart.css';
 // material-ui
-import { Grid, Typography, Box, Divider } from '@mui/material';
-
+import { Grid, Typography, Box, Divider, Button, Dialog, DialogTitle, DialogContent, Autocomplete, TextField } from '@mui/material';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 // project imports
-
 import { gridSpacing } from 'store/constant';
 import Connections from 'api';
 import { useTheme } from '@mui/material/styles';
-import ReactApexChart from 'react-apexcharts';
+import AddNew from './components/add-new';
+import LowStocks from './components/low-stock';
+import CustomerCard from './components/customer-card';
+import SalesTargets from './components/sales-against-target';
+import { IconX } from '@tabler/icons';
+
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
+const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const Dashboard = () => {
     const userString = sessionStorage.getItem('user');
     const user = JSON.parse(userString);
     const theme = useTheme();
+
+    const [shopId, setShopId] = useState(null);
+    const [shopName, setShopsName] = useState();
+    const [shops, setShops] = useState([]);
     const [isLoading, setLoading] = useState(true);
+    const [spinner, setSpinner] = useState(false);
     const [stat, setStat] = useState([]);
     const [month] = useState('');
     const [year] = useState('');
+    const [openTargetDialog, setOpenTargetDialog] = useState(false);
 
-    const [chartOptions, setChartOptions] = useState({
-        plotOptions: {
-            pie: {
-                donut: {
-                    labels: {
-                        show: true,
-                        name: {
-                            show: true,
-                            fontSize: '16px',
-                            fontFamily: 'Arial, sans-serif',
-                            fontWeight: 600,
-                            color: '#333',
-                            offsetY: -10
-                        },
-                        value: {
-                            show: true,
-                            fontSize: '14px',
-                            fontFamily: 'Arial, sans-serif',
-                            fontWeight: 400,
-                            color: '#888',
-                            offsetY: 10
-                        },
-                        total: {
-                            show: true,
-                            label: 'Total',
-                            fontSize: '16px',
-                            fontFamily: 'Arial, sans-serif',
-                            fontWeight: 600,
-                            color: '#333'
-                        }
-                    }
-                }
-            }
-        }
+    const [target, setTarget] = useState({
+        daily: '',
+        monthly: '',
+        annually: ''
     });
-
-    const [chartSeries, setChartSeries] = useState([
-        {
-            data: [10, 20, 30],
-            labels: ['Label 1', 'Label 2', 'Label 3']
+    const [popup, setPopup] = useState({
+        status: false,
+        severity: 'info',
+        message: ''
+    });
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
         }
-    ]);
+
+        setPopup({
+            ...popup,
+            status: false
+        });
+    };
+
+    const handleTargetClick = () => {
+        setOpenTargetDialog(true);
+        getShops();
+    };
+
+    const handleDialogClose = () => {
+        setOpenTargetDialog(false);
+    };
+
+    const handleShopSelection = (value) => {
+        setShopId(value.id);
+        setShopsName(value.name);
+    };
+
+    const handleDailyTarget = (event) => {
+        // var dailytarget = event.target.value;
+        // const numDaysInMonth = getDaysInMonth();
+
+        setTarget({
+            ...target,
+            daily: event.target.value
+        });
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        setSpinner(true);
+        if (!shopName) {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please select shop!'
+            });
+            setSpinner(false);
+        } else {
+            // Handle form submission here
+            // Declare the data to be sent to the API
+            var Api = Connections.api + Connections.addtarget;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            var Data = {
+                userid: user.id,
+                shopid: shopId,
+                shopname: shopName,
+                r_daily: target.daily,
+                r_monthly: target.monthly,
+                r_yearly: target.annually
+            };
+            console.log(Data);
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(Data)
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error setting target!'
+                    });
+                    setSpinner(false);
+                });
+        }
+    };
+
+    const getShops = () => {
+        var Api = Connections.api + Connections.viewstore;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'GET',
+            headers: headers,
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setShops(response.data);
+                } else {
+                    setShops(shops);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error fetching shop!'
+                });
+            });
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            var AdminApi = Connections.api + Connections.adminstat + `?month=${month}&year=${year}`;
-            var SalesApi = Connections.api + Connections.shopstat + `?shop=${user.store_name}&month=${month}&year=${year}`;
-            var Api = user.role === 'Admin' ? AdminApi : SalesApi;
-
-            const response = await fetch(Api, { method: 'GET', cache: 'no-cache' });
-            const data = await response.json();
-            if (data.success) {
-                setStat(data.data);
-            }
-        };
-        fetchData();
-        setLoading(false);
-    }, [month, year]);
+        getShops();
+    }, [shops]);
 
     return (
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
-                    <Box paddingX={4} paddingY={4}>
+                    <Box paddingX={4} paddingY={3}>
                         <Typography className="fs-3 fw-semibold">Dashboard</Typography>
                     </Box>
-                    <Grid container className="ms-4 me-3" justifyContent="space-between" alignItems="center">
-                        <Grid item xs={8.4} sx={{ backgroundColor: '#fff', borderRadius: 2, padding: 3 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 1 }}>
-                                <Typography className="fs-5 fw-regular">Sales summary against target</Typography>
-                                <Typography>Shops</Typography>
-                            </Box>
-                            <Divider />
-
-                            <Grid
-                                container
-                                sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 1 }}
-                            >
-                                <Grid item xs={3.8}>
-                                    <Box
-                                        sx={{
-                                            backgroundColor: theme.palette.background.default,
-
-                                            marginY: 2,
-                                            borderRadius: 1.5,
-                                            border: 1,
-                                            borderColor: theme.palette.grey[300]
-                                        }}
-                                    >
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <Typography sx={{ paddingLeft: 1.8, paddingY: 1, fontSize: theme.typography.h4 }}>
-                                                Daily
-                                            </Typography>
-                                            <Typography sx={{ paddingRight: 1.8, paddingY: 1, fontSize: theme.typography.h4 }}>
-                                                +2.1k
-                                            </Typography>
-                                        </Box>
-
-                                        <Divider />
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                justifyContent: 'space-around',
-                                                alignItems: 'center',
-                                                paddingY: 2
-                                            }}
-                                        >
-                                            <Box
-                                                sx={{
-                                                    height: 60,
-                                                    width: 60,
-                                                    borderRadius: 30,
-                                                    backgroundColor: theme.palette.success.light,
-                                                    display: 'flex',
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center'
-                                                }}
-                                            >
-                                                <Typography
-                                                    sx={{
-                                                        fontSize: theme.typography.h3,
-                                                        marginTop: 0.5,
-                                                        marginRight: 1
-                                                    }}
-                                                    className="text-success text-center m-auto"
-                                                >
-                                                    100%
-                                                </Typography>
-                                            </Box>
-
-                                            <Box sx={{ padding: 2 }}>
-                                                <Typography sx={{ fontSize: theme.typography.h3 }}>30k</Typography>
-                                                <Typography>Target</Typography>
-                                            </Box>
-
-                                            <Box sx={{ padding: 2 }}>
-                                                <Typography sx={{ fontSize: theme.typography.h3 }}>32k</Typography>
-                                                <Typography>Collected</Typography>
-                                            </Box>
-                                        </Box>
-                                    </Box>
-                                </Grid>
-                                <Grid item xs={3.8}>
-                                    <Box
-                                        sx={{
-                                            backgroundColor: theme.palette.background.default,
-
-                                            marginY: 2,
-                                            borderRadius: 1.5,
-                                            border: 1,
-                                            borderColor: theme.palette.grey[300]
-                                        }}
-                                    >
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <Typography sx={{ paddingLeft: 1.8, paddingY: 1, fontSize: theme.typography.h4 }}>
-                                                Monthly
-                                            </Typography>
-                                            <Typography sx={{ paddingRight: 1.8, paddingY: 1, fontSize: theme.typography.h4 }}></Typography>
-                                        </Box>
-
-                                        <Divider />
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                justifyContent: 'space-around',
-                                                alignItems: 'center',
-                                                paddingY: 2
-                                            }}
-                                        >
-                                            <Box
-                                                sx={{
-                                                    height: 60,
-                                                    width: 60,
-                                                    borderRadius: 30,
-                                                    backgroundColor: theme.palette.primary.light,
-                                                    display: 'flex',
-                                                    justifyContent: '',
-                                                    alignItems: 'center'
-                                                }}
-                                            >
-                                                <Typography
-                                                    sx={{
-                                                        fontSize: theme.typography.h3,
-                                                        marginTop: 0.5,
-                                                        marginRight: 1
-                                                    }}
-                                                    className="text-primary text-center m-auto"
-                                                >
-                                                    86%
-                                                </Typography>
-                                            </Box>
-
-                                            <Box sx={{ padding: 2 }}>
-                                                <Typography sx={{ fontSize: theme.typography.h3 }}>360k</Typography>
-                                                <Typography>Target</Typography>
-                                            </Box>
-
-                                            <Box sx={{ padding: 2 }}>
-                                                <Typography sx={{ fontSize: theme.typography.h3 }}>282k</Typography>
-                                                <Typography>Collected</Typography>
-                                            </Box>
-                                        </Box>
-                                    </Box>
-                                </Grid>
-                                <Grid item xs={3.8}>
-                                    <Box
-                                        sx={{
-                                            backgroundColor: theme.palette.background.default,
-
-                                            marginY: 2,
-                                            borderRadius: 1.5,
-                                            border: 1,
-                                            borderColor: theme.palette.grey[300]
-                                        }}
-                                    >
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <Typography sx={{ paddingLeft: 1.8, paddingY: 1, fontSize: theme.typography.h4 }}>
-                                                Yearly
-                                            </Typography>
-                                            <Typography sx={{ paddingRight: 1.8, paddingY: 1, fontSize: theme.typography.h4 }}></Typography>
-                                        </Box>
-
-                                        <Divider />
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                justifyContent: 'space-around',
-                                                alignItems: 'center',
-                                                paddingY: 2
-                                            }}
-                                        >
-                                            <Box
-                                                sx={{
-                                                    height: 60,
-                                                    width: 60,
-                                                    borderRadius: 30,
-                                                    backgroundColor: theme.palette.primary.light,
-                                                    display: 'flex',
-                                                    justifyContent: '',
-                                                    alignItems: 'center'
-                                                }}
-                                            >
-                                                <Typography
-                                                    sx={{
-                                                        fontSize: theme.typography.h3,
-                                                        marginTop: 0.5,
-                                                        marginRight: 1
-                                                    }}
-                                                    className="text-primary text-center m-auto"
-                                                >
-                                                    74%
-                                                </Typography>
-                                            </Box>
-
-                                            <Box sx={{ padding: 2 }}>
-                                                <Typography sx={{ fontSize: theme.typography.h3 }}>30k</Typography>
-                                                <Typography>Target</Typography>
-                                            </Box>
-
-                                            <Box sx={{ padding: 2 }}>
-                                                <Typography sx={{ fontSize: theme.typography.h3 }}>32k</Typography>
-                                                <Typography>Collected</Typography>
-                                            </Box>
-                                        </Box>
-                                    </Box>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-
+                    <Grid container className="ms-4 me-3" justifyContent="space-between" alignItems="start">
+                        <SalesTargets shops={shops} />
                         <Grid item xs={3.4}>
-                            <Box sx={{ backgroundColor: theme.palette.background.default, borderRadius: 2, paddingY: 1 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: 1.5 }}>
-                                    <Typography
-                                        sx={{
-                                            fontSize: theme.typography.h3,
-                                            fontWeight: theme.typography.fontWeightMedium,
-                                            color: theme.palette.primary.dark
-                                        }}
-                                    >
-                                        Add New
-                                    </Typography>
-                                </Box>
-                                <Divider />
-
-                                <Box
-                                    sx={{
-                                        padding: 1.2,
-                                        borderRadius: 2,
-                                        borderWidth: 1,
-                                        borderColor: theme.palette.grey[400],
-                                        margin: 2,
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center'
-                                    }}
-                                >
-                                    <Typography
-                                        sx={{
-                                            fontSize: theme.typography.h3,
-                                            fontWeight: theme.typography.fontWeightMedium,
-                                            color: theme.palette.primary.dark
-                                        }}
-                                    >
-                                        Stock
-                                    </Typography>
-                                    <Typography
-                                        sx={{
-                                            fontSize: theme.typography.h3,
-                                            fontWeight: theme.typography.fontWeightMedium,
-                                            color: theme.palette.primary.dark
-                                        }}
-                                    >
-                                        Package
-                                    </Typography>
-                                    <Typography
-                                        sx={{
-                                            fontSize: theme.typography.h3,
-                                            fontWeight: theme.typography.fontWeightMedium,
-                                            color: theme.palette.primary.dark
-                                        }}
-                                    >
-                                        Target
-                                    </Typography>
-                                </Box>
-                            </Box>
-
-                            <Box sx={{ backgroundColor: theme.palette.background.default, borderRadius: 2, paddingY: 1, marginTop: 1 }}>
-                                <Box
-                                    sx={{
-                                        padding: 2,
-                                        borderRadius: 2,
-                                        borderWidth: 1,
-                                        borderColor: theme.palette.grey[400],
-                                        backgroundColor: theme.palette.background,
-
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center'
-                                    }}
-                                >
-                                    <Typography
-                                        sx={{
-                                            fontSize: theme.typography.h3,
-                                            fontWeight: theme.typography.fontWeightMedium,
-                                            color: theme.palette.primary.dark
-                                        }}
-                                    >
-                                        Total Customer
-                                    </Typography>
-
-                                    <Typography
-                                        sx={{
-                                            fontSize: theme.typography.h3,
-                                            fontWeight: theme.typography.fontWeightMedium,
-                                            color: theme.palette.primary.dark
-                                        }}
-                                    >
-                                        2342
-                                    </Typography>
-                                </Box>
-                            </Box>
-
-                            <Box sx={{ backgroundColor: theme.palette.background.default, borderRadius: 2, paddingY: 1, marginTop: 1 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: 1.5 }}>
-                                    <Typography
-                                        sx={{
-                                            fontSize: theme.typography.h3,
-                                            fontWeight: theme.typography.fontWeightMedium,
-                                            color: theme.palette.primary.dark
-                                        }}
-                                    >
-                                        Low Stocks
-                                    </Typography>
-                                    <Typography
-                                        sx={{
-                                            fontSize: theme.typography.h3,
-                                            fontWeight: theme.typography.fontWeightMedium,
-                                            color: theme.palette.primary.dark
-                                        }}
-                                    >
-                                        Shops
-                                    </Typography>
-                                </Box>
-                                <Divider />
-
-                                <Box
-                                    sx={{
-                                        padding: 1.2,
-                                        borderRadius: 2,
-                                        borderWidth: 1,
-                                        borderColor: theme.palette.grey[400],
-                                        margin: 2,
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center'
-                                    }}
-                                >
-                                    <Typography
-                                        sx={{
-                                            fontSize: theme.typography.body2,
-                                            fontWeight: theme.typography.fontWeightMedium,
-                                            color: theme.palette.primary.dark
-                                        }}
-                                    >
-                                        Rice
-                                    </Typography>
-
-                                    <Typography
-                                        sx={{
-                                            fontSize: theme.typography.body2,
-                                            fontWeight: theme.typography.fontWeightMedium,
-                                            color: theme.palette.primary.dark
-                                        }}
-                                    >
-                                        12 KG
-                                    </Typography>
-                                </Box>
-                            </Box>
+                            <AddNew
+                                stockbtn={() => alert('stock clicked')}
+                                packagebtn={() => alert('package clicked')}
+                                targetbtn={() => handleTargetClick()}
+                            />
+                            <CustomerCard />
+                            <LowStocks shops={shops} />
                         </Grid>
                     </Grid>
                 </Grid>
             </Grid>
+
+            <Dialog open={openTargetDialog} onClose={handleDialogClose}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        backgroundColor: theme.palette.primary.main
+                    }}
+                >
+                    <DialogTitle sx={{ fontSize: theme.typography.h4 }}>Set New Target</DialogTitle>
+                    <Button variant="text" color="dark" onClick={handleDialogClose}>
+                        <IconX />
+                    </Button>
+                </Box>
+
+                <Divider />
+                <DialogContent>
+                    <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleSubmit}>
+                        <Grid container sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 500 }}>
+                            <Grid item xs={12} sm={12}>
+                                <Autocomplete
+                                    required
+                                    options={shops}
+                                    getOptionLabel={(option) => option.name}
+                                    onChange={(event, value) => {
+                                        if (value) {
+                                            handleShopSelection(value);
+                                        }
+                                    }}
+                                    renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" />}
+                                    noOptionsText="Loading..."
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    type="text"
+                                    label="Daily"
+                                    value={target.daily}
+                                    onChange={(event) => handleDailyTarget(event)}
+                                    sx={{ marginTop: 2, marginRight: 1, backgroundColor: theme.palette.background.default }}
+                                />
+                                <TextField
+                                    fullWidth
+                                    required
+                                    type="text"
+                                    label="Monthly"
+                                    value={target.monthly}
+                                    onChange={(event) => setTarget({ ...target, monthly: event.target.value })}
+                                    sx={{ marginTop: 2, marginLeft: 1, backgroundColor: theme.palette.background.default }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    type="text"
+                                    label="Annually"
+                                    value={target.annually}
+                                    onChange={(event) => setTarget({ ...target, annually: event.target.value })}
+                                    sx={{ marginTop: 2, marginRight: 1, backgroundColor: theme.palette.background.default }}
+                                />
+
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    sx={{
+                                        paddingX: 4,
+                                        paddingY: 1.6,
+
+                                        backgroundColor: theme.palette.primary.main,
+                                        color: theme.palette.background.default
+                                    }}
+                                >
+                                    {spinner ? (
+                                        <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    ) : (
+                                        'Set'
+                                    )}
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
+                    {popup.message}
+                </Alert>
+            </Snackbar>
         </Grid>
     );
 };

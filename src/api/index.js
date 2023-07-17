@@ -77,6 +77,13 @@ const Connections = {
     updateprice: '/updateprice',
     updateallprice: '/updateallprice',
 
+    // shop targets
+    targets: '/targets',
+    singleshop: '/singleshop/',
+    addtarget: '/addtarget',
+    updatetarget: '/updatetarget/',
+    deletetarget: '/deletetarget/',
+
     //replanishments
     newreplanishment: '/newreplanishment',
     singlereplanishment: '/singlereplanishment',
