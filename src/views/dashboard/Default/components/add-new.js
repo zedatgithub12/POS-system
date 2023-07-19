@@ -10,7 +10,7 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
     return (
         <Grid container sx={{ backgroundColor: theme.palette.background.default, borderRadius: 2, paddingY: 1 }}>
             <Grid item xs={12}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: 1.5 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: 1.2 }}>
                     <Typography
                         sx={{
                             fontSize: theme.typography.h4,
@@ -22,6 +22,7 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
                         Add New
                     </Typography>
                 </Box>
+                <Divider />
             </Grid>
 
             <Divider />
@@ -47,13 +48,15 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-evenly',
-                            backgroundColor: theme.palette.primary.light,
+
                             borderRadius: 2,
                             padding: 1,
                             paddingX: 3
                         }}
                     >
-                        <Typography variant="h5">Stock</Typography>
+                        <Typography variant="h4" sx={{ color: theme.palette.primary.dark, fontWeight: theme.typography.fontWeightMedium }}>
+                            Stock
+                        </Typography>
                     </Button>
                 </Grid>
 
@@ -64,13 +67,14 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-evenly',
-                            backgroundColor: theme.palette.primary.light,
                             borderRadius: 2,
                             padding: 1,
                             paddingX: 3
                         }}
                     >
-                        <Typography variant="h5">Package</Typography>
+                        <Typography variant="h4" sx={{ color: theme.palette.primary.dark, fontWeight: theme.typography.fontWeightMedium }}>
+                            Package
+                        </Typography>
                     </Button>
                 </Grid>
                 <Grid item xs={3}>
@@ -80,14 +84,15 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-evenly',
-                            backgroundColor: theme.palette.primary.light,
                             borderRadius: 2,
                             padding: 1,
                             paddingX: 3,
                             marginX: 1
                         }}
                     >
-                        <Typography variant="h5">Target</Typography>
+                        <Typography variant="h4" sx={{ color: theme.palette.primary.dark, fontWeight: theme.typography.fontWeightMedium }}>
+                            Target
+                        </Typography>
                     </Button>
                 </Grid>
             </Grid>

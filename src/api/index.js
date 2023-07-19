@@ -10,6 +10,11 @@ const Connections = {
     //stats api
     adminstat: '/adminstat',
     shopstat: '/shopstat',
+    againsttarget: '/againsttarget/',
+
+    // admin dashboard sidebar
+    lowstock: '/lowstock/',
+    customercount: '/customercount',
     //stores api
     createstore: '/createstore',
     viewstore: '/viewstore',
@@ -48,6 +53,7 @@ const Connections = {
 
     //sub category api's
     addsubcategory: '/addsubcategory',
+    subcategory: '/subcategory/',
     viewsubcategory: '/viewsubcategory',
     editsubcategory: '/editsubcategory/',
     deletesubcategory: '/deletesubcategory/',

@@ -17,3 +17,11 @@ export const getDaysInMonth = () => {
 
     return new Date(year, month, 0).getDate();
 };
+
+export const calculatePercentage = (numerator, denominator) => {
+    if (denominator === 0) {
+        return 0;
+    }
+    const percentage = (numerator / denominator) * 100;
+    return percentage.toFixed(2); // Limiting the result to 2 decimal places
+};

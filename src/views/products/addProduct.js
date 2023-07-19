@@ -34,6 +34,7 @@ const AddProduct = () => {
     };
     //category data
     const [CategoryData, setCategoryData] = useState([]);
+    const [SubCategoryData, setSubCategoryData] = useState([]);
     //shops data
     const [shops, setShops] = useState([]);
     const [productPicture, setProductPicture] = useState(null);
@@ -55,6 +56,7 @@ const AddProduct = () => {
 
     const handleCategoryChange = (event) => {
         setProductCategory(event.target.value);
+        getSubCatgeory(event.target.value);
     };
 
     const handleSubCategoryChange = (event) => {
@@ -71,10 +73,6 @@ const AddProduct = () => {
         // Handle form submission here
         // Declare the data to be sent to the API
         var Api = Connections.api + Connections.addproduct;
-        // var headers = {
-        //     accept: 'application/json',
-        //     'Content-Type': 'application/json'
-        // };
 
         const data = new FormData();
         data.append('picture', productPicture);
@@ -141,9 +139,39 @@ const AddProduct = () => {
         }
     };
 
+    const getSubCatgeory = (name) => {
+        var Api = Connections.api + Connections.subcategory + name;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'GET',
+            headers: headers,
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setSubCategoryData((prevCat) => {
+                        // Combine the previous shops with the new ones from the API
+                        return [...prevCat, ...response.data];
+                    });
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error fetching sub categories!'
+                });
+            });
+    };
     useEffect(() => {
         const getCatgeory = () => {
-            var Api = Connections.api + Connections.viewsubcategory;
+            var Api = Connections.api + Connections.viewcategory;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -168,10 +196,11 @@ const AddProduct = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error creatng shop!'
+                        message: 'There is error fetching categories!'
                     });
                 });
         };
+
         const getShops = () => {
             var Api = Connections.api + Connections.viewstore;
             var headers = {
@@ -276,7 +305,7 @@ const AddProduct = () => {
                             <FormControl fullWidth required>
                                 <Select value={productCategory} onChange={handleCategoryChange}>
                                     <MenuItem value="Main Category">Main Category</MenuItem>
-                                    {Array.from(new Set(CategoryData.map((product) => product.main_category))).map((category) => (
+                                    {Array.from(new Set(CategoryData.map((product) => product.name))).map((category) => (
                                         <MenuItem key={category} value={category}>
                                             {category}
                                         </MenuItem>
@@ -289,7 +318,7 @@ const AddProduct = () => {
                             <FormControl fullWidth>
                                 <Select value={productSubCategory} onChange={handleSubCategoryChange}>
                                     <MenuItem value="Sub Category">Sub Category</MenuItem>
-                                    {Array.from(new Set(CategoryData.map((product) => product.sub_category))).map((category) => (
+                                    {Array.from(new Set(SubCategoryData.map((product) => product.sub_category))).map((category) => (
                                         <MenuItem key={category} value={category}>
                                             {category}
                                         </MenuItem>

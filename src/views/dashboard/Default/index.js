@@ -1,7 +1,21 @@
 import { useEffect, useState, forwardRef } from 'react';
 import './DonutChart.css';
 // material-ui
-import { Grid, Typography, Box, Divider, Button, Dialog, DialogTitle, DialogContent, Autocomplete, TextField } from '@mui/material';
+import {
+    Grid,
+    Typography,
+    Box,
+    Divider,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    Autocomplete,
+    TextField,
+    FormControl,
+    Select,
+    MenuItem
+} from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -12,7 +26,16 @@ import AddNew from './components/add-new';
 import LowStocks from './components/low-stock';
 import CustomerCard from './components/customer-card';
 import SalesTargets from './components/sales-against-target';
-import { IconX } from '@tabler/icons';
+import {
+    IconX,
+    IconCircleCheck,
+    IconBuildingStore,
+    IconReportAnalytics,
+    IconChartInfographic,
+    IconBrandGoogleAnalytics
+} from '@tabler/icons';
+import TargetListing from './components/target-listing';
+import { useNavigate } from 'react-router-dom';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
@@ -24,14 +47,20 @@ const Dashboard = () => {
     const user = JSON.parse(userString);
     const theme = useTheme();
 
+    const navigate = useNavigate();
+
     const [shopId, setShopId] = useState(null);
     const [shopName, setShopsName] = useState();
     const [shops, setShops] = useState([]);
+    const [revenueTarget, setRevenueTarget] = useState([]);
+    const [shopFilter, setShopFilter] = useState('Select Shop');
+    const [targetShopFilter, setTargetShopFilter] = useState('Select Shop');
     const [isLoading, setLoading] = useState(true);
     const [spinner, setSpinner] = useState(false);
     const [stat, setStat] = useState([]);
-    const [month] = useState('');
-    const [year] = useState('');
+    const [lowstock, setLowStock] = useState([]);
+    const [totalCustomer, setTotalCustomer] = useState();
+    const [todaycustomers, setTodayCustomers] = useState();
     const [openTargetDialog, setOpenTargetDialog] = useState(false);
 
     const [target, setTarget] = useState({
@@ -44,6 +73,21 @@ const Dashboard = () => {
         severity: 'info',
         message: ''
     });
+
+    const handleTargetShopFilter = (event) => {
+        if (event.target.value !== 'Select Shop') {
+            setTargetShopFilter(event.target.value);
+            getTargets(event.target.value);
+        }
+    };
+
+    //low stock shop drop down filter
+    const handleShopFilterChange = (event) => {
+        if (event.target.value !== 'Select Shop') {
+            setShopFilter(event.target.value);
+            getLowStocks(event.target.value);
+        }
+    };
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -106,7 +150,7 @@ const Dashboard = () => {
                 r_monthly: target.monthly,
                 r_yearly: target.annually
             };
-            console.log(Data);
+
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'POST',
@@ -174,10 +218,98 @@ const Dashboard = () => {
                 });
             });
     };
+    const getTargets = (name) => {
+        var Api = Connections.api + Connections.againsttarget + name;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'GET',
+            headers: headers,
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setRevenueTarget(response.data);
+                } else {
+                    setRevenueTarget([]);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error fetching targets!'
+                });
+            });
+    };
 
+    const getLowStocks = (name) => {
+        var Api = Connections.api + Connections.lowstock + name;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'GET',
+            headers: headers,
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setLowStock(response.data);
+                } else {
+                    setLowStock(lowstock);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error fetching low stocks!'
+                });
+            });
+    };
+
+    const getCustomerCount = () => {
+        var Api = Connections.api + Connections.customercount;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'GET',
+            headers: headers,
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setTotalCustomer(response.data.totalcustomers);
+                    setTodayCustomers(response.data.todaycustomers);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is an error fetching customers count'
+                });
+            });
+    };
     useEffect(() => {
         getShops();
-    }, [shops]);
+        getCustomerCount();
+    }, []);
 
     return (
         <Grid container spacing={gridSpacing}>
@@ -187,15 +319,95 @@ const Dashboard = () => {
                         <Typography className="fs-3 fw-semibold">Dashboard</Typography>
                     </Box>
                     <Grid container className="ms-4 me-3" justifyContent="space-between" alignItems="start">
-                        <SalesTargets shops={shops} />
+                        <Grid item xs={8.4} sx={{ borderRadius: 2, padding: 3, paddingTop: 0 }}>
+                            <Grid
+                                item
+                                xs={12}
+                                sx={{ padding: 2, borderRadius: 3, marginBottom: 1, backgroundColor: theme.palette.background.default }}
+                            >
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        marginBottom: 1
+                                    }}
+                                >
+                                    <IconChartInfographic size={32} color={theme.palette.primary.dark} />
+                                    <FormControl>
+                                        <Select
+                                            value={targetShopFilter}
+                                            onChange={handleTargetShopFilter}
+                                            sx={{ backgroundColor: theme.palette.background.default }}
+                                        >
+                                            <MenuItem value="Select Shop">Select Shop</MenuItem>
+                                            {Array.from(new Set(shops.map((item) => item.name))).map((shop) => (
+                                                <MenuItem
+                                                    key={shop}
+                                                    value={shop}
+                                                    sx={{ backgroundColor: theme.palette.background.default }}
+                                                >
+                                                    {shop}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+
+                                <SalesTargets targets={revenueTarget} />
+                            </Grid>
+                            <TargetListing lists={revenueTarget} />
+                        </Grid>
                         <Grid item xs={3.4}>
                             <AddNew
-                                stockbtn={() => alert('stock clicked')}
-                                packagebtn={() => alert('package clicked')}
+                                stockbtn={() => navigate('/add-product')}
+                                packagebtn={() => navigate('/create-package')}
                                 targetbtn={() => handleTargetClick()}
                             />
-                            <CustomerCard />
-                            <LowStocks shops={shops} />
+                            <CustomerCard total={totalCustomer} addedToday={todaycustomers} />
+
+                            <Box sx={{ backgroundColor: theme.palette.background.default, borderRadius: 2, paddingY: 1, marginTop: 1 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: 1.5 }}>
+                                    <Typography
+                                        sx={{
+                                            fontSize: theme.typography.h4,
+                                            fontWeight: theme.typography.fontWeightMedium,
+                                            color: theme.palette.primary.dark,
+                                            marginLeft: 1
+                                        }}
+                                    >
+                                        Low Stocks
+                                    </Typography>
+                                    <FormControl>
+                                        <Select value={shopFilter} onChange={handleShopFilterChange}>
+                                            <MenuItem value="Select Shop">Select Shop</MenuItem>
+
+                                            {Array.from(new Set(shops.map((item) => item.name))).map((shop) => (
+                                                <MenuItem key={shop} value={shop}>
+                                                    {shop}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+                                <Divider />
+                                {shopFilter ? (
+                                    <LowStocks stocks={lowstock} />
+                                ) : (
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            padding: 6
+                                        }}
+                                    >
+                                        <IconBuildingStore size={48} color={theme.palette.primary.main} />
+                                        <Typography marginTop={1}>First select store to check</Typography>
+                                    </Box>
+                                )}
+                            </Box>
                         </Grid>
                     </Grid>
                 </Grid>

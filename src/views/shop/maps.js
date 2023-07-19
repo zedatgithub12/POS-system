@@ -6,7 +6,7 @@ import GoogleMapReact from 'google-map-react';
 import { Typography, Box, Divider, Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import Marker from 'assets/images/icons/marker.svg';
-import { IconCategory, IconPhone, IconPin, IconUser } from '@tabler/icons';
+import { IconBuildingStore, IconCategory, IconPhone, IconPin, IconUser } from '@tabler/icons';
 import { useNavigate } from 'react-router-dom';
 // ==============================|| SHOP MAP PAGE ||============================== //
 
@@ -21,7 +21,7 @@ const ShopMarker = ({ name, info, category, manager, phone, onPress }) => {
 
     return (
         <Box className="marker" onClick={toggleInfo}>
-            <img src={Marker} alt="marker" width={30} height={30} />
+            <IconBuildingStore size={28} color={theme.palette.warning.dark} />
             {showInfo && (
                 <Box sx={{ width: 220, height: 220, padding: 2, borderRadius: 2, backgroundColor: theme.palette.background.default }}>
                     <Typography sx={{ fontSize: theme.typography.h4 }}>{name}</Typography>
