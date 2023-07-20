@@ -30,7 +30,6 @@ import MuiAlert from '@mui/material/Alert';
 import { MoreVert } from '@mui/icons-material';
 import { IconSearch } from '@tabler/icons';
 // project imports
-import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate } from 'react-router-dom';
 import Connections from 'api';
@@ -257,7 +256,7 @@ const StockScreen = () => {
         return () => {};
     }, [popup]);
     return (
-        <MainCard>
+        <>
             <Grid container spacing={gridSpacing}>
                 <Grid item xs={12}>
                     <Box paddingX={2} className="shadow-1 p-4 pt-2 rounded">
@@ -416,7 +415,7 @@ const StockScreen = () => {
                     {popup.message}
                 </Alert>
             </Snackbar>
-        </MainCard>
+        </>
     );
 };
 

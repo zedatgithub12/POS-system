@@ -26,14 +26,7 @@ import AddNew from './components/add-new';
 import LowStocks from './components/low-stock';
 import CustomerCard from './components/customer-card';
 import SalesTargets from './components/sales-against-target';
-import {
-    IconX,
-    IconCircleCheck,
-    IconBuildingStore,
-    IconReportAnalytics,
-    IconChartInfographic,
-    IconBrandGoogleAnalytics
-} from '@tabler/icons';
+import { IconX, IconBuildingStore, IconChartInfographic } from '@tabler/icons';
 import TargetListing from './components/target-listing';
 import { useNavigate } from 'react-router-dom';
 
@@ -55,9 +48,7 @@ const Dashboard = () => {
     const [revenueTarget, setRevenueTarget] = useState([]);
     const [shopFilter, setShopFilter] = useState('Select Shop');
     const [targetShopFilter, setTargetShopFilter] = useState('Select Shop');
-    const [isLoading, setLoading] = useState(true);
     const [spinner, setSpinner] = useState(false);
-    const [stat, setStat] = useState([]);
     const [lowstock, setLowStock] = useState([]);
     const [totalCustomer, setTotalCustomer] = useState();
     const [todaycustomers, setTodayCustomers] = useState();
@@ -307,9 +298,8 @@ const Dashboard = () => {
             });
     };
     useEffect(() => {
-        getShops();
-        getCustomerCount();
-    }, []);
+        user.role === 'Admin' ? (getShops(), getCustomerCount()) : (getTargets(user.store_name), getLowStocks(user.store_name));
+    }, [user.role, user.store_name]);
 
     return (
         <Grid container spacing={gridSpacing}>
@@ -319,7 +309,7 @@ const Dashboard = () => {
                         <Typography className="fs-3 fw-semibold">Dashboard</Typography>
                     </Box>
                     <Grid container className="ms-4 me-3" justifyContent="space-between" alignItems="start">
-                        <Grid item xs={8.4} sx={{ borderRadius: 2, padding: 3, paddingTop: 0 }}>
+                        <Grid item xs={12} sm={12} md={12} lg={8.6} xl={8.6} sx={{ borderRadius: 2, padding: 3, paddingTop: 0 }}>
                             <Grid
                                 item
                                 xs={12}
@@ -334,39 +324,54 @@ const Dashboard = () => {
                                     }}
                                 >
                                     <IconChartInfographic size={32} color={theme.palette.primary.dark} />
-                                    <FormControl>
-                                        <Select
-                                            value={targetShopFilter}
-                                            onChange={handleTargetShopFilter}
-                                            sx={{ backgroundColor: theme.palette.background.default }}
-                                        >
-                                            <MenuItem value="Select Shop">Select Shop</MenuItem>
-                                            {Array.from(new Set(shops.map((item) => item.name))).map((shop) => (
-                                                <MenuItem
-                                                    key={shop}
-                                                    value={shop}
-                                                    sx={{ backgroundColor: theme.palette.background.default }}
-                                                >
-                                                    {shop}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
+                                    {user.role === 'Admin' ? (
+                                        <FormControl>
+                                            <Select
+                                                value={targetShopFilter}
+                                                onChange={handleTargetShopFilter}
+                                                sx={{ backgroundColor: theme.palette.background.default }}
+                                            >
+                                                <MenuItem value="Select Shop">Select Shop</MenuItem>
+                                                {Array.from(new Set(shops.map((item) => item.name))).map((shop) => (
+                                                    <MenuItem
+                                                        key={shop}
+                                                        value={shop}
+                                                        sx={{ backgroundColor: theme.palette.background.default }}
+                                                    >
+                                                        {shop}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    ) : (
+                                        <Typography sx={{ fontSize: theme.typography.h5, marginRight: 2 }}>{user.store_name}</Typography>
+                                    )}
                                 </Box>
 
                                 <SalesTargets targets={revenueTarget} />
                             </Grid>
                             <TargetListing lists={revenueTarget} />
                         </Grid>
-                        <Grid item xs={3.4}>
-                            <AddNew
-                                stockbtn={() => navigate('/add-product')}
-                                packagebtn={() => navigate('/create-package')}
-                                targetbtn={() => handleTargetClick()}
-                            />
-                            <CustomerCard total={totalCustomer} addedToday={todaycustomers} />
 
-                            <Box sx={{ backgroundColor: theme.palette.background.default, borderRadius: 2, paddingY: 1, marginTop: 1 }}>
+                        <Grid item xs={3.4}>
+                            {user.role === 'Admin' && (
+                                <>
+                                    <AddNew
+                                        stockbtn={() => navigate('/add-product')}
+                                        packagebtn={() => navigate('/create-package')}
+                                        targetbtn={() => handleTargetClick()}
+                                    />
+                                    <CustomerCard total={totalCustomer} addedToday={todaycustomers} />
+                                </>
+                            )}
+                            <Box
+                                sx={{
+                                    backgroundColor: theme.palette.background.default,
+                                    borderRadius: 2,
+                                    paddingY: 1,
+                                    marginTop: user.role === 'Admin' ? 1 : 0
+                                }}
+                            >
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: 1.5 }}>
                                     <Typography
                                         sx={{
@@ -378,17 +383,22 @@ const Dashboard = () => {
                                     >
                                         Low Stocks
                                     </Typography>
-                                    <FormControl>
-                                        <Select value={shopFilter} onChange={handleShopFilterChange}>
-                                            <MenuItem value="Select Shop">Select Shop</MenuItem>
 
-                                            {Array.from(new Set(shops.map((item) => item.name))).map((shop) => (
-                                                <MenuItem key={shop} value={shop}>
-                                                    {shop}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
+                                    {user.role === 'Admin' ? (
+                                        <FormControl>
+                                            <Select value={shopFilter} onChange={handleShopFilterChange}>
+                                                <MenuItem value="Select Shop">Select Shop</MenuItem>
+
+                                                {Array.from(new Set(shops.map((item) => item.name))).map((shop) => (
+                                                    <MenuItem key={shop} value={shop}>
+                                                        {shop}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    ) : (
+                                        <Typography sx={{ fontSize: theme.typography.h5, marginRight: 2 }}>{user.store_name}</Typography>
+                                    )}
                                 </Box>
                                 <Divider />
                                 {shopFilter ? (

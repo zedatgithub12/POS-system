@@ -52,7 +52,7 @@ const LowStocks = ({ stocks }) => {
                                 color: theme.palette.primary.dark
                             }}
                         >
-                            {item.min_quantity} {item.unit}
+                            {item.quantity} {item.unit}
                         </Typography>
                     </Box>
                 ))

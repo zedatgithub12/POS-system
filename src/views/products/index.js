@@ -67,10 +67,6 @@ const Products = () => {
     const users = JSON.parse(userString);
     const theme = useTheme();
 
-    const GoBack = () => {
-        navigate(-1);
-    };
-
     const [shopId, setShopId] = useState(null);
     const [shopName, setShopsName] = useState();
     const [shops, setShops] = useState([]);
@@ -400,7 +396,8 @@ const Products = () => {
                                         backgroundColor: theme.palette.primary.light,
                                         borderRadius: 2,
                                         padding: 2,
-                                        marginRight: 1
+                                        marginX: 1,
+                                        marginTop: 1
                                     }}
                                 >
                                     <IconPlus />
@@ -418,7 +415,9 @@ const Products = () => {
                                         backgroundColor: theme.palette.primary.light,
                                         borderRadius: 2,
                                         padding: 2,
-                                        marginX: 1
+                                        paddingX: 4,
+                                        marginX: 1,
+                                        marginTop: 1
                                     }}
                                 >
                                     <IconTestPipe />
@@ -437,7 +436,8 @@ const Products = () => {
                                         backgroundColor: theme.palette.primary.light,
                                         borderRadius: 2,
                                         padding: 2,
-                                        marginX: 1
+                                        marginX: 1,
+                                        marginTop: 1
                                     }}
                                 >
                                     <IconArrowsTransferDown />
@@ -1161,6 +1161,7 @@ ProductRow.propTypes = {
         picture: PropTypes.string,
         name: PropTypes.string.isRequired,
         category: PropTypes.string.isRequired,
+        sub_category: PropTypes.string.isRequired,
         brand: PropTypes.string.isRequired,
         price: PropTypes.number.isRequired,
         quantity: PropTypes.number.isRequired,

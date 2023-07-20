@@ -12,8 +12,6 @@ import {
     TableRow,
     Paper,
     IconButton,
-    TextField,
-    InputAdornment,
     MenuItem,
     TablePagination,
     Dialog,
@@ -30,7 +28,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
-import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
+import { IconTrash, IconEdit } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
@@ -38,6 +36,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Connections from 'api';
 import 'react-lazy-load-image-component/src/effects/blur.css';
+import notransfer from 'assets/images/notransfer.png';
 // ==============================|| TRANSFERS PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -53,7 +52,6 @@ const Transfers = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
     const [stocktransfers, setStockTransfers] = useState([]);
-    const [packages, setPackages] = useState([]);
 
     const handleShopFilterChange = (event) => {
         setShopFilter(event.target.value);
@@ -148,7 +146,7 @@ const Transfers = () => {
                                     <Button
                                         component={Link}
                                         to="/make-transfer"
-                                        variant="contained"
+                                        variant="outlined"
                                         sx={{
                                             textDecoration: 'none',
                                             '&:hover': {
@@ -230,7 +228,7 @@ const Transfers = () => {
                                         <TableRow>
                                             <TableCell colSpan={5} align="center" sx={{ borderBottom: 0 }}>
                                                 <Box padding={3}>
-                                                    <img src={packages} alt="No Packages" width="40%" height="40%" />
+                                                    <img src={notransfer} alt="No Transfer" width="40%" height="40%" />
                                                 </Box>
                                             </TableCell>
                                         </TableRow>
@@ -498,8 +496,12 @@ const ProductRow = ({ product }) => {
 ProductRow.propTypes = {
     product: PropTypes.shape({
         id: PropTypes.number,
+        receivershopname: PropTypes.string.isRequired,
+        sendershopname: PropTypes.string.isRequired,
+        created_at: PropTypes.string.isRequired,
+        note: PropTypes.string.isRequired,
+        items: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
-        shopname: PropTypes.string.isRequired,
         category: PropTypes.string.isRequired,
         price: PropTypes.number.isRequired,
         quantity: PropTypes.number.isRequired,

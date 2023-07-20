@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 // material-ui
-import { Grid, Typography, Button, Divider, Box, TextField, IconButton, MenuItem } from '@mui/material';
+import { Grid, Typography, Button, Divider, Box, TextField, IconButton, Autocomplete } from '@mui/material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -45,11 +45,12 @@ const UpdateShop = () => {
         });
     };
 
-    const ChangeManager = (event) => {
-        setManagerName(event.target.value.name);
-        setManagerId(event.target.value.id);
+    const ChangeManager = (value) => {
+        const selectedName = value.name;
+        const selectedId = value.id;
+        setManagerName(selectedName);
+        setManagerId(selectedId);
     };
-
     const [formData, setFormData] = useState({
         shopName: state.name ? state.name : '',
         category: state.category ? state.category : '',
@@ -65,10 +66,9 @@ const UpdateShop = () => {
         shopProfilePreview: state.profile_image ? state.profile_image : null
     });
 
-    const [selectedLocation, setSelectedLocation] = useState({ lat: null, lng: null });
+    // const [selectedLocation, setSelectedLocation] = useState({ lat: null, lng: null });
 
     const handleMapClick = ({ lat, lng }) => {
-        setSelectedLocation({ lat, lng });
         setFormData({ ...formData, latitude: lat, longitude: lng });
     };
     const handleSubmit = (event) => {
@@ -272,20 +272,18 @@ const UpdateShop = () => {
                                 </Grid>
 
                                 <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        select
-                                        label="Manager"
-                                        className="mt-3"
-                                        value={managername.name ? managername.name : state.manager}
-                                        onChange={(event) => ChangeManager(event)}
-                                    >
-                                        {users.map((option) => (
-                                            <MenuItem key={option.id} value={option} defaultValue={option.name === state.manager}>
-                                                {option.name}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
+                                    <Autocomplete
+                                        options={users}
+                                        getOptionLabel={(option) => `${option.name} (${option.id})`} // Modified getOptionLabel function
+                                        onInputChange={(event, value) => {
+                                            ChangeManager(value);
+                                        }}
+                                        defaultValue={{ name: managername }}
+                                        renderInput={(params) => <TextField {...params} label="Manager" variant="outlined" />}
+                                        onChange={(event, value) => {
+                                            ChangeManager(value); // Pass the selected option to the ChangeManager function
+                                        }}
+                                    />
                                 </Grid>
 
                                 <Grid item xs={12}>

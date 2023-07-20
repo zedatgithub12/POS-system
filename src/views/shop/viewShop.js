@@ -1,6 +1,6 @@
 import React, { useState, forwardRef, useEffect } from 'react';
 // material-ui
-import { Grid, Typography, Button, Divider, TextField, MenuItem, FormControl, Select } from '@mui/material';
+import { Grid, Box, Typography, Button, Divider, TextField, MenuItem, FormControl, Select, CircularProgress } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -13,12 +13,10 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
-import PopularCard from 'views/dashboard/Default/PopularCard';
-import TotalOrderLineChartCard from 'views/dashboard/Default/TotalOrderLineChartCard';
-import TotalIncomeDarkCard from 'views/dashboard/Default/TotalIncomeDarkCard';
-import TotalIncomeLightCard from 'views/dashboard/Default/TotalIncomeLightCard';
 import Connections from 'api';
-import LowProducts from 'views/dashboard/Default/LowProducts';
+import SalesTargets from 'views/dashboard/Default/components/sales-against-target';
+import TargetListing from 'views/dashboard/Default/components/target-listing';
+import { useTheme } from '@mui/material/styles';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -36,9 +34,11 @@ const ViewShop = () => {
         navigate(-1);
     };
 
+    const theme = useTheme();
     const [shops, setShops] = useState([]);
     const [activeShops, setActiveShops] = useState([]);
     const [shopFilter, setShopFilter] = useState(shop.name);
+    const [revenueTarget, setRevenueTarget] = useState([]);
     const [isLoading, setLoading] = useState(true);
     const [stat, setStat] = useState([]);
     const [month] = useState('');
@@ -92,6 +92,7 @@ const ViewShop = () => {
 
     const handleShopFilterChange = (event) => {
         setShopFilter(event.target.value);
+        getTargets(event.target.value);
     };
 
     const AddManager = () => {
@@ -190,6 +191,35 @@ const ViewShop = () => {
             });
     };
 
+    const getTargets = (name) => {
+        var Api = Connections.api + Connections.againsttarget + name;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'GET',
+            headers: headers,
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setRevenueTarget(response.data);
+                } else {
+                    setRevenueTarget([]);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error fetching targets!'
+                });
+            });
+    };
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -233,7 +263,7 @@ const ViewShop = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error creatng shop!'
+                        message: 'There is error creating shop!'
                     });
                 });
         };
@@ -269,6 +299,7 @@ const ViewShop = () => {
 
         getUsers();
         getShops();
+        getTargets(shop.name);
 
         return () => {};
     }, []);
@@ -311,45 +342,6 @@ const ViewShop = () => {
                             item
                             xs={12}
                             style={{
-                                marginTop: 14,
-                                borderRadius: 6,
-                                padding: 6,
-                                paddingRight: 20,
-                                paddingLeft: 14
-                            }}
-                        >
-                            <Grid container spacing={gridSpacing}>
-                                <Grid item lg={8} md={12} sm={12} xs={12}>
-                                    <TotalOrderLineChartCard
-                                        isLoading={isLoading}
-                                        dailySales={stat.dailySales ? stat.dailySales : 0}
-                                        monthlysales={stat.monthlySales ? stat.monthlySales : 0}
-                                        anualsales={stat.annualSales ? stat.annualSales : 0}
-                                        todatesales={stat.todatesales ? stat.todatesales : 0}
-                                    />
-                                </Grid>
-                                <Grid item lg={4} md={12} sm={12} xs={12}>
-                                    <Grid container spacing={gridSpacing}>
-                                        <Grid item sm={12} xs={12} md={12} lg={12}>
-                                            <TotalIncomeDarkCard
-                                                isLoading={isLoading}
-                                                totalProducts={stat.totalProducts ? stat.totalProducts : 0}
-                                            />
-                                        </Grid>
-                                        <Grid item sm={12} xs={12} md={12} lg={12}>
-                                            <TotalIncomeLightCard
-                                                isLoading={isLoading}
-                                                totalcustomers={stat.totalCustomers ? stat.totalCustomers : 0}
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                        <Grid
-                            item
-                            xs={12}
-                            style={{
                                 marginTop: 4,
                                 marginLeft: 4,
                                 borderRadius: 6,
@@ -358,14 +350,34 @@ const ViewShop = () => {
                                 paddingLeft: 10
                             }}
                         >
-                            <Grid container spacing={gridSpacing}>
-                                <Grid item xs={12} md={6}>
-                                    <PopularCard isLoading={isLoading} topProducts={stat.topProducts} />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <LowProducts isLoading={isLoading} lowProducts={stat.lowProducts} />
-                                </Grid>
-                            </Grid>
+                            {isLoading ? (
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        padding: 6
+                                    }}
+                                >
+                                    <CircularProgress size={24} />
+                                    <Typography
+                                        sx={{
+                                            marginLeft: 2,
+
+                                            justifyContent: 'center',
+                                            fontSize: theme.typography.h4,
+                                            fontWeight: theme.typography.fontWeightRegular
+                                        }}
+                                    >
+                                        Loading...
+                                    </Typography>
+                                </Box>
+                            ) : (
+                                <>
+                                    <SalesTargets targets={revenueTarget} />
+                                    <TargetListing lists={revenueTarget} />
+                                </>
+                            )}
                         </Grid>
                     </Grid>
 

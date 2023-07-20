@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 // material-ui
 import {
     Grid,
-    Typography,
-    Divider,
     Table,
     TableBody,
     TableCell,
@@ -22,7 +20,6 @@ import {
     FormControl,
     Checkbox,
     Select,
-    InputLabel,
     Dialog,
     DialogTitle,
     DialogContent,
@@ -32,11 +29,8 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { MoreVert } from '@mui/icons-material';
 import { IconSearch } from '@tabler/icons';
-import { useTheme } from '@mui/material/styles';
-// project imports
-import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Connections from 'api';
 
 // ==============================|| SALES PAGE ||============================== //
@@ -47,9 +41,7 @@ const PackageScreen = () => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
 
-    const theme = useTheme();
     const navigate = useNavigate();
-    const [active, setActive] = useState(true);
     const [anchorEl, setAnchorEl] = useState(null);
 
     //package states
@@ -62,7 +54,6 @@ const PackageScreen = () => {
     const [prowsPerPage, setRowsPPerPage] = useState(15);
     const [selectedPRows, setSelectedPRows] = useState([]);
     const [selectedPItem, setSelectedPItems] = useState();
-    const [selectedItem, setSelectedItems] = useState();
     const [spinner, setSpinner] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     //stock sales related code
@@ -89,10 +80,6 @@ const PackageScreen = () => {
 
     const handleMenuClose = () => {
         setAnchorEl(null);
-    };
-    const handleSelectItem = (event, item) => {
-        handleMenuClick(event);
-        setSelectedItems({ ...item });
     };
 
     const handlePFilterDateChange = (event) => {
@@ -271,7 +258,7 @@ const PackageScreen = () => {
     const displayedPSalesData = filteredPSalesData.slice(ppage * prowsPerPage, ppage * prowsPerPage + prowsPerPage);
 
     return (
-        <MainCard>
+        <>
             <Grid container spacing={gridSpacing}>
                 <Grid item xs={12}>
                     <Box paddingX={2} className="shadow-1 p-4 pt-2 rounded">
@@ -439,7 +426,7 @@ const PackageScreen = () => {
                     {popup.message}
                 </Alert>
             </Snackbar>
-        </MainCard>
+        </>
     );
 };
 
