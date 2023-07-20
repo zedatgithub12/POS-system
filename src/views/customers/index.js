@@ -24,7 +24,6 @@ import {
     Box,
     Collapse,
     FormControl,
-    InputLabel,
     Select
 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
@@ -117,7 +116,8 @@ const Customers = () => {
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -284,7 +284,8 @@ const CustomerRow = ({ customer }) => {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            cache: 'no-cache'
         };
         fetch(Api, requestOptions)
             .then((response) => response.json())
@@ -332,7 +333,8 @@ const CustomerRow = ({ customer }) => {
         // Make the API call using fetch()
         fetch(Api, {
             method: 'DELETE',
-            headers: headers
+            headers: headers,
+            cache: 'no-cache'
         })
             .then((response) => response.json())
             .then((response) => {
@@ -474,6 +476,7 @@ const CustomerRow = ({ customer }) => {
 };
 CustomerRow.propTypes = {
     customer: PropTypes.shape({
+        id: PropTypes.number.isRequired,
         name: PropTypes.string.isRequired,
         phone: PropTypes.string.isRequired,
         shop: PropTypes.string.isRequired,

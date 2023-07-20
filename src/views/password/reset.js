@@ -145,7 +145,8 @@ const Reset_Password = ({ ...others }) => {
                                                 fetch(Api, {
                                                     method: 'POST',
                                                     headers: headers,
-                                                    body: JSON.stringify(data)
+                                                    body: JSON.stringify(data),
+                                                    cache: 'no-cache'
                                                 })
                                                     .then((response) => response.json())
                                                     .then((response) => {

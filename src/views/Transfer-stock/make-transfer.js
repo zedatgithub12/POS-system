@@ -19,42 +19,41 @@ import {
     TableCell,
     TableHead
 } from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
-import { Delete } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
-import Connections from 'api';
 import { gridSpacing } from 'store/constant';
-import packages from 'assets/images/packages.svg';
+import { useNavigate } from 'react-router-dom';
+import Connections from 'api';
+import { Delete } from '@mui/icons-material';
+import Transfering from 'assets/images/transfering.png';
 
-// ==============================|| UPDATE PACKAGE PAGE ||============================== //
+// ==============================|| Transfer Stock ||============================== //
+
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-const UpdatePackage = () => {
+const TransferStock = () => {
     const navigate = useNavigate();
-    const theme = useTheme();
-    const { state } = useLocation();
-    const item = state ? state : {};
-
     const GoBack = () => {
         navigate(-1);
     };
+    const theme = useTheme();
+
     const userString = sessionStorage.getItem('user');
     const user = JSON.parse(userString);
-    const [shopId, setShopId] = useState(item.shopid);
-    const [shopName, setShopsName] = useState(item.shopname);
+    const [shopId, setShopId] = useState(null);
+    const [shopName, setShopsName] = useState();
+    const [receivingShopId, setReceivingShopId] = useState(null);
+    const [receivingshopName, setReceivingShopsName] = useState();
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(false);
     const [productData, setProductData] = useState([]);
-    const [products, setProducts] = useState(item.items);
-    const [name, setName] = useState(item.name);
-    const [Price, setPrice] = useState(item.price);
-    const [date, setDate] = useState(item.date);
+    const [Items, setItems] = useState([]);
+    const [note, setNote] = useState('');
     const [spinner, setSpinner] = useState(false);
     const [popup, setPopup] = useState({
         status: false,
@@ -76,6 +75,12 @@ const UpdatePackage = () => {
         setShopsName(value.name);
         getProducts(value.name);
     };
+
+    const handleReceivingShopSelection = (value) => {
+        setReceivingShopId(value.id);
+        setReceivingShopsName(value.name);
+    };
+
     const getProducts = (shop) => {
         setLoading(true);
         var Api = Connections.api + Connections.viewstoreproduct + shop;
@@ -110,52 +115,50 @@ const UpdatePackage = () => {
             });
     };
     const handleAddToCart = (product) => {
-        const existingItem = JSON.parse(products).find((item) => item.id === product.id);
+        const existingItem = Items.find((item) => item.id === product.id);
 
         if (existingItem) {
             // If it does, update the quantity of the existing item
-            const updatedItems = JSON.parse(products).map((item) => {
+            const updatedItems = Items.map((item) => {
                 if (item.id === product.id) {
                     return { ...item, quantity: item.quantity + 1 };
                 }
                 return item;
             });
-            setProducts(JSON.stringify(updatedItems));
+            setItems(updatedItems);
         } else {
-            var newProduct = JSON.parse(products);
-            setProducts(
-                JSON.stringify([...newProduct, { id: product.id, name: product.name, code: product.code, unit: product.unit, quantity: 1 }])
-            );
+            setItems([
+                ...Items,
+                { id: product.id, name: product.name, code: product.code, unit: product.unit, existing: product.quantity, quantity: 1 }
+            ]);
         }
     };
 
     const handleRemoveFromCart = (product) => {
-        const updatedItems = JSON.parse(products).filter((item) => item.id !== product.id);
-        setProducts(JSON.stringify(updatedItems));
+        const updatedItems = Items.filter((item) => item.id !== product.id);
+        setItems(updatedItems);
     };
     const handleIncrement = (id) => {
-        const updatedItems = JSON.parse(products).map((item) => {
+        const updatedItems = Items.map((item) => {
             if (item.id === id) {
                 return { ...item, quantity: item.quantity + 1 };
             }
             return item;
         });
-        setProducts(JSON.stringify(updatedItems));
+        setItems(updatedItems);
     };
 
     const handleDecrement = (id) => {
-        const updatedItems = JSON.parse(products).map((item) => {
+        const updatedItems = Items.map((item) => {
             if (item.id === id && item.quantity > 0) {
                 return { ...item, quantity: item.quantity - 1 };
             }
             return item;
         });
-        setProducts(JSON.stringify(updatedItems));
+        setItems(updatedItems);
     };
 
-    const handleDateChange = (event) => {
-        setDate(event.target.value);
-    };
+    //submit data to api
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -169,38 +172,37 @@ const UpdatePackage = () => {
             });
             setSpinner(false);
         }
-        if (products.length == 0) {
+        if (Items.length == 0) {
             setPopup({
                 ...popup,
                 status: true,
                 severity: 'error',
-                message: 'Please add items to package first!'
+                message: 'Please add items to list first!'
             });
             setSpinner(false);
         } else {
             // Handle form submission here
             // Declare the data to be sent to the API
-            var Api = Connections.api + Connections.updatepackage + item.id;
+            var Api = Connections.api + Connections.transfer;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
             };
             var Data = {
-                shop: shopName,
-                shopid: shopId,
-                userid: user.id,
-                name: name,
-                items: JSON.parse(products),
-                price: Price,
-                expiredate: date
+                sendershopid: shopId,
+                sendershopname: shopName,
+                receivershopid: receivingShopId,
+                receivershopname: receivingshopName,
+                items: Items,
+                note: note,
+                userid: user.id
             };
 
             // Make the API call using fetch()
             fetch(Api, {
-                method: 'put',
+                method: 'POST',
                 headers: headers,
-                body: JSON.stringify(Data),
-                cache: 'no-cache'
+                body: JSON.stringify(Data)
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -211,6 +213,7 @@ const UpdatePackage = () => {
                             severity: 'success',
                             message: response.message
                         });
+
                         setSpinner(false);
                     } else {
                         setPopup({
@@ -227,7 +230,7 @@ const UpdatePackage = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error updating package!'
+                        message: 'There is error making transfer!'
                     });
                     setSpinner(false);
                 });
@@ -270,6 +273,7 @@ const UpdatePackage = () => {
 
         return () => {};
     }, []);
+
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -278,9 +282,7 @@ const UpdatePackage = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h4">
-                                        Update <span className="text-primary">{name}</span>
-                                    </Typography>
+                                    <Typography variant="h3">Transfer Stock</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -295,31 +297,45 @@ const UpdatePackage = () => {
                 <Grid item xs={12}>
                     <Divider />
                 </Grid>
+
                 <Grid item xs={12}>
                     <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleSubmit}>
                         <Grid container>
-                            <Grid item xs={12} sm={6}>
-                                <Autocomplete
-                                    required
-                                    options={shops}
-                                    getOptionLabel={(option) => option.name}
-                                    onChange={(event, value) => {
-                                        if (value) {
-                                            handleShopSelection(value);
-                                        }
-                                    }}
-                                    defaultValue={{ name: shopName }}
-                                    renderInput={(params) => (
-                                        <TextField {...params} label="Shop" variant="outlined" value={shopName} defaultValue={shopName} />
-                                    )}
-                                    noOptionsText="Loading..."
-                                />
+                            <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Grid item xs={12} sm={6}>
+                                    <Autocomplete
+                                        required
+                                        options={shops}
+                                        getOptionLabel={(option) => option.name}
+                                        onChange={(event, value) => {
+                                            if (value) {
+                                                handleShopSelection(value);
+                                            }
+                                        }}
+                                        renderInput={(params) => <TextField {...params} label="Sending Shop" variant="outlined" />}
+                                        noOptionsText="Loading..."
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12} sm={5}>
+                                    <Autocomplete
+                                        required
+                                        options={shops}
+                                        getOptionLabel={(option) => option.name}
+                                        onChange={(event, value) => {
+                                            if (value) {
+                                                handleReceivingShopSelection(value);
+                                            }
+                                        }}
+                                        renderInput={(params) => <TextField {...params} label="Receiving Shop" variant="outlined" />}
+                                        noOptionsText="Loading..."
+                                    />
+                                </Grid>
                             </Grid>
 
                             <Grid container>
                                 <Grid item xs={12} sm={6}>
                                     <Autocomplete
-                                        required
                                         key={productData.id}
                                         disabled={shopId ? false : true}
                                         options={productData}
@@ -345,7 +361,6 @@ const UpdatePackage = () => {
                                     </Grid>
                                 )}
                             </Grid>
-
                             <Grid item xs={12}>
                                 <TableContainer component={Paper} sx={{ bgcolor: theme.palette.primary.light, marginY: 3 }}>
                                     <Table>
@@ -359,9 +374,9 @@ const UpdatePackage = () => {
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
-                                        {products.length > 0 ? (
+                                        {Items.length > 0 ? (
                                             <TableBody>
-                                                {JSON.parse(products).map((item, index) => (
+                                                {Items.map((item, index) => (
                                                     <TableRow key={index}>
                                                         <TableCell>{item.name}</TableCell>
                                                         <TableCell>{item.code}</TableCell>
@@ -386,11 +401,11 @@ const UpdatePackage = () => {
                                         ) : (
                                             <TableBody>
                                                 <TableRow>
-                                                    <TableCell colSpan={5} align="center" sx={{ borderBottom: 0 }}>
+                                                    <TableCell colSpan={6} align="center" sx={{ borderBottom: 0 }}>
                                                         <Box padding={3}>
-                                                            <img src={packages} alt="Add Item" width="40%" height="40%" />
+                                                            <img src={Transfering} alt="Add Item" width="30%" height="30%" />
                                                             <Typography variant="h4" color="textSecondary" sx={{ marginY: 4 }}>
-                                                                Add Package Item
+                                                                Add item to list
                                                             </Typography>
                                                         </Box>
                                                     </TableCell>
@@ -408,50 +423,13 @@ const UpdatePackage = () => {
                                     sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginRight: 1 }}
                                 >
                                     <TextField
-                                        required
                                         fullWidth
-                                        label="Package Name"
-                                        value={name}
-                                        onChange={(event) => setName(event.target.value)}
-                                        sx={{ marginTop: 2 }}
-                                    />
-                                </Grid>
-
-                                <Grid
-                                    item
-                                    xs={12}
-                                    sm={6}
-                                    sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginRight: 1 }}
-                                >
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        label="Package Price"
-                                        value={Price}
-                                        onChange={(event) => setPrice(event.target.value)}
-                                        InputProps={{
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <Typography> ETB </Typography>
-                                                </InputAdornment>
-                                            )
-                                        }}
-                                        sx={{ marginTop: 2 }}
-                                    />
-                                </Grid>
-
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        id="date"
-                                        label="Expire Date"
-                                        type="date"
-                                        value={date}
-                                        onChange={handleDateChange}
-                                        InputLabelProps={{
-                                            shrink: true
-                                        }}
+                                        type="text"
+                                        label="Note"
+                                        value={note}
+                                        multiline
+                                        rows={6}
+                                        onChange={(event) => setNote(event.target.value)}
                                         sx={{ marginTop: 2 }}
                                     />
                                 </Grid>
@@ -463,9 +441,10 @@ const UpdatePackage = () => {
                                             <span className="visually-hidden">Loading...</span>
                                         </div>
                                     ) : (
-                                        'Update'
+                                        'Start Transfer'
                                     )}
                                 </Button>
+
                                 <Button onClick={GoBack} variant="text" color="error" sx={{ paddingX: 4, marginRight: 2 }}>
                                     Cancel
                                 </Button>
@@ -483,4 +462,4 @@ const UpdatePackage = () => {
     );
 };
 
-export default UpdatePackage;
+export default TransferStock;

@@ -1,6 +1,4 @@
-import { useState, useContext } from 'react';
-// import { useSelector } from 'react-redux';
-
+import { useState } from 'react';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {
@@ -11,8 +9,6 @@ import {
     // FormControlLabel,
     FormHelperText,
     Grid,
-    IconButton,
-    InputAdornment,
     InputLabel,
     OutlinedInput,
     Stack,
@@ -126,7 +122,8 @@ const Forgot_Password = ({ ...others }) => {
                                                 fetch(Api, {
                                                     method: 'POST',
                                                     headers: headers,
-                                                    body: JSON.stringify(data)
+                                                    body: JSON.stringify(data),
+                                                    cache: 'no-cache'
                                                 })
                                                     .then((response) => response.json())
                                                     .then((response) => {

@@ -1,8 +1,8 @@
 const Connections = {
-    api: 'http://localhost:8000/api',
-    images: 'http://localhost:8000/api/images/',
-    // api: 'https://addischircharo.com/backend/api',
-    // images: 'https://addischircharo.com/backend/api/images/',
+    // api: 'http://localhost:8000/api',
+    // images: 'http://localhost:8000/api/images/',
+    api: 'https://addischircharo.com/backend/api',
+    images: 'https://addischircharo.com/backend/api/images/',
     login: '/login',
     forgotpassword: '/forgotpassword',
     resetpassword: '/resetpassword',
@@ -10,6 +10,11 @@ const Connections = {
     //stats api
     adminstat: '/adminstat',
     shopstat: '/shopstat',
+    againsttarget: '/againsttarget/',
+
+    // admin dashboard sidebar
+    lowstock: '/lowstock/',
+    customercount: '/customercount',
     //stores api
     createstore: '/createstore',
     viewstore: '/viewstore',
@@ -25,7 +30,7 @@ const Connections = {
     updateproduct: '/updateproduct/',
     deleteproduct: '/deleteproduct/',
 
-    //product api's
+    //package api's
     addpackage: '/addpackage',
     viewpackages: '/viewpackages',
     packagedetail: '/package/',
@@ -33,11 +38,25 @@ const Connections = {
     updatepackage: '/updatepackage/',
     deletepackage: '/deletepackage/',
 
+    //sold package Api's
+    createpackagesale: '/createpackagesale',
+    viewpackagesale: '/viewsoldpackages',
+    viewstorepackagesale: '/viewstorepackagesale/',
+    updatepackagesale: '/updatepackagesale/',
+    deletepackagesale: '/deletepackagesale/',
+
     //category api's
     addcategory: '/addcategory',
     viewcategory: '/viewcategory',
     editcategory: '/editcategory/',
     deletecategory: '/deletecategory/',
+
+    //sub category api's
+    addsubcategory: '/addsubcategory',
+    subcategory: '/subcategory/',
+    viewsubcategory: '/viewsubcategory',
+    editsubcategory: '/editsubcategory/',
+    deletesubcategory: '/deletesubcategory/',
 
     //sales api
     createsale: '/createsale',
@@ -62,6 +81,26 @@ const Connections = {
     //price updates
     priceupdates: '/priceupdates/',
     updateprice: '/updateprice',
+    updateallprice: '/updateallprice',
+
+    // shop targets
+    targets: '/targets',
+    singleshop: '/singleshop/',
+    addtarget: '/addtarget',
+    updatetarget: '/updatetarget/',
+    deletetarget: '/deletetarget/',
+
+    //replanishments
+    newreplanishment: '/newreplanishment',
+    singlereplanishment: '/singlereplanishment',
+    allreplanishments: '/allreplanishments',
+    deleterecord: '/deleterecord',
+
+    //tranfers
+    alltransfers: '/alltransfers',
+    transfer: '/transfer',
+    updatetransfer: '/updatetransfer/',
+    deletetransfer: '/deletetransfer/',
 
     //Notifaction Api's
     adminnotification: '/adminnotification',

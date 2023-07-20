@@ -17,8 +17,6 @@ import ChartDataYear from './chart-data/total-order-year-line-chart';
 
 // assets
 import LocalMallOutlinedIcon from '@mui/icons-material/LocalMallOutlined';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-// import { backgroundColor } from '@mui/system/palette';
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
     backgroundColor: theme.palette.warning.light,
@@ -254,7 +252,8 @@ TotalOrderLineChartCard.propTypes = {
     isLoading: PropTypes.bool,
     dailySales: PropTypes.number,
     monthlysales: PropTypes.number,
-    anualsales: PropTypes.number
+    anualsales: PropTypes.number,
+    todatesales: PropTypes.number
 };
 
 export default TotalOrderLineChartCard;

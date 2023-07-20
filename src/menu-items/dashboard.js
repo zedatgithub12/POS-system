@@ -33,10 +33,26 @@ const getDashboardItems = (role) => {
         {
             id: 'stocks',
             title: 'Stocks',
-            type: 'item',
+            type: 'collapse',
             url: '/products',
             icon: icons.IconBox,
-            breadcrumbs: false
+            breadcrumbs: false,
+            children: [
+                {
+                    id: 'stocks',
+                    title: 'Stocks',
+                    type: 'item',
+                    url: '/products',
+                    breadcrumbs: false
+                },
+                {
+                    id: 'tranfer-stock',
+                    title: 'Stock Transfers',
+                    type: 'item',
+                    url: '/transfer-stock',
+                    breadcrumbs: false
+                }
+            ]
         },
         {
             id: 'packages',
@@ -48,11 +64,27 @@ const getDashboardItems = (role) => {
         },
         {
             id: 'category',
-            title: 'Category',
-            type: 'item',
+            title: 'Categories',
+            type: 'collapse',
             url: '/categories',
             icon: icons.IconCategory,
-            breadcrumbs: false
+            breadcrumbs: false,
+            children: [
+                {
+                    id: 'maincategory',
+                    title: 'Main Category',
+                    type: 'item',
+                    url: '/categories',
+                    breadcrumbs: false
+                },
+                {
+                    id: 'subcategory',
+                    title: 'Sub Category',
+                    type: 'item',
+                    url: '/sub-categories',
+                    breadcrumbs: false
+                }
+            ]
         },
         {
             id: 'sales',

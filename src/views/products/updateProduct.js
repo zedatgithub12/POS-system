@@ -1,5 +1,5 @@
 // material-ui
-import { Grid, Typography, Button, Divider, TextField, Container, MenuItem, Autocomplete } from '@mui/material';
+import { Grid, Typography, Button, Divider, TextField, Container, MenuItem, Autocomplete, FormControl, Select } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -31,21 +31,35 @@ const UpdateProduct = () => {
     const [picturePreview, setPicturePreview] = useState(state.picture ? state.picture : null);
     const [productName, setProductName] = useState(state.name ? state.name : '');
     const [productCategory, setProductCategory] = useState(state.category ? state.category : '');
+    const [productSubCategory, setProductSubCategory] = useState(state.sub_category ? state.sub_category : '');
     const [brand, setBrand] = useState(state.brand ? state.brand : '');
     const [productCode, setProductCode] = useState(state.code ? state.code : '');
     const [productCost, setProductCost] = useState(state.cost ? state.cost : '');
     const [productUnit, setProductUnit] = useState(state.unit ? state.unit : '');
     const [productPrice, setProductPrice] = useState(state.price ? state.price : '');
     const [productQuantity, setProductQuantity] = useState(state.quantity ? state.quantity : '');
+    const [productMinQuantity, setProductMinQuantity] = useState(state.min_quantity ? state.min_quantity : '');
     const [productDescription, setProductDescription] = useState(state.description ? state.description : '');
     const [warehouses, setWarehouses] = useState(state.shop ? state.shop : '');
-    const [status, setStatus] = useState(state.status ? state.status : '');
     const [spinner, setSpinner] = useState(false);
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
         message: ''
     });
+
+    const handleCategoryChange = (event) => {
+        setProductCategory(event.target.value);
+    };
+
+    const handleSubCategoryChange = (event) => {
+        setProductSubCategory(event.target.value);
+    };
+
+    const handleShopChange = (event) => {
+        setWarehouses(event.target.value);
+    };
+
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -72,20 +86,23 @@ const UpdateProduct = () => {
         data.append('picture', productPicture);
         data.append('name', productName);
         data.append('category', productCategory);
+        data.append('sub_category', productSubCategory);
         data.append('brand', brand);
         data.append('code', productCode);
         data.append('cost', productCost);
         data.append('unit', productUnit);
         data.append('price', productPrice);
         data.append('quantity', productQuantity);
+        data.append('min_quantity', productMinQuantity);
         data.append('description', productDescription);
         data.append('shop', warehouses);
-        data.append('status', status);
+        data.append('status', 'In-stock');
 
         // Make the API call using fetch()
         fetch(Api, {
             method: 'POST',
-            body: data
+            body: data,
+            cache: 'no-cache'
         })
             .then((response) => response.json())
             .then((response) => {
@@ -112,7 +129,7 @@ const UpdateProduct = () => {
                     ...popup,
                     status: true,
                     severity: 'error',
-                    message: 'There is error creatng shop!'
+                    message: 'There is error updating stock item!'
                 });
                 setSpinner(false);
             });
@@ -131,7 +148,7 @@ const UpdateProduct = () => {
     };
     useEffect(() => {
         const getCatgeory = () => {
-            var Api = Connections.api + Connections.viewcategory;
+            var Api = Connections.api + Connections.viewsubcategory;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -139,7 +156,8 @@ const UpdateProduct = () => {
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -165,7 +183,8 @@ const UpdateProduct = () => {
             // Make the API call using fetch()
             fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -180,7 +199,7 @@ const UpdateProduct = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error creatng shop!'
+                        message: 'There is error fetching shop!'
                     });
                 });
         };
@@ -250,17 +269,29 @@ const UpdateProduct = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <Autocomplete
-                                options={CategoryData}
-                                getOptionLabel={(option) => option.name}
-                                onChange={(event, value) => {
-                                    if (value) {
-                                        setProductCategory(value.name);
-                                    }
-                                }}
-                                defaultValue={{ name: productCategory }}
-                                renderInput={(params) => <TextField {...params} label="Select Category" variant="outlined" />}
-                            />
+                            <FormControl fullWidth required>
+                                <Select value={productCategory} onChange={handleCategoryChange}>
+                                    <MenuItem value="Main Category">Main Category</MenuItem>
+                                    {Array.from(new Set(CategoryData.map((product) => product.main_category))).map((category) => (
+                                        <MenuItem key={category} value={category}>
+                                            {category}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth>
+                                <Select value={productSubCategory} onChange={handleSubCategoryChange}>
+                                    <MenuItem value="Sub Category">Sub Category</MenuItem>
+                                    {Array.from(new Set(CategoryData.map((product) => product.sub_category))).map((category) => (
+                                        <MenuItem key={category} value={category}>
+                                            {category}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
@@ -321,15 +352,17 @@ const UpdateProduct = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Product Description"
+                                label="Min Quantity"
                                 color="primary"
-                                value={productDescription}
-                                onChange={(event) => setProductDescription(event.target.value)}
+                                value={productMinQuantity}
+                                onChange={(event) => setProductMinQuantity(event.target.value)}
+                                required
                             />
                         </Grid>
+
                         <Grid item xs={12} sm={6}>
                             <Autocomplete
                                 options={shops}
@@ -343,17 +376,14 @@ const UpdateProduct = () => {
                                 renderInput={(params) => <TextField {...params} label="Select Shop" variant="outlined" />}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12}>
                             <TextField
-                                select
                                 fullWidth
-                                label="Status"
+                                label="Product Description"
                                 color="primary"
-                                value={status}
-                                onChange={(event) => setStatus(event.target.value)}
-                            >
-                                <MenuItem value="In-stock">In-stock</MenuItem>
-                            </TextField>
+                                value={productDescription}
+                                onChange={(event) => setProductDescription(event.target.value)}
+                            />
                         </Grid>
                     </Grid>
                     <Button type="submit" fullWidth variant="contained" color="primary" style={{ margin: '1rem 0' }}>

@@ -35,7 +35,7 @@ import { Formik, Form, Field } from 'formik';
 // import UpgradePlanCard from './UpgradePlanCard';
 
 // assets
-import { IconChevronDown, IconChevronRight, IconLogout, IconReload, IconSettings } from '@tabler/icons';
+import { IconChevronDown, IconChevronRight, IconLogout, IconReload } from '@tabler/icons';
 import { AuthContext } from 'context/context';
 import Connections from 'api';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -59,7 +59,7 @@ const ProfileSection = () => {
     };
     const userString = sessionStorage.getItem('user');
     const user = JSON.parse(userString);
-    const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [selectedIndex] = useState(-1);
     const [open, setOpen] = useState(false);
     const anchorRef = useRef(null);
     const handleClose = (event) => {
@@ -276,16 +276,7 @@ const ProfileSection = () => {
                                                             validationSchema={ChangePasswordSchema}
                                                             onSubmit={handleSubmit}
                                                         >
-                                                            {({
-                                                                values,
-                                                                errors,
-                                                                touched,
-                                                                handleChange,
-                                                                handleBlur,
-                                                                handleSubmit,
-                                                                isSubmitting,
-                                                                dirty
-                                                            }) => (
+                                                            {({ errors, touched, handleSubmit }) => (
                                                                 <Form onSubmit={handleSubmit}>
                                                                     <Field
                                                                         as={TextField}

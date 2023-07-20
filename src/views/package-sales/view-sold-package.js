@@ -15,17 +15,17 @@ import {
     Typography,
     Button
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import { AccountCircleOutlined, ReceiptOutlined, CreditCardOutlined, InfoOutlined } from '@mui/icons-material';
-import { IconBuildingStore, IconCoins, IconMoneybag } from '@tabler/icons';
+import { useTheme } from '@mui/material/styles';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { gridSpacing } from 'store/constant';
+import { IconBuildingStore } from '@tabler/icons';
 
-// ==============================|| VIEW SALE PAGE ||============================== //
+// ==============================|| VIEW PACKAGE SALE PAGE ||============================== //
 
-const ViewSale = () => {
+const ViewSoldPackage = () => {
     const theme = useTheme();
     const navigate = useNavigate();
     const { state } = useLocation();
@@ -42,8 +42,14 @@ const ViewSale = () => {
                     <Grid container alignItems="center" justifyContent="space-between">
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
-                                <Grid item>
-                                    <Typography variant="h3">{item.reference} Detail </Typography>
+                                <Grid item sx={{ display: 'flex' }}>
+                                    <Typography variant="h3">Sold Package {item.reference} ||</Typography>
+                                    <Typography
+                                        variant="h5"
+                                        sx={{ paddingX: 1, textTransform: 'capitalize', color: theme.palette.primary.main }}
+                                    >
+                                        {item.p_name}
+                                    </Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -61,19 +67,6 @@ const ViewSale = () => {
                 <Grid item xs={12}>
                     <Box>
                         <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6}>
-                                <Paper variant="outlined">
-                                    <Typography className="px-3 py-2 fs-6 fw-semibold">Customer Information</Typography>
-                                    <Box p={2} display="flex" alignItems="center">
-                                        <Avatar className="bg-light">
-                                            <AccountCircleOutlined />
-                                        </Avatar>
-                                        <Box ml={2}>
-                                            <Typography variant="h6">{item.customer}</Typography>
-                                        </Box>
-                                    </Box>
-                                </Paper>
-                            </Grid>
                             <Grid item xs={12} sm={6}>
                                 <Paper variant="outlined">
                                     <Typography className="px-3 py-2 fs-6  fw-semibold">Invoice Info</Typography>
@@ -117,48 +110,45 @@ const ViewSale = () => {
                                             </Box>
                                         </Box>
                                     )}
-                                    <Box p={1} ml={2} display="flex" alignItems="center">
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <Paper variant="outlined">
+                                    <Typography className="px-3 py-2 fs-6 fw-semibold">Customer Information</Typography>
+                                    <Box p={2} display="flex" alignItems="center">
                                         <Avatar className="bg-light">
-                                            <IconCoins />
+                                            <AccountCircleOutlined />
                                         </Avatar>
                                         <Box ml={2}>
-                                            <Typography variant="h6">Grand Total</Typography>
-                                            <Typography color="text.secondary"> {parseInt(item.grandtotal).toFixed(2)} ETB</Typography>
+                                            <Typography variant="h6">{item.customer}</Typography>
                                         </Box>
                                     </Box>
                                 </Paper>
                             </Grid>
-
                             <Grid item xs={12}>
-                                <Paper>
+                                <Paper sx={{ bgcolor: theme.palette.primary.light }}>
                                     <Box p={2}>
-                                        <Typography variant="h5" sx={{ margin: 2 }}>
-                                            Product Summary
+                                        <Typography variant="h4" sx={{ margin: 1.5 }}>
+                                            Package Summary
                                         </Typography>
 
-                                        <TableContainer sx={{ bgcolor: theme.palette.primary.light, borderRadius: 2, padding: 2 }}>
-                                            <Table size="small">
+                                        <TableContainer>
+                                            <Table>
                                                 <TableHead>
                                                     <TableRow>
                                                         <TableCell>Item Name</TableCell>
-                                                        <TableCell>Item Code</TableCell>
-                                                        <TableCell>Item Brand</TableCell>
-                                                        <TableCell align="right">Unit</TableCell>
-                                                        <TableCell align="right">Unit Price</TableCell>
-                                                        <TableCell align="right">Quantity</TableCell>
-                                                        <TableCell align="right">SubTotal</TableCell>
+                                                        <TableCell>Code</TableCell>
+                                                        <TableCell>Quantity</TableCell>
+                                                        <TableCell>Unit</TableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {JSON.parse(item.items).map((soldItem, index) => (
+                                                    {JSON.parse(item.items).map((item, index) => (
                                                         <TableRow key={index}>
-                                                            <TableCell>{soldItem.itemName}</TableCell>
-                                                            <TableCell>{soldItem.itemCode}</TableCell>
-                                                            <TableCell>{soldItem.brand}</TableCell>
-                                                            <TableCell align="right">{soldItem.unit}</TableCell>
-                                                            <TableCell align="right">{parseInt(soldItem.unitPrice).toFixed(2)}</TableCell>
-                                                            <TableCell align="right">{soldItem.quantity}</TableCell>
-                                                            <TableCell align="right">{parseInt(soldItem.subtotal).toFixed(2)}</TableCell>
+                                                            <TableCell>{item.name}</TableCell>
+                                                            <TableCell>{item.code}</TableCell>
+                                                            <TableCell>{item.quantity}</TableCell>
+                                                            <TableCell>{item.unit}</TableCell>
                                                         </TableRow>
                                                     ))}
                                                 </TableBody>
@@ -166,6 +156,39 @@ const ViewSale = () => {
                                         </TableContainer>
                                     </Box>
                                 </Paper>
+                            </Grid>
+
+                            <Grid container xs={12}>
+                                <Grid item xs={12} sm={8} lg={6} xl={6} sx={{ paddingY: 4, margin: 4, borderRadius: 4 }}>
+                                    <TableContainer>
+                                        <Table size="small">
+                                            <TableBody>
+                                                <TableRow>
+                                                    <TableCell>Total Tax</TableCell>
+                                                    <TableCell align="right" sx={{ color: theme.palette.primary.main }}>
+                                                        {parseInt(item.tax).toFixed(2)}%
+                                                    </TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                    <TableCell>Total Discount</TableCell>
+                                                    <TableCell align="right" sx={{ color: theme.palette.primary.main }}>
+                                                        {parseInt(item.discount).toFixed(2)} ETB
+                                                    </TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                    <TableCell className="border-bottom-0 fw-semibold">Grand Total</TableCell>
+                                                    <TableCell
+                                                        align="right"
+                                                        className="border-bottom-0 fw-semibold fs-5"
+                                                        sx={{ color: theme.palette.primary.main }}
+                                                    >
+                                                        {parseInt(item.grandtotal).toFixed(2)} ETB
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </Grid>
                             </Grid>
 
                             <Grid item xs={12}>
@@ -185,4 +208,4 @@ const ViewSale = () => {
     );
 };
 
-export default ViewSale;
+export default ViewSoldPackage;

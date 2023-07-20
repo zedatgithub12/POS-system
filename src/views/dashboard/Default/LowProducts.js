@@ -12,7 +12,6 @@ import { gridSpacing } from 'store/constant';
 // assets
 // import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 // import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 import { KeyboardArrowDownOutlined } from '@mui/icons-material';
 
 // ==============================|| DASHBOARD DEFAULT - POPULAR CARD ||============================== //

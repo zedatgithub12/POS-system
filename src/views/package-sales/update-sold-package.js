@@ -10,7 +10,6 @@ import {
     TableHead,
     TableRow,
     Paper,
-    IconButton,
     Button,
     Box,
     Typography,
@@ -22,20 +21,21 @@ import {
     Divider,
     Autocomplete
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Delete } from '@mui/icons-material';
 import Connections from 'api';
 
 // ==============================|| CREATE SALE PAGE ||============================== //
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-const UpdateSale = () => {
+const UpdateSoldPackage = () => {
+    const theme = useTheme();
     const navigate = useNavigate();
     const { state } = useLocation();
 
@@ -50,14 +50,15 @@ const UpdateSale = () => {
     const [shops, setShops] = useState([]);
     const [shopName, setShopsName] = useState('');
     const [CustomersData, setCustomersData] = useState([]);
-    const [salesData, setSalesData] = useState(item);
+    const [salesData] = useState(item);
+    const [saleTax, setSaleTax] = useState(item.tax);
+    const [discount, setDiscount] = useState(item.discount);
     const [paymentStatus, setPaymentStatus] = useState(item.payment_status);
     const [paymentMethod, setPaymentMethod] = useState(item.payment_method);
     const [shop] = useState(item.shop);
     const [customerName, setCustomerName] = useState(item.customer);
     const [note, setNote] = useState(item.note);
     const [spinner, setSpinner] = useState(false);
-    //
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -79,116 +80,6 @@ const UpdateSale = () => {
     const handleMethodChange = (event) => {
         setPaymentMethod(event.target.value);
     };
-
-    // function handleAddToCart(itemToAdd) {
-    //     let newItem = {
-    //         id: itemToAdd.id,
-    //         itemName: itemToAdd.name,
-    //         itemCode: itemToAdd.code,
-    //         brand: itemToAdd.brand,
-    //         unit: itemToAdd.unit,
-    //         unitPrice: itemToAdd.price,
-    //         quantity: 1,
-    //         subtotal: itemToAdd.price
-    //     };
-
-    //     // Parse the items string into a JavaScript array
-    //     const itemsArray = JSON.parse(salesData.items);
-
-    //     // Find the index of the object that needs to be updated (if it already exists in the array)
-    //     const index = itemsArray.find((item) => item.id === newItem.id);
-
-    //     if (index) {
-    //         // If the item already exists in the array, update its quantity and subtotal
-    //         itemsArray[index].quantity++;
-    //         itemsArray[index].subtotal = itemsArray[index].quantity * itemToAdd.price;
-    //     } else {
-    //         // If the item doesn't exist in the array, add it to the end
-    //         itemsArray.push(newItem);
-    //     }
-
-    //     // Stringify the array back into a JSON string
-    //     const updatedItems = JSON.stringify(itemsArray);
-
-    //     const updatedSalesData = {
-    //         ...salesData,
-    //         items: updatedItems,
-    //         grandtotal: itemsArray.reduce((total, item) => total + item.subtotal, 0) + -salesData.discount
-    //     };
-
-    //     setSalesData(updatedSalesData);
-    // }
-
-    // Handle incrementing item quantity
-    function handleIncrement(itemId) {
-        let itemsArray = JSON.parse(salesData.items);
-
-        // Find the index of the object that needs to be updated
-        let index = itemsArray.findIndex((item) => item.id === itemId);
-
-        if (index !== -1) {
-            // If the item exists in the array, update its quantity and subtotal
-            itemsArray[index].quantity += 1;
-            itemsArray[index].subtotal = itemsArray[index].unitPrice * itemsArray[index].quantity;
-
-            // Stringify the array back into a JSON string
-            let updatedItems = JSON.stringify(itemsArray);
-
-            let updatedSalesData = {
-                ...salesData,
-                items: updatedItems,
-                grandtotal: itemsArray.reduce((total, item) => total + item.subtotal, 0)
-            };
-
-            setSalesData(updatedSalesData);
-        }
-    }
-
-    // Handle decrementing item quantity
-    function handleDecrement(itemId) {
-        let itemsArray = JSON.parse(salesData.items);
-
-        // Find the index of the object that needs to be updated
-        let index = itemsArray.findIndex((item) => item.id === itemId);
-
-        if (index !== -1) {
-            // If the item exists in the array and its quantity is greater than 1, update its quantity and subtotal
-            if (itemsArray[index].quantity > 1) {
-                itemsArray[index].quantity -= 1;
-                itemsArray[index].subtotal = itemsArray[index].unitPrice * itemsArray[index].quantity;
-
-                // Stringify the array back into a JSON string
-                let updatedItems = JSON.stringify(itemsArray);
-
-                let updatedSalesData = {
-                    ...salesData,
-                    items: updatedItems,
-                    grandtotal: itemsArray.reduce((total, item) => total + item.subtotal, 0)
-                };
-
-                setSalesData(updatedSalesData);
-            }
-        }
-    }
-
-    // Handle removing item from cart
-    function handleRemoveFromCart(itemToRemove) {
-        let itemsArray = JSON.parse(salesData.items);
-
-        // Filter out the item to be removed
-        itemsArray = itemsArray.filter((item) => item.id !== itemToRemove.id);
-
-        // Stringify the array back into a JSON string
-        let updatedItems = JSON.stringify(itemsArray);
-
-        let updatedSalesData = {
-            ...salesData,
-            items: updatedItems,
-            grandtotal: itemsArray.reduce((total, item) => (total += item.subtotal), 0)
-        };
-
-        setSalesData(updatedSalesData);
-    }
     const handleNoteChange = (event) => {
         setNote(event.target.value);
     };
@@ -196,7 +87,7 @@ const UpdateSale = () => {
     const handleUpdate = () => {
         // Save sale to database
         setSpinner(true);
-        var Api = Connections.api + Connections.updatesale + salesData.id;
+        var Api = Connections.api + Connections.updatepackagesale + salesData.id;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
@@ -206,7 +97,9 @@ const UpdateSale = () => {
             user: user.name, //this will be a value featched from session storage user.id
             shop: shopName, //this will be a shop salling user assigned as manager featched from session storage user.shop
             customer: customerName,
-            products: JSON.parse(salesData.items),
+            items: JSON.parse(salesData.items),
+            tax: saleTax,
+            discount: discount,
             grandTotal: salesData.grandtotal,
             payment_status: paymentStatus,
             payment_method: paymentMethod,
@@ -279,6 +172,7 @@ const UpdateSale = () => {
                     });
                 });
         };
+
         const getCustomers = () => {
             var AdminApi = Connections.api + Connections.viewcustomer;
             var SalesApi = Connections.api + Connections.viewstorecustomer + user.store_name;
@@ -322,8 +216,14 @@ const UpdateSale = () => {
                     <Grid container alignItems="center" justifyContent="space-between">
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
-                                <Grid item>
-                                    <Typography variant="h3">Update Sale #{item.reference}</Typography>
+                                <Grid item sx={{ display: 'flex' }}>
+                                    <Typography variant="h3">Update {item.reference} ||</Typography>
+                                    <Typography
+                                        variant="h5"
+                                        sx={{ paddingX: 1, textTransform: 'capitalize', color: theme.palette.primary.main }}
+                                    >
+                                        {item.p_name}
+                                    </Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -364,55 +264,25 @@ const UpdateSale = () => {
                                 renderInput={(params) => <TextField {...params} label="Customer" variant="outlined" />}
                             />
                         </Grid>
-                        {/* <Grid item xs={12}>
-                            <Autocomplete
-                                options={productData}
-                                getOptionLabel={(option) => option.name}
-                                onChange={(event, value) => {
-                                    if (value) {
-                                        handleAddToCart(value);
-                                    }
-                                }}
-                                renderInput={(params) => <TextField {...params} label="Search Product" variant="outlined" />}
-                            />
-                        </Grid> */}
+
                         <Grid item xs={12}>
-                            <TableContainer component={Paper}>
+                            <TableContainer component={Paper} sx={{ bgcolor: theme.palette.primary.light, marginY: 3 }}>
                                 <Table>
                                     <TableHead>
                                         <TableRow>
                                             <TableCell>Item Name</TableCell>
-                                            <TableCell>Item Code</TableCell>
-                                            <TableCell>Brand</TableCell>
+                                            <TableCell>Code</TableCell>
                                             <TableCell>Quantity</TableCell>
                                             <TableCell>Unit</TableCell>
-                                            <TableCell>Unit Price</TableCell>
-                                            <TableCell>Subtotal</TableCell>
-                                            <TableCell>Action</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {JSON.parse(salesData.items).map((item, index) => (
                                             <TableRow key={index}>
-                                                <TableCell>{item.itemName}</TableCell>
-                                                <TableCell>{item.itemCode}</TableCell>
-
-                                                <TableCell>{item.brand}</TableCell>
-                                                <TableCell>
-                                                    <Box display="flex" alignItems="center">
-                                                        <Button onClick={() => handleDecrement(item.id)}>-</Button>
-                                                        <Typography>{item.quantity}</Typography>
-                                                        <Button onClick={() => handleIncrement(item.id)}>+</Button>
-                                                    </Box>
-                                                </TableCell>
+                                                <TableCell>{item.name}</TableCell>
+                                                <TableCell>{item.code}</TableCell>
+                                                <TableCell>{item.quantity}</TableCell>
                                                 <TableCell>{item.unit}</TableCell>
-                                                <TableCell>{parseInt(item.unitPrice)}</TableCell>
-                                                <TableCell>{parseInt(item.subtotal).toFixed(2)}</TableCell>
-                                                <TableCell>
-                                                    <IconButton onClick={() => handleRemoveFromCart(item)}>
-                                                        <Delete />
-                                                    </IconButton>
-                                                </TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -425,9 +295,17 @@ const UpdateSale = () => {
                                     <Table>
                                         <TableBody>
                                             <TableRow>
+                                                <TableCell>Tax</TableCell>
+                                                <TableCell>{saleTax}%</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>Discount</TableCell>
+                                                <TableCell>{discount} ETB</TableCell>
+                                            </TableRow>
+                                            <TableRow>
                                                 <TableCell>Grand Total</TableCell>
                                                 <TableCell className="fw-semibold fs-4">
-                                                    {parseInt(salesData.grandtotal).toFixed(2)} ETB
+                                                    {parseInt(salesData.grandtotal).toFixed(2) - discount} ETB
                                                 </TableCell>
                                             </TableRow>
                                         </TableBody>
@@ -439,6 +317,23 @@ const UpdateSale = () => {
                         <Grid item xs={12} md={6}>
                             <Box mt={2}>
                                 <Grid container spacing={2}>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            label="Sale Tax (%)"
+                                            onChange={(event) => setSaleTax(event.target.value)}
+                                            fullWidth
+                                            value={saleTax}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            label="Discount (ETB)"
+                                            onChange={(event) => setDiscount(event.target.value)}
+                                            fullWidth
+                                            value={discount}
+                                        />
+                                    </Grid>
+
                                     <Grid item xs={12} sm={6}>
                                         <FormControl fullWidth>
                                             <InputLabel id="payment-status-label">Payment Status</InputLabel>
@@ -517,4 +412,4 @@ const UpdateSale = () => {
     );
 };
 
-export default UpdateSale;
+export default UpdateSoldPackage;

@@ -1,5 +1,5 @@
 // material-ui
-import { Grid, Divider, Box, Paper, Button, Typography, Table, TableBody, TableRow, TableCell, TableHead } from '@mui/material';
+import { Grid, Divider, Box, Button, Typography, Table, TableBody, TableRow, TableCell, TableHead } from '@mui/material';
 import Connections from 'api';
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -26,6 +26,7 @@ const ViewProduct = () => {
 
     const [product, setProduct] = useState({});
     const [availablity, setAvailablity] = useState([]);
+    const [replanishment, setReplanishment] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
@@ -64,19 +65,22 @@ const ViewProduct = () => {
 
             const req = fetch(Api, {
                 method: 'GET',
-                headers: headers
+                headers: headers,
+                cache: 'no-cache'
             });
             req.then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
                         setProduct(response.product);
                         setAvailablity(response.items);
+                        setReplanishment(response.replanishments);
+                        console.log(replanishment);
                         setIsLoading(false);
                     } else {
                         setIsLoading(true);
                     }
                 })
-                .catch((error) => {
+                .catch(() => {
                     setIsLoading(true);
                 });
         };
@@ -136,13 +140,22 @@ const ViewProduct = () => {
                                                 <TableCell>{product.shop}</TableCell>
                                             </TableRow>
                                             <TableRow>
+                                                <TableCell>Category</TableCell>
+                                                <TableCell>{product.category}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>Sub Category</TableCell>
+                                                <TableCell>{product.sub_category}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
                                                 <TableCell>Quantity</TableCell>
                                                 <TableCell>{product.quantity}</TableCell>
                                             </TableRow>
                                             <TableRow>
-                                                <TableCell>Category</TableCell>
-                                                <TableCell>{product.category}</TableCell>
+                                                <TableCell>Min Quantity</TableCell>
+                                                <TableCell>{product.min_quantity}</TableCell>
                                             </TableRow>
+
                                             <TableRow>
                                                 <TableCell> Brand</TableCell>
                                                 <TableCell>{product.brand}</TableCell>
@@ -194,9 +207,31 @@ const ViewProduct = () => {
                                         />
                                     )}
                                 </Box>
-                                <Box paddingX={4} marginTop={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                {/* <Box paddingX={4} marginTop={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                     <Barcode value={product.code} />
-                                </Box>
+                                </Box> */}
+                                <Typography sx={{ fontSize: theme.typography.h4, marginTop: 6, marginLeft: 2 }}>
+                                    Replanishment History
+                                </Typography>
+
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Date</TableCell>
+                                            <TableCell>Existing</TableCell>
+                                            <TableCell>Added</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {replanishment.map((item, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell>{item.created_at.slice(0, 10)}</TableCell>
+                                                <TableCell>{item.existing_amount}</TableCell>
+                                                <TableCell>{item.added_amount}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
                             </Grid>
                         </Grid>
                     </Grid>

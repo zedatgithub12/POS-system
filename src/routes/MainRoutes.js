@@ -4,9 +4,20 @@ import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 
+//Transfer Stock rounting
+const Transfers = Loadable(lazy(() => import('views/Transfer-stock')));
+const TransferStock = Loadable(lazy(() => import('views/Transfer-stock/make-transfer')));
+const UpdateTransfer = Loadable(lazy(() => import('views/Transfer-stock/update-transfer')));
+//package routing
 const Packages = Loadable(lazy(() => import('views/Packages')));
 const CreatePackage = Loadable(lazy(() => import('views/Packages/createPackage')));
 const UpdatePackage = Loadable(lazy(() => import('views/Packages/updatePackage')));
+
+//package selling routing
+const SalePackage = Loadable(lazy(() => import('views/package-sales/sale-package')));
+const UpdateSoldPackage = Loadable(lazy(() => import('views/package-sales/update-sold-package')));
+const ViewSoldPackage = Loadable(lazy(() => import('views/package-sales/view-sold-package')));
+
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 // user profile routes
@@ -23,6 +34,9 @@ const ViewProduct = Loadable(lazy(() => import('views/products/viewProduct')));
 const UpdateProduct = Loadable(lazy(() => import('views/products/updateProduct')));
 // Category routing
 const Category = Loadable(lazy(() => import('views/category')));
+
+//sub category
+const SubCategory = Loadable(lazy(() => import('views/sub-category')));
 //sales routing
 const Sales = Loadable(lazy(() => import('views/sales')));
 const CreateSale = Loadable(lazy(() => import('views/sales/createSale')));
@@ -160,6 +174,10 @@ const MainRoutes = {
             element: <Category />
         },
         {
+            path: 'sub-categories',
+            element: <SubCategory />
+        },
+        {
             path: 'sales',
             element: <Sales />
         },
@@ -218,6 +236,31 @@ const MainRoutes = {
         {
             path: 'update-package',
             element: <UpdatePackage />
+        },
+        {
+            path: 'sale-package',
+            element: <SalePackage />
+        },
+        {
+            path: 'update-sold-package',
+            element: <UpdateSoldPackage />
+        },
+        {
+            path: 'view-sold-package',
+            element: <ViewSoldPackage />
+        },
+
+        {
+            path: 'transfer-stock',
+            element: <Transfers />
+        },
+        {
+            path: 'make-transfer',
+            element: <TransferStock />
+        },
+        {
+            path: 'update-transfer',
+            element: <UpdateTransfer />
         },
         {
             path: '*',
