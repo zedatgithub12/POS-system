@@ -22,7 +22,7 @@ const SalesTargets = (targets) => {
         >
             {targets.targets.target ? (
                 <>
-                    <Grid item xs={3.8}>
+                    <Grid item xs={12} sm={12} md={5.6} lg={3.8} xl={3.8}>
                         <Box
                             sx={{
                                 backgroundColor: theme.palette.primary.light,
@@ -98,7 +98,11 @@ const SalesTargets = (targets) => {
                     </Grid>
                     <Grid
                         item
-                        xs={3.8}
+                        xs={12}
+                        sm={12}
+                        md={5.6}
+                        lg={3.8}
+                        xl={3.8}
                         sx={{
                             backgroundColor: theme.palette.primary.main,
                             marginY: 1,
@@ -146,7 +150,7 @@ const SalesTargets = (targets) => {
                             </Grid>
                         </Grid>
                     </Grid>
-                    <Grid item xs={3.8}>
+                    <Grid item xs={12} sm={12} md={6} lg={3.8} xl={3.8}>
                         <Box
                             sx={{
                                 backgroundColor: theme.palette.primary.light,

@@ -54,6 +54,7 @@ const SubCategory = () => {
     };
 
     //category data
+    const [mainCategories, setMainCategories] = useState([]);
     const [CategoryData, setCategoryData] = useState([]);
     const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -87,8 +88,8 @@ const SubCategory = () => {
     const uniqueCategories = new Set();
 
     // Loop through the CategoryData array and add each main_category value to the Set
-    CategoryData.forEach((category) => {
-        uniqueCategories.add(category.main_category);
+    mainCategories.forEach((category) => {
+        uniqueCategories.add(category.name);
     });
 
     // Convert the Set back to an array
@@ -305,9 +306,36 @@ const SubCategory = () => {
     };
 
     //useffect which fetches list of categories when component get mounted
-
     useEffect(() => {
-        const getCatgeory = () => {
+        const getMainCatgeory = () => {
+            var Api = Connections.api + Connections.viewcategory;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers,
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setMainCategories(response.data);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error fetching categories!'
+                    });
+                });
+        };
+
+        const getSubCatgeory = () => {
             var Api = Connections.api + Connections.viewsubcategory;
             var headers = {
                 accept: 'application/json',
@@ -334,7 +362,8 @@ const SubCategory = () => {
                     });
                 });
         };
-        getCatgeory();
+        getMainCatgeory();
+        getSubCatgeory();
         return () => {};
     }, [popup]);
 
@@ -442,7 +471,7 @@ const SubCategory = () => {
             </MainCard>
 
             <Dialog open={addDialogOpen} onClose={handleAddDialogClose}>
-                <DialogTitle>Add Category</DialogTitle>
+                <DialogTitle>Add Sub Category</DialogTitle>
 
                 <DialogContent>
                     <Autocomplete
@@ -484,7 +513,7 @@ const SubCategory = () => {
             </Dialog>
 
             <Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
-                <DialogTitle>Edit Category</DialogTitle>
+                <DialogTitle>Edit Sub Category</DialogTitle>
                 <DialogContent>
                     <Autocomplete
                         options={uniqueCategoryArray}
@@ -539,7 +568,7 @@ const SubCategory = () => {
                                 <span className="visually-hidden">Loading...</span>
                             </div>
                         ) : (
-                            'Delete'
+                            'Yes'
                         )}
                     </Button>
                 </DialogActions>

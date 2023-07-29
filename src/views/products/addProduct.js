@@ -51,7 +51,6 @@ const AddProduct = () => {
     const [productMinQuantity, setProductMinQuantity] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [warehouses, setWarehouses] = useState('Shops');
-    const [status, setStatus] = useState('');
     const [spinner, setSpinner] = useState(false);
 
     const handleCategoryChange = (event) => {
@@ -352,7 +351,6 @@ const AddProduct = () => {
                                 color="primary"
                                 value={productCost}
                                 onChange={(event) => setProductCost(event.target.value)}
-                                required
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>

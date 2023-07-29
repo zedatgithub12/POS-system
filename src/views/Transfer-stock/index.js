@@ -37,6 +37,7 @@ import PropTypes from 'prop-types';
 import Connections from 'api';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import notransfer from 'assets/images/notransfer.png';
+import { DateFormatter } from 'utils/functions';
 // ==============================|| TRANSFERS PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -46,8 +47,9 @@ const Transfers = () => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
 
-    const [shopFilter, setShopFilter] = useState('Shop');
+    const [shopFilter, setShopFilter] = useState('Sender');
     const [receiverFilter, setReceiverFilter] = useState('Receiver');
+    const [filterDate, setFilterDate] = useState('Date');
     const [statusFilter, setStatusFilter] = useState('Status');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
@@ -64,7 +66,9 @@ const Transfers = () => {
     const handleStatusFilterChange = (event) => {
         setStatusFilter(event.target.value);
     };
-
+    const handleFilterDateChange = (event) => {
+        setFilterDate(event.target.value);
+    };
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -77,14 +81,16 @@ const Transfers = () => {
     const filteredData = stocktransfers.filter((record) => {
         let isMatch = true;
 
-        if (shopFilter !== 'Shop') {
+        if (shopFilter !== 'Sender') {
             isMatch = isMatch && record.sendershopname.includes(shopFilter);
         }
 
         if (receiverFilter !== 'Receiver') {
             isMatch = isMatch && record.receivershopname.includes(receiverFilter);
         }
-
+        if (filterDate !== 'Date') {
+            isMatch = isMatch && record.created_at === filterDate;
+        }
         if (statusFilter !== 'Status') {
             isMatch = isMatch && record.status === statusFilter;
         }
@@ -147,12 +153,8 @@ const Transfers = () => {
                                         component={Link}
                                         to="/make-transfer"
                                         variant="outlined"
-                                        sx={{
-                                            textDecoration: 'none',
-                                            '&:hover': {
-                                                color: 'white'
-                                            }
-                                        }}
+                                        color="primary"
+                                        sx={{ textDecoration: 'none', marginRight: 2 }}
                                     >
                                         Make New Transfer
                                     </Button>
@@ -167,31 +169,38 @@ const Transfers = () => {
                 </Grid>
                 <Grid item xs={12}>
                     <Box paddingX="2" className="shadow-1 p-4 rounded ">
-                        {users.role === 'Admin' && (
-                            <>
-                                <FormControl className="ms-2 my-2 ">
-                                    <Select value={shopFilter} onChange={handleShopFilterChange}>
-                                        <MenuItem value="Shop">Sending Shop</MenuItem>
-                                        {Array.from(new Set(stocktransfers.map((item) => item.sendershopname))).map((shop) => (
-                                            <MenuItem key={shop} value={shop}>
-                                                {shop}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                        <FormControl className="ms-2 my-2 ">
+                            <Select value={shopFilter} onChange={handleShopFilterChange}>
+                                <MenuItem value="Sender">Sending Shop</MenuItem>
+                                {Array.from(new Set(stocktransfers.map((item) => item.sendershopname))).map((shop) => (
+                                    <MenuItem key={shop} value={shop}>
+                                        {shop}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
 
-                                <FormControl className="ms-2 my-2 ">
-                                    <Select value={shopFilter} onChange={handleReceiverFilterChange}>
-                                        <MenuItem value="Shop">Receiving Shop</MenuItem>
-                                        {Array.from(new Set(stocktransfers.map((item) => item.receivershopname))).map((shop) => (
-                                            <MenuItem key={shop} value={shop}>
-                                                {shop}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </>
-                        )}
+                        <FormControl className="ms-2 my-2 ">
+                            <Select value={receiverFilter} onChange={handleReceiverFilterChange}>
+                                <MenuItem value="Receiver">Receiving Shop</MenuItem>
+                                {Array.from(new Set(stocktransfers.map((item) => item.receivershopname))).map((shop) => (
+                                    <MenuItem key={shop} value={shop}>
+                                        {shop}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        <FormControl className="ms-2 my-2">
+                            <Select value={filterDate} onChange={handleFilterDateChange}>
+                                <MenuItem value="Date">Transfer Date</MenuItem>
+                                {Array.from(new Set(stocktransfers.map((transfer) => transfer.created_at))).map((date) => (
+                                    <MenuItem key={date} value={date}>
+                                        {DateFormatter(date)}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
 
                         <FormControl className="ms-2 my-2 ">
                             <Select value={statusFilter} onChange={handleStatusFilterChange}>
@@ -443,8 +452,8 @@ const ProductRow = ({ product }) => {
                                                 <TableCell>Item Name</TableCell>
                                                 <TableCell>Item Code</TableCell>
                                                 <TableCell>Unit</TableCell>
-                                                <TableCell>Quantity</TableCell>
                                                 <TableCell>Existing</TableCell>
+                                                <TableCell>Added</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -453,8 +462,8 @@ const ProductRow = ({ product }) => {
                                                     <TableCell>{item.name}</TableCell>
                                                     <TableCell>{item.code}</TableCell>
                                                     <TableCell>{item.unit}</TableCell>
-                                                    <TableCell>{item.quantity}</TableCell>
                                                     <TableCell>{item.existing}</TableCell>
+                                                    <TableCell>{item.quantity}</TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>

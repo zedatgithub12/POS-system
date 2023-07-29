@@ -25,3 +25,11 @@ export const calculatePercentage = (numerator, denominator) => {
     const percentage = (numerator / denominator) * 100;
     return percentage.toFixed(2); // Limiting the result to 2 decimal places
 };
+
+export const DateFormatter = (soldat) => {
+    var year = soldat.slice(0, 4);
+    var month = soldat.slice(5, 7);
+    var day = soldat.slice(8, 10);
+    const date = day + '-' + month + '-' + year;
+    return date;
+};

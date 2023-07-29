@@ -308,8 +308,16 @@ const Dashboard = () => {
                     <Box paddingX={4} paddingY={3}>
                         <Typography className="fs-3 fw-semibold">Dashboard</Typography>
                     </Box>
-                    <Grid container className="ms-4 me-3" justifyContent="space-between" alignItems="start">
-                        <Grid item xs={12} sm={12} md={12} lg={8.6} xl={8.6} sx={{ borderRadius: 2, padding: 3, paddingTop: 0 }}>
+                    <Grid container className="mx-2" justifyContent="space-between" alignItems="start">
+                        <Grid
+                            item
+                            xs={12}
+                            sm={12}
+                            md={12}
+                            lg={8.6}
+                            xl={8.6}
+                            sx={{ borderRadius: 2, padding: 1, paddingLeft: 2, paddingTop: 0 }}
+                        >
                             <Grid
                                 item
                                 xs={12}
@@ -353,23 +361,12 @@ const Dashboard = () => {
                             <TargetListing lists={revenueTarget} />
                         </Grid>
 
-                        <Grid item xs={3.4}>
-                            {user.role === 'Admin' && (
-                                <>
-                                    <AddNew
-                                        stockbtn={() => navigate('/add-product')}
-                                        packagebtn={() => navigate('/create-package')}
-                                        targetbtn={() => handleTargetClick()}
-                                    />
-                                    <CustomerCard total={totalCustomer} addedToday={todaycustomers} />
-                                </>
-                            )}
+                        <Grid item xs={12} sm={12} md={12} lg={3.4} xl={3.4} sx={{ borderRadius: 2, padding: 1, paddingTop: 0 }}>
                             <Box
                                 sx={{
                                     backgroundColor: theme.palette.background.default,
                                     borderRadius: 2,
-                                    paddingY: 1,
-                                    marginTop: user.role === 'Admin' ? 1 : 0
+                                    paddingY: 1
                                 }}
                             >
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: 1.5 }}>
@@ -418,6 +415,16 @@ const Dashboard = () => {
                                     </Box>
                                 )}
                             </Box>
+                            {user.role === 'Admin' && (
+                                <>
+                                    <CustomerCard total={totalCustomer} addedToday={todaycustomers} />
+                                    <AddNew
+                                        stockbtn={() => navigate('/add-product')}
+                                        packagebtn={() => navigate('/create-package')}
+                                        targetbtn={() => handleTargetClick()}
+                                    />
+                                </>
+                            )}
                         </Grid>
                     </Grid>
                 </Grid>

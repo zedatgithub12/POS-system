@@ -472,7 +472,7 @@ const Category = () => {
                                 <span className="visually-hidden">Loading...</span>
                             </div>
                         ) : (
-                            'Delete'
+                            'Yes'
                         )}
                     </Button>
                 </DialogActions>

@@ -8,7 +8,7 @@ import { useTheme } from '@mui/material/styles';
 const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
     const theme = useTheme();
     return (
-        <Grid container sx={{ backgroundColor: theme.palette.background.default, borderRadius: 2, paddingY: 1 }}>
+        <Grid container sx={{ backgroundColor: theme.palette.background.default, borderRadius: 2, paddingY: 1, marginTop: 1 }}>
             <Grid item xs={12}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: 1.2 }}>
                     <Typography
@@ -28,8 +28,7 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
             <Divider />
 
             <Grid
-                item
-                xs={12}
+                container
                 sx={{
                     padding: 1.2,
                     borderRadius: 2,
@@ -37,7 +36,7 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
                     borderColor: theme.palette.grey[400],
                     margin: 1,
                     display: 'flex',
-                    justifyContent: 'space-around',
+                    justifyContent: 'space-between',
                     alignItems: 'center'
                 }}
             >
@@ -45,13 +44,8 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
                     <Button
                         onClick={stockbtn}
                         sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-evenly',
-
                             borderRadius: 2,
-                            padding: 1,
-                            paddingX: 3
+                            padding: 1
                         }}
                     >
                         <Typography variant="h4" sx={{ color: theme.palette.primary.dark, fontWeight: theme.typography.fontWeightMedium }}>
@@ -64,12 +58,8 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
                     <Button
                         onClick={packagebtn}
                         sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-evenly',
                             borderRadius: 2,
-                            padding: 1,
-                            paddingX: 3
+                            padding: 1
                         }}
                     >
                         <Typography variant="h4" sx={{ color: theme.palette.primary.dark, fontWeight: theme.typography.fontWeightMedium }}>
@@ -85,9 +75,7 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
                             alignItems: 'center',
                             justifyContent: 'space-evenly',
                             borderRadius: 2,
-                            padding: 1,
-                            paddingX: 3,
-                            marginX: 1
+                            padding: 1
                         }}
                     >
                         <Typography variant="h4" sx={{ color: theme.palette.primary.dark, fontWeight: theme.typography.fontWeightMedium }}>

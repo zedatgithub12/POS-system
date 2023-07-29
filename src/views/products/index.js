@@ -785,8 +785,6 @@ const ProductRow = ({ product }) => {
             });
     };
 
-    const [prices, setPrices] = useState([]);
-
     const [inputValue, setInputValue] = React.useState('');
     const [updating, setUpdating] = useState(false);
     const handleInputChange = (event) => {
@@ -905,44 +903,6 @@ const ProductRow = ({ product }) => {
         }
     };
 
-    useEffect(() => {
-        const FetchPrices = () => {
-            var Api = Connections.api + Connections.priceupdates + product.id;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            fetch(Api, {
-                method: 'GET',
-                headers: headers,
-                cache: 'no-cache'
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setPrices(response.data);
-                    } else {
-                        setPrices(prices);
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: response.message
-                        });
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: response.message
-                    });
-                });
-        };
-        FetchPrices();
-        return () => {};
-    }, [spinner, popup, open]);
     return (
         <>
             <TableRow
@@ -1091,35 +1051,6 @@ const ProductRow = ({ product }) => {
                                                 />
                                             </form>
                                         </Box>
-                                    )}
-
-                                    {prices ? (
-                                        <List>
-                                            {prices.map((item) => (
-                                                <ListItem key={item.id}>
-                                                    <ListItemText primary={item.date} />
-                                                    <ListItemText secondary={item.from} />
-                                                    <ListItemText secondary={item.to} />
-                                                    <ListItemText
-                                                        primary={
-                                                            item.to > item.from ? (
-                                                                <>
-                                                                    {item.to - item.from}
-                                                                    <IconChevronsUp size={18} className="text-success" />
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    {item.from - item.to}
-                                                                    <IconChevronsDown size={18} className="text-danger" />
-                                                                </>
-                                                            )
-                                                        }
-                                                    />
-                                                </ListItem>
-                                            ))}
-                                        </List>
-                                    ) : (
-                                        <Typography>No price update yet!</Typography>
                                     )}
                                 </Box>
                             </Grid>

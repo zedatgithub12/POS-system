@@ -510,23 +510,37 @@ const CreateSale = () => {
                                 renderInput={(params) => <TextField {...params} label="Customer" variant="outlined" />}
                             />
                         </Grid>
-                        <Grid item xs={12}>
-                            <Autocomplete
-                                options={productData}
-                                getOptionLabel={(option) => option.name}
-                                onChange={(event, value) => {
-                                    if (value) {
-                                        handleAddToCart(value);
-                                    }
-                                }}
-                                renderInput={(params) => <TextField {...params} label="Search Product" variant="outlined" />}
-                            />
-                            <Box style={{ display: 'flex', alignItems: 'center' }}>
-                                <Button className="mt-2" onClick={() => startScanner()} disabled={isScanning}>
-                                    Scan Barcode
-                                </Button>
-                                <Typography sx={{ color: theme.palette.error.main }}>{isScanning ? 'Scanning...' : ''}</Typography>
-                            </Box>
+                        <Grid item container spacing={2} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Grid item xs={4}>
+                                <Autocomplete
+                                    options={productData}
+                                    getOptionLabel={(option) => option.code}
+                                    onChange={(event, value) => {
+                                        if (value) {
+                                            handleAddToCart(value);
+                                        }
+                                    }}
+                                    renderInput={(params) => <TextField {...params} label="Search by code" variant="outlined" />}
+                                />
+                                <Box style={{ display: 'flex', alignItems: 'center' }}>
+                                    <Button className="mt-2" onClick={() => startScanner()} disabled={isScanning}>
+                                        Scan Barcode
+                                    </Button>
+                                    <Typography sx={{ color: theme.palette.error.main }}>{isScanning ? 'Scanning...' : ''}</Typography>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={8}>
+                                <Autocomplete
+                                    options={productData}
+                                    getOptionLabel={(option) => option.name}
+                                    onChange={(event, value) => {
+                                        if (value) {
+                                            handleAddToCart(value);
+                                        }
+                                    }}
+                                    renderInput={(params) => <TextField {...params} label="Search by name" variant="outlined" />}
+                                />
+                            </Grid>
                         </Grid>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>

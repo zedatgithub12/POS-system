@@ -177,7 +177,7 @@ const FirebaseLogin = ({ ...others }) => {
                                 setLogSpinner(false);
                             } else {
                                 setStatus({ success: false });
-                                setErrors({ submit: err.message });
+                                setErrors({ submit: response.message });
                                 setSubmitting(false);
                                 setLogSpinner(false);
                             }
