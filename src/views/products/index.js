@@ -47,7 +47,9 @@ import {
     IconPlus,
     IconTestPipe,
     IconArrowsTransferDown,
-    IconX
+    IconX,
+    IconChargingPile,
+    IconCoins
 } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -80,12 +82,17 @@ const Products = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
     const [productData, setProductData] = useState([]);
+    const [inputValue, setInputValue] = React.useState('');
+    const [updating, setUpdating] = useState(false);
+    const [openUpdatePDialog, setOpenUpdatePDialog] = useState(false);
     const [openReplanishDialog, setOpenReplanishDialog] = useState(false);
     const [stockData, setStockData] = useState([]);
     const [selectedStock, setSelectedStock] = useState([]);
     const [addedAmount, setAddedAmount] = useState();
     const [spinner, setSpinner] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [checked, setChecked] = useState(false);
+
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -101,6 +108,138 @@ const Products = () => {
             status: false
         });
     };
+
+    //price update dialog functions
+    const handleUpdatePriceClick = () => {
+        setOpenUpdatePDialog(true);
+        getShops();
+    };
+
+    const handleUpdateDialogClose = () => {
+        setOpenUpdatePDialog(false);
+    };
+
+    const handleCheckboxChange = (event) => {
+        setChecked(event.target.checked);
+    };
+
+    const handleInputChange = (event) => {
+        setInputValue(event.target.value);
+    };
+
+    const handlePUSubmit = (event) => {
+        event.preventDefault();
+
+        if (inputValue === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please enter the new price'
+            });
+        } else if (checked) {
+            setUpdating(true);
+            var Api = Connections.api + Connections.updateallprice;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            var data = {
+                productid: selectedStock.id,
+                productcode: selectedStock.code,
+                name: selectedStock.shop,
+                from: selectedStock.price,
+                to: inputValue
+            };
+
+            fetch(Api, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(data),
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        setUpdating(false);
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setUpdating(false);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error updating price'
+                    });
+                    setUpdating(false);
+                });
+        } else {
+            setUpdating(true);
+            var Api = Connections.api + Connections.updateprice;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            var data = {
+                productid: selectedStock.id,
+                name: selectedStock.shop,
+                from: selectedStock.price,
+                to: inputValue
+            };
+
+            fetch(Api, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(data),
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        setUpdating(false);
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setUpdating(false);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error updating price'
+                    });
+                    setUpdating(false);
+                });
+        }
+    };
+
+    //Replanish dialog functions
     const handleReplanishClick = () => {
         setOpenReplanishDialog(true);
         getShops();
@@ -382,71 +521,90 @@ const Products = () => {
                         </Grid>
                     </Grid>
                 </Grid>
-                <>
-                    {users.role === 'Admin' && (
-                        <Grid container paddingX={6} paddingTop={5}>
-                            <Grid item xs={12} sm={12} md={6} lg={4} xl={2} sx={{ alignItems: 'center', justifyContent: 'center' }}>
-                                <Button
-                                    component={Link}
-                                    to="/add-product"
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-evenly',
-                                        backgroundColor: theme.palette.primary.light,
-                                        borderRadius: 2,
-                                        padding: 2,
-                                        marginX: 1,
-                                        marginTop: 1
-                                    }}
-                                >
-                                    <IconPlus />
-                                    <Typography variant="h4">Add New</Typography>
-                                </Button>
-                            </Grid>
 
-                            <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
-                                <Button
-                                    onClick={() => handleReplanishClick()}
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-evenly',
-                                        backgroundColor: theme.palette.primary.light,
-                                        borderRadius: 2,
-                                        padding: 2,
-                                        paddingX: 4,
-                                        marginX: 1,
-                                        marginTop: 1
-                                    }}
-                                >
-                                    <IconTestPipe />
-                                    <Typography variant="h4">Replanish</Typography>
-                                </Button>
-                            </Grid>
-
-                            <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
-                                <Button
-                                    component={Link}
-                                    to="/make-transfer"
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-evenly',
-                                        backgroundColor: theme.palette.primary.light,
-                                        borderRadius: 2,
-                                        padding: 2,
-                                        marginX: 1,
-                                        marginTop: 1
-                                    }}
-                                >
-                                    <IconArrowsTransferDown />
-                                    <Typography variant="h4">Transfer</Typography>
-                                </Button>
-                            </Grid>
+                {users.role === 'Admin' && (
+                    <Grid container paddingX={4} paddingTop={5}>
+                        <Grid item xs={12} sm={12} md={6} lg={3} xl={2} sx={{ alignItems: 'center', justifyContent: 'center' }}>
+                            <Button
+                                component={Link}
+                                to="/add-product"
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-evenly',
+                                    backgroundColor: theme.palette.primary.light,
+                                    borderRadius: 2,
+                                    padding: 2,
+                                    marginX: 1,
+                                    marginTop: 1
+                                }}
+                            >
+                                <IconPlus />
+                                <Typography variant="h4">Add New</Typography>
+                            </Button>
                         </Grid>
-                    )}
-                </>
+
+                        <Grid item xs={12} sm={12} md={6} lg={3} xl={2}>
+                            <Button
+                                onClick={() => handleUpdatePriceClick()}
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-evenly',
+                                    backgroundColor: theme.palette.primary.light,
+                                    borderRadius: 2,
+                                    padding: 2,
+                                    paddingX: 4,
+                                    marginX: 1,
+                                    marginTop: 1
+                                }}
+                            >
+                                <IconCoins />
+                                <Typography variant="h4">Update Price</Typography>
+                            </Button>
+                        </Grid>
+
+                        <Grid item xs={12} sm={12} md={6} lg={3} xl={2}>
+                            <Button
+                                onClick={() => handleReplanishClick()}
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-evenly',
+                                    backgroundColor: theme.palette.primary.light,
+                                    borderRadius: 2,
+                                    padding: 2,
+                                    paddingX: 4,
+                                    marginX: 1,
+                                    marginTop: 1
+                                }}
+                            >
+                                <IconTestPipe />
+                                <Typography variant="h4">Replanish</Typography>
+                            </Button>
+                        </Grid>
+
+                        <Grid item xs={12} sm={12} md={6} lg={3} xl={2}>
+                            <Button
+                                component={Link}
+                                to="/make-transfer"
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-evenly',
+                                    backgroundColor: theme.palette.primary.light,
+                                    borderRadius: 2,
+                                    padding: 2,
+                                    marginX: 1,
+                                    marginTop: 1
+                                }}
+                            >
+                                <IconArrowsTransferDown />
+                                <Typography variant="h4">Transfer</Typography>
+                            </Button>
+                        </Grid>
+                    </Grid>
+                )}
 
                 <Grid item xs={12}>
                     <Box paddingX="2" className="shadow-1 p-3 rounded ">
@@ -559,6 +717,150 @@ const Products = () => {
                     </Box>
                 </Grid>
             </Grid>
+
+            <Dialog open={openUpdatePDialog} onClose={handleUpdateDialogClose}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        backgroundColor: theme.palette.primary.main
+                    }}
+                >
+                    <DialogTitle sx={{ fontSize: theme.typography.h4 }}>Price Update </DialogTitle>
+                    <Button variant="text" color="dark" onClick={handleUpdateDialogClose}>
+                        <IconX />
+                    </Button>
+                </Box>
+
+                <Divider />
+                <DialogContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handlePUSubmit}>
+                            <Grid container>
+                                <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Grid item xs={12} sm={12}>
+                                        <Autocomplete
+                                            required
+                                            options={shops}
+                                            getOptionLabel={(option) => option.name}
+                                            onChange={(event, value) => {
+                                                if (value) {
+                                                    handleShopSelection(value);
+                                                }
+                                            }}
+                                            renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" />}
+                                            noOptionsText="Loading..."
+                                        />
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container>
+                                    <Grid item xs={12} sm={12}>
+                                        <Autocomplete
+                                            required
+                                            key={stockData.id}
+                                            disabled={shopId ? false : true}
+                                            options={stockData}
+                                            getOptionLabel={(option) => option.name}
+                                            onChange={(event, value) => {
+                                                if (value) {
+                                                    setSelectedStock(value);
+                                                }
+                                            }}
+                                            sx={{ marginTop: 2 }}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    label="Stock"
+                                                    variant="outlined"
+                                                    sx={{ backgroundColor: theme.palette.background.default }}
+                                                />
+                                            )}
+                                            noOptionsText={loading ? <CircularProgress size={20} /> : 'No item in this shop'}
+                                        />
+                                    </Grid>
+
+                                    {loading && (
+                                        <Grid
+                                            item
+                                            xs={12}
+                                            sm={6}
+                                            sx={{ color: '#ffbb00', display: 'flex', alignItems: 'center', paddingLeft: 1 }}
+                                        >
+                                            <CircularProgress size={20} />
+                                        </Grid>
+                                    )}
+                                </Grid>
+
+                                <Grid container>
+                                    <Grid
+                                        item
+                                        xs={12}
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            padding: 2,
+                                            marginY: 2,
+                                            backgroundColor: theme.palette.primary.light,
+                                            borderRadius: 2
+                                        }}
+                                    >
+                                        <Typography sx={{ fontSize: theme.typography.h5 }}>Current price</Typography>
+                                        <Typography sx={{ fontSize: theme.typography.h4 }}>{selectedStock.price} ETB</Typography>
+                                    </Grid>
+                                </Grid>
+                                <Grid container>
+                                    <Grid item xs={12} sm={8}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            sx={{ marginTop: 1 }}
+                                            label="New Price"
+                                            variant="outlined"
+                                            value={inputValue}
+                                            onChange={handleInputChange}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <FormControlLabel
+                                            label="Apply to all"
+                                            control={
+                                                <Checkbox
+                                                    checked={checked}
+                                                    onChange={handleCheckboxChange}
+                                                    name="checked"
+                                                    color="primary"
+                                                />
+                                            }
+                                            className="mt-2 ms-2"
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Grid item xs={12} sm={6} sx={{ display: 'flex', alignItems: 'flex-baseline', justifyContent: 'flex-end' }}>
+                                    <Button
+                                        fullWidth
+                                        type="submit"
+                                        variant="contained"
+                                        color="primary"
+                                        sx={{ paddingX: 4, paddingY: 1.6, marginTop: 4 }}
+                                    >
+                                        {updating ? (
+                                            <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                                <span className="visually-hidden">Loading...</span>
+                                            </div>
+                                        ) : (
+                                            'Submit'
+                                        )}
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </form>
+                    </Box>
+                </DialogContent>
+            </Dialog>
+
             <Dialog open={openReplanishDialog} onClose={handleDialogClose}>
                 <Box
                     sx={{
@@ -656,6 +958,7 @@ const Products = () => {
                             <Grid container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <Grid item xs={12} sm={8}>
                                     <TextField
+                                        required
                                         fullWidth
                                         type="text"
                                         label="New Amount"
@@ -699,7 +1002,6 @@ const ProductRow = ({ product }) => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
     const navigate = useNavigate();
-    const [checked, setChecked] = useState(false);
     const [spinner, setSpinner] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -731,10 +1033,6 @@ const ProductRow = ({ product }) => {
     const handleDialogClose = () => {
         setSelectedProduct(null);
         setDialogOpen(false);
-    };
-
-    const handleCheckboxChange = (event) => {
-        setChecked(event.target.checked);
     };
 
     const Delete = () => {
@@ -783,124 +1081,6 @@ const ProductRow = ({ product }) => {
                 });
                 setSpinner(false);
             });
-    };
-
-    const [inputValue, setInputValue] = React.useState('');
-    const [updating, setUpdating] = useState(false);
-    const handleInputChange = (event) => {
-        setInputValue(event.target.value);
-    };
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-
-        if (inputValue === '') {
-            setPopup({
-                ...popup,
-                status: true,
-                severity: 'error',
-                message: 'Please enter the new price'
-            });
-        } else if (checked) {
-            setUpdating(true);
-            var Api = Connections.api + Connections.updateallprice;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            var data = {
-                productid: product.id,
-                productcode: product.code,
-                name: product.shop,
-                from: product.price,
-                to: inputValue
-            };
-
-            fetch(Api, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(data),
-                cache: 'no-cache'
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'success',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    } else {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: 'There is error updating price'
-                    });
-                    setUpdating(false);
-                });
-        } else {
-            setUpdating(true);
-            var Api = Connections.api + Connections.updateprice;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            var data = {
-                productid: product.id,
-                name: product.shop,
-                from: product.price,
-                to: inputValue
-            };
-
-            fetch(Api, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(data),
-                cache: 'no-cache'
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'success',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    } else {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: 'There is error updating price'
-                    });
-                    setUpdating(false);
-                });
-        }
     };
 
     return (
@@ -964,7 +1144,7 @@ const ProductRow = ({ product }) => {
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Grid container>
-                            <Grid item xs={12} md={6}>
+                            <Grid item xs={12} md={12}>
                                 <Box margin={1}>
                                     <Typography variant="h6" gutterBottom component="div">
                                         Product details
@@ -1010,48 +1190,7 @@ const ProductRow = ({ product }) => {
                                     <Typography variant="h6" gutterBottom component="div">
                                         Price Updates
                                     </Typography>
-                                    {users.role === 'Admin' && (
-                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                            <FormControlLabel
-                                                control={
-                                                    <Checkbox
-                                                        checked={checked}
-                                                        onChange={handleCheckboxChange}
-                                                        name="checked"
-                                                        color="primary"
-                                                    />
-                                                }
-                                                label="All"
-                                                className="mt-2 ms-2"
-                                            />
-                                            <form onSubmit={handleSubmit}>
-                                                <TextField
-                                                    label="Change to"
-                                                    variant="outlined"
-                                                    size="small"
-                                                    value={inputValue}
-                                                    className="mt-2 me-4"
-                                                    onChange={handleInputChange}
-                                                    InputProps={{
-                                                        endAdornment: (
-                                                            <IconButton type="submit">
-                                                                {updating ? (
-                                                                    <div
-                                                                        className="spinner-border spinner-border-sm text-dark "
-                                                                        role="status"
-                                                                    >
-                                                                        <span className="visually-hidden">Loading...</span>
-                                                                    </div>
-                                                                ) : (
-                                                                    <IconCheck />
-                                                                )}
-                                                            </IconButton>
-                                                        )
-                                                    }}
-                                                />
-                                            </form>
-                                        </Box>
-                                    )}
+                                    {/* the code is cuted from here */}
                                 </Box>
                             </Grid>
                         </Grid>
