@@ -51,6 +51,7 @@ const PackageScreen = () => {
     const [filterPShop, setFilterPShop] = useState('Shop');
     const [filterPPaymentStatus, setFilterPPaymentStatus] = useState('Payment_Status');
     const [ppage, setPPage] = useState(0);
+    const [pLastPage, setLastPPage] = useState();
     const [prowsPerPage, setRowsPPerPage] = useState(15);
     const [selectedPRows, setSelectedPRows] = useState([]);
     const [selectedPItem, setSelectedPItems] = useState();
@@ -220,8 +221,8 @@ const PackageScreen = () => {
 
     useEffect(() => {
         const getSoldPackage = () => {
-            var AdminApi = Connections.api + Connections.viewpackagesale;
-            var SalesApi = Connections.api + Connections.viewstorepackagesale + users.store_name;
+            var AdminApi = Connections.api + Connections.viewpackagesale + `?page=${ppage}&limit=${prowsPerPage}`;
+            var SalesApi = Connections.api + Connections.viewstorepackagesale + users.store_name + `?page=${ppage}&limit=${prowsPerPage}`;
             var Api = users.role === 'Admin' ? AdminApi : SalesApi;
 
             var headers = {
@@ -237,7 +238,8 @@ const PackageScreen = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        setSoldPackage(response.data);
+                        setSoldPackage(response.data.data);
+                        setLastPPage(response.data.last_page);
                     } else {
                         setSoldPackage(soldPackage);
                     }
@@ -253,9 +255,9 @@ const PackageScreen = () => {
         };
         getSoldPackage();
         return () => {};
-    }, [popup]);
+    }, [popup, ppage, prowsPerPage]);
 
-    const displayedPSalesData = filteredPSalesData.slice(ppage * prowsPerPage, ppage * prowsPerPage + prowsPerPage);
+    // const displayedPSalesData = filteredPSalesData.slice(ppage * prowsPerPage, ppage * prowsPerPage + prowsPerPage);
 
     return (
         <>
@@ -335,7 +337,7 @@ const PackageScreen = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {displayedPSalesData.map((soldItem) => (
+                                    {filteredPSalesData.map((soldItem) => (
                                         <TableRow key={soldItem.id} hover onClick={(event) => handlePRowClick(event, soldItem.id)}>
                                             <TableCell padding="checkbox">
                                                 <Checkbox checked={selectedPRows.indexOf(soldItem.id) !== -1} />
@@ -393,7 +395,7 @@ const PackageScreen = () => {
                             <TablePagination
                                 rowsPerPageOptions={[15, 25, 50, 75, 100]}
                                 component="div"
-                                count={filteredPSalesData.length}
+                                count={parseInt(pLastPage * prowsPerPage)}
                                 rowsPerPage={prowsPerPage}
                                 page={ppage}
                                 onPageChange={handlePPageChange}

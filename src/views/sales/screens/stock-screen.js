@@ -51,6 +51,7 @@ const StockScreen = () => {
     const [filterShop, setFilterShop] = useState('Shop');
     const [filterPaymentStatus, setFilterPaymentStatus] = useState('Payment_Status');
     const [page, setPage] = useState(0);
+    const [lastPage, setLastPage] = useState();
     const [rowsPerPage, setRowsPerPage] = useState(15);
     const [selectedRows, setSelectedRows] = useState([]);
     const [selectedItem, setSelectedItems] = useState();
@@ -159,7 +160,7 @@ const StockScreen = () => {
         return isMatch;
     });
 
-    const displayedSalesData = filteredSalesData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    // const displayedSalesData = filteredSalesData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
     const handleTrashClick = () => {
         setDialogOpen(true);
@@ -221,8 +222,8 @@ const StockScreen = () => {
 
     useEffect(() => {
         const getSales = () => {
-            var AdminApi = Connections.api + Connections.viewsale;
-            var SalesApi = Connections.api + Connections.viewstoresale + users.store_name;
+            var AdminApi = Connections.api + Connections.viewsale + `?page=${page}&limit=${rowsPerPage}`;
+            var SalesApi = Connections.api + Connections.viewstoresale + users.store_name + `?page=${page}&limit=${rowsPerPage}`;
             var Api = users.role === 'Admin' ? AdminApi : SalesApi;
 
             var headers = {
@@ -238,7 +239,8 @@ const StockScreen = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        setSalesData(response.data);
+                        setSalesData(response.data.data);
+                        setLastPage(response.data.last_page);
                     } else {
                         setSalesData(salesData);
                     }
@@ -254,7 +256,7 @@ const StockScreen = () => {
         };
         getSales();
         return () => {};
-    }, [popup]);
+    }, [page, rowsPerPage]);
     return (
         <>
             <Grid container spacing={gridSpacing}>
@@ -331,7 +333,7 @@ const StockScreen = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {displayedSalesData.map((soldItem) => (
+                                    {filteredSalesData.map((soldItem) => (
                                         <TableRow key={soldItem.id} hover onClick={(event) => handleRowClick(event, soldItem.id)}>
                                             <TableCell padding="checkbox">
                                                 <Checkbox checked={selectedRows.indexOf(soldItem.id) !== -1} />
@@ -382,7 +384,7 @@ const StockScreen = () => {
                             <TablePagination
                                 rowsPerPageOptions={[15, 25, 50, 75, 100]}
                                 component="div"
-                                count={filteredSalesData.length}
+                                count={parseInt(rowsPerPage * lastPage)}
                                 rowsPerPage={rowsPerPage}
                                 page={page}
                                 onPageChange={handlePageChange}
