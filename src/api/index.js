@@ -11,7 +11,7 @@ const Connections = {
     adminstat: '/adminstat',
     shopstat: '/shopstat',
     againsttarget: '/againsttarget/',
-
+    monthlytarget: '/monthlytarget/',
     // admin dashboard sidebar
     lowstock: '/lowstock/',
     customercount: '/customercount',

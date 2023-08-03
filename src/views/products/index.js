@@ -80,7 +80,8 @@ const Products = () => {
     const [shopFilter, setShopFilter] = useState('Shop');
     const [statusFilter, setStatusFilter] = useState('In-stock');
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(12);
+    const [totalRecords, setTotalRecords] = useState();
+    const [rowsPerPage, setRowsPerPage] = useState(15);
     const [productData, setProductData] = useState([]);
     const [inputValue, setInputValue] = React.useState('');
     const [updating, setUpdating] = useState(false);
@@ -471,8 +472,8 @@ const Products = () => {
 
     useEffect(() => {
         const getProducts = () => {
-            var AdminApi = Connections.api + Connections.viewproduct;
-            var saleApi = Connections.api + Connections.viewstoreproduct + users.store_name;
+            var AdminApi = Connections.api + Connections.viewproduct + `?page=${page}&limit=${rowsPerPage}`;
+            var saleApi = Connections.api + Connections.viewstoreproduct + users.store_name + `?page=${page}&limit=${rowsPerPage}`;
             var Api = users.role === 'Admin' ? AdminApi : saleApi;
             var headers = {
                 accept: 'application/json',
@@ -487,7 +488,8 @@ const Products = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        setProductData(response.data);
+                        setProductData(response.data.data);
+                        setTotalRecords(response.data.last_page);
                     } else {
                         setProductData(productData);
                     }
@@ -504,8 +506,9 @@ const Products = () => {
 
         getProducts();
         return () => {};
-    }, []);
-    const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    }, [page, rowsPerPage]);
+
+    // const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
     return (
         <MainCard>
@@ -699,15 +702,15 @@ const Products = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {paginatedData.map((product, index) => (
+                                    {filteredData.map((product, index) => (
                                         <ProductRow key={index} product={product} />
                                     ))}
                                 </TableBody>
                             </Table>
                             <TablePagination
-                                rowsPerPageOptions={[15, 25, 50]}
+                                rowsPerPageOptions={[15, 25, 50, 100]}
                                 component="div"
-                                count={filteredData.length}
+                                count={parseInt(rowsPerPage * totalRecords)}
                                 rowsPerPage={rowsPerPage}
                                 page={page}
                                 onPageChange={handleChangePage}
@@ -1182,15 +1185,6 @@ const ProductRow = ({ product }) => {
                                             </TableRow>
                                         </TableBody>
                                     </Table>
-                                </Box>
-                            </Grid>
-
-                            <Grid item xs={12} md={6} className="border border-start-1 border-top-0 border-bottom-0 border-end-0">
-                                <Box margin={1}>
-                                    <Typography variant="h6" gutterBottom component="div">
-                                        Price Updates
-                                    </Typography>
-                                    {/* the code is cuted from here */}
                                 </Box>
                             </Grid>
                         </Grid>

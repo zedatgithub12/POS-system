@@ -211,7 +211,7 @@ const SalesTargets = (targets) => {
                                         sx={{
                                             paddingRight: 1.8,
                                             fontSize: 20,
-                                            fontWeight: theme.typography.fontWeightBold,
+                                            fontWeight: theme.typography.fontWeightMedium,
                                             color: theme.palette.grey[900]
                                         }}
                                     >

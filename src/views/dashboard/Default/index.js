@@ -225,6 +225,7 @@ const Dashboard = () => {
             .then((response) => {
                 if (response.success) {
                     setRevenueTarget(response.data);
+                    console.log(response.data);
                 } else {
                     setRevenueTarget([]);
                 }

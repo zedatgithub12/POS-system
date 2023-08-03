@@ -31,7 +31,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Delete } from '@mui/icons-material';
 import Connections from 'api';
 
-// ==============================|| CREATE SALE PAGE ||============================== //
+// ==============================||     UPDATE SALE PAGE ||============================== //
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });

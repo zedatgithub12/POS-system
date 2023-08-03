@@ -134,7 +134,7 @@ const ViewProduct = () => {
                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                             <TabList onChange={handleChange} aria-label="Item Tabs">
                                 <Tab label="Item Detail" value="1" />
-                                <Tab label="Availablity" value="2" />
+                                <Tab label="Availability" value="2" />
 
                                 <Tab label="Price Updates" value="3" />
                                 <Tab label="Replanishments" value="4" />
