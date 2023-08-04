@@ -230,7 +230,6 @@ const Dashboard = () => {
             .then((response) => {
                 if (response.success) {
                     setRevenueTarget(response.data);
-                    console.log(response.data);
                 } else {
                     setRevenueTarget([]);
                 }
@@ -364,7 +363,7 @@ const Dashboard = () => {
 
                                 <SalesTargets targets={revenueTarget} />
                             </Grid>
-                            <TargetListing lists={revenueTarget} />
+                            <TargetListing lists={revenueTarget ? revenueTarget : []} shopname={shopFilter} />
                         </Grid>
 
                         <Grid item xs={12} sm={12} md={12} lg={3.4} xl={3.4} sx={{ borderRadius: 2, padding: 1, paddingTop: 0 }}>

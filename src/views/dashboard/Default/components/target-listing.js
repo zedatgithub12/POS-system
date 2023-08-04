@@ -14,21 +14,22 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Paper
+    Paper,
+    CircularProgress
 } from '@mui/material';
 import { IconChevronLeft, IconChevronRight, IconCircleCheck, IconList } from '@tabler/icons';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { useTheme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import { calculatePercentage, formatNumber } from 'utils/functions';
+import { calculatePercentage, formatNumber, DateFormatter } from 'utils/functions';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Pagination from '@mui/material/Pagination';
 import { Preferences } from 'preferences';
 import { useEffect } from 'react';
 import Connections from 'api';
-// import { saveAs } from 'file-saver';
-// import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import * as XLSX from 'xlsx';
 
 // project imports
 
@@ -40,9 +41,10 @@ const ITEM_HEIGHT = 20;
 const TargetListing = (props) => {
     const theme = useTheme();
 
-    const { lists } = props;
+    const { lists, shopname } = props;
 
     const thirtydays = lists.thirtydays;
+
     const datalength = thirtydays ? thirtydays.length : 1;
     const [days, setThirtydays] = useState(thirtydays ? thirtydays : []);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -86,10 +88,6 @@ const TargetListing = (props) => {
         setAnchorEl(null);
     };
 
-    const excelExport = () => {
-        handleClose();
-    };
-
     const csvExport = () => {
         handleClose();
     };
@@ -98,120 +96,130 @@ const TargetListing = (props) => {
         setPage(value);
     };
 
-    // const getTargets = () => {
-    //     var Api = Connections.api + Connections.monthlytarget + monthName;
-    //     var headers = {
-    //         accept: 'application/json',
-    //         'Content-Type': 'application/json'
-    //     };
-    //     // Make the API call using fetch()
-    //     fetch(Api, {
-    //         method: 'GET',
-    //         headers: headers,
-    //         cache: 'no-cache'
-    //     })
-    //         .then((response) => response.json())
-    //         .then((response) => {
-    //             if (response.success) {
-    //                 setThirtydays(response.data);
-    //             } else {
-    //                 setThirtydays(thirtydays);
-    //             }
-    //         })
-    //         .catch(() => {
-    //             setPopup({
-    //                 ...popup,
-    //                 status: true,
-    //                 severity: 'error',
-    //                 message: 'unable to fetch a list of target for this month'
-    //             });
-    //         });
-    // };
+    const getTargets = () => {
+        setLoading(true);
+        var Api = Connections.api + Connections.monthlytarget + monthName + `?shop=${shopname}`;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'GET',
+            headers: headers,
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setThirtydays(response.data);
+                    setLoading(false);
+                } else {
+                    setLoading(false);
+                    setThirtydays([]);
+                }
+            })
+            .catch((error) => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'error fetching monthly summary'
+                });
+                setLoading(false);
+            });
+    };
+    useEffect(() => {
+        getTargets();
+        return () => {};
+    }, [currentDate]);
+    const handleDownloadExcel = () => {
+        const sheetData = days.map((item) => [
+            item.date,
+            lists.target.r_daily,
+            item.totalRevenue,
+            parseInt(item.totalRevenue) - parseInt(lists.target.r_daily),
+            calculatePercentage(parseInt(item.totalRevenue), parseInt(lists.target.r_daily)) + '%'
+        ]);
 
-    //const targetList = thirtydays.slice((page - 1) * Preferences.numPerPage, page * Preferences.numPerPage);
+        const sheet = XLSX.utils.aoa_to_sheet(sheetData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, sheet, 'Sheet 1');
 
-    // const handleDownloadExcel = () => {
-    //     const sheetData = thirtydays.map((item) => [
-    //         item.date,
-    //         lists.target.r_daily,
-    //         item.totalRevenue,
-    //         parseInt(item.totalRevenue) - parseInt(lists.target.r_daily),
-    //         calculatePercentage(parseInt(item.totalRevenue), parseInt(lists.target.r_daily)) + '%'
-    //     ]);
-
-    //     const sheet = XLSX.utils.aoa_to_sheet(sheetData);
-    //     const workbook = XLSX.utils.book_new();
-    //     XLSX.utils.book_append_sheet(workbook, sheet, 'Sheet 1');
-
-    //     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    //     const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    //     saveAs(blob, 'excel-report.xlsx');
-    // };
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, 'excel-report.xlsx');
+    };
 
     return (
         <Grid container sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 1 }}>
-            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginY: 1 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingX: 2 }}>
-                    <IconButton
-                        aria-label="previous"
-                        id="long-button"
-                        aria-controls={open ? 'long-menu' : undefined}
-                        aria-expanded={open ? 'true' : undefined}
-                        aria-haspopup="true"
-                        onClick={handlePreviousMonth}
-                        marginX={2}
-                    >
-                        <IconChevronLeft size={16} />
-                    </IconButton>
-                    <Typography variant="subtitle1" sx={{ marginX: 1 }}>
-                        {monthShortName}
-                    </Typography>
+            {shopname && lists.target && (
+                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginY: 1 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingX: 2 }}>
+                        <IconButton
+                            aria-label="previous"
+                            id="long-button"
+                            disabled={loading ? true : false}
+                            aria-controls={open ? 'long-menu' : undefined}
+                            aria-expanded={open ? 'true' : undefined}
+                            aria-haspopup="true"
+                            onClick={handlePreviousMonth}
+                            marginX={2}
+                        >
+                            <IconChevronLeft size={16} />
+                        </IconButton>
+                        <Typography variant="subtitle1" sx={{ marginX: 1 }}>
+                            {monthShortName}
+                        </Typography>
 
-                    <IconButton
-                        aria-label="next"
-                        id="long-button"
-                        aria-controls={open ? 'long-menu' : undefined}
-                        aria-expanded={open ? 'true' : undefined}
-                        aria-haspopup="true"
-                        onClick={handleNextMonth}
-                        marginX={2}
-                    >
-                        <IconChevronRight size={16} />
-                    </IconButton>
-                </Box>
+                        <IconButton
+                            aria-label="next"
+                            id="long-button"
+                            disabled={loading ? true : false}
+                            aria-controls={open ? 'long-menu' : undefined}
+                            aria-expanded={open ? 'true' : undefined}
+                            aria-haspopup="true"
+                            onClick={handleNextMonth}
+                            marginX={2}
+                        >
+                            <IconChevronRight size={16} />
+                        </IconButton>
+                    </Box>
 
-                <div>
-                    <IconButton
-                        aria-label="more"
-                        id="long-button"
-                        aria-controls={open ? 'long-menu' : undefined}
-                        aria-expanded={open ? 'true' : undefined}
-                        aria-haspopup="true"
-                        onClick={handleClick}
-                    >
-                        <MoreVertIcon />
-                    </IconButton>
-                    <Menu
-                        id="long-menu"
-                        MenuListProps={{
-                            'aria-labelledby': 'long-button'
-                        }}
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                        PaperProps={{
-                            style: {
-                                maxHeight: ITEM_HEIGHT * 4.5,
-                                width: '20ch'
-                            }
-                        }}
-                    >
-                        <MenuItem onClick={() => alert('not now')}> Excel Export</MenuItem>
-                        {/* <MenuItem onClick={handleDownloadCSV}>CSV</MenuItem> */}
-                    </Menu>
-                </div>
-            </Grid>
-            {thirtydays ? (
+                    <div>
+                        <IconButton
+                            aria-label="more"
+                            id="long-button"
+                            aria-controls={open ? 'long-menu' : undefined}
+                            aria-expanded={open ? 'true' : undefined}
+                            aria-haspopup="true"
+                            onClick={handleClick}
+                        >
+                            <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                            id="long-menu"
+                            MenuListProps={{
+                                'aria-labelledby': 'long-button'
+                            }}
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            PaperProps={{
+                                style: {
+                                    maxHeight: ITEM_HEIGHT * 4.5,
+                                    width: '20ch'
+                                }
+                            }}
+                        >
+                            <MenuItem onClick={handleDownloadExcel}>Export Excel </MenuItem>
+                            {/* <MenuItem onClick={handleDownloadCSV}>CSV</MenuItem> */}
+                        </Menu>
+                    </div>
+                </Grid>
+            )}
+
+            {days ? (
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
@@ -223,28 +231,25 @@ const TargetListing = (props) => {
                                 <TableCell>Achievement</TableCell>
                             </TableRow>
                         </TableHead>
+
                         <TableBody>
-                            {thirtydays.length === 0 ? (
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        padding: 6
-                                    }}
-                                >
-                                    <IconCircleCheck size={48} color={theme.palette.primary.main} />
-                                    <Typography marginTop={1}>All stocks in this shop are above minimum</Typography>
-                                </Box>
-                            ) : (
-                                thirtydays.map((item, index) => (
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} align="center">
+                                        <CircularProgress size={26} />
+                                    </TableCell>
+                                </TableRow>
+                            ) : days.length > 0 ? (
+                                days.map((item, index) => (
                                     <TableRow key={index}>
-                                        <TableCell>{item.date}</TableCell>
+                                        <TableCell>{DateFormatter(item.date)}</TableCell>
                                         <TableCell>{formatNumber(lists.target.r_daily)}</TableCell>
                                         <TableCell>
                                             <Typography
-                                                sx={{ color: theme.palette.primary.dark, fontWeight: theme.typography.fontWeightMedium }}
+                                                sx={{
+                                                    color: theme.palette.primary.dark,
+                                                    fontWeight: theme.typography.fontWeightMedium
+                                                }}
                                             >
                                                 {item.totalRevenue}
                                             </Typography>
@@ -277,10 +282,30 @@ const TargetListing = (props) => {
                                         </TableCell>
                                     </TableRow>
                                 ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={5} align="center">
+                                        <Grid container component={Paper} sx={{ paddingY: 4, borderRadius: 2 }}>
+                                            <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <Box
+                                                    sx={{
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center'
+                                                    }}
+                                                >
+                                                    <IconList size={48} color={theme.palette.primary.main} />
+                                                    <Typography>List of target and achievement for selected shop</Typography>
+                                                </Box>
+                                            </Grid>
+                                        </Grid>
+                                    </TableCell>
+                                </TableRow>
                             )}
                         </TableBody>
                     </Table>
-                    {thirtydays.length > Preferences.numPerPage && (
+                    {days.length > Preferences.numPerPage && (
                         <Box marginY={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                             <Pagination count={numPages} page={page} onChange={handleChangePage} />
                         </Box>
