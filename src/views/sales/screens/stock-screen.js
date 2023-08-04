@@ -239,6 +239,8 @@ const StockScreen = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
+                        var selectedShop = response.data.data > 0 ? response.data.data[1].shop : 'Shop';
+                        setFilterShop(selectedShop);
                         setSalesData(response.data.data);
                         setLastPage(response.data.last_page);
                     } else {
@@ -279,16 +281,7 @@ const StockScreen = () => {
                                 )
                             }}
                         />
-                        <FormControl className="ms-2 my-1">
-                            <Select value={filterDate} onChange={handleFilterDateChange}>
-                                <MenuItem value="Date">Date</MenuItem>
-                                {Array.from(new Set(salesData.map((sale) => sale.date))).map((date) => (
-                                    <MenuItem key={date} value={date}>
-                                        {date}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+
                         {users.role === 'Admin' && (
                             <FormControl className="ms-2 my-1">
                                 <Select value={filterShop} onChange={handleFilterShopChange}>
@@ -301,6 +294,18 @@ const StockScreen = () => {
                                 </Select>
                             </FormControl>
                         )}
+
+                        <FormControl className="ms-2 my-1">
+                            <Select value={filterDate} onChange={handleFilterDateChange}>
+                                <MenuItem value="Date">Date</MenuItem>
+                                {Array.from(new Set(salesData.map((sale) => sale.date))).map((date) => (
+                                    <MenuItem key={date} value={date}>
+                                        {date}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
                         <FormControl className="ms-2 my-1">
                             <Select value={filterPaymentStatus} onChange={handleFilterPaymentMethodChange}>
                                 <MenuItem value="Payment_Status">Payment_Status</MenuItem>

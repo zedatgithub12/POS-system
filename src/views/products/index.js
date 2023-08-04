@@ -336,7 +336,7 @@ const Products = () => {
             .then((response) => response.json())
             .then((response) => {
                 if (response.success) {
-                    setStockData(response.data);
+                    setStockData(response.data.data);
                     setLoading(false);
                 } else {
                     setStockData([]);
@@ -488,8 +488,10 @@ const Products = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
+                        var selectedShop = response.data.data[1].shop;
                         setProductData(response.data.data);
                         setTotalRecords(response.data.last_page);
+                        setShopFilter(selectedShop);
                     } else {
                         setProductData(productData);
                     }
@@ -628,7 +630,18 @@ const Products = () => {
                                 )
                             }}
                         />
-
+                        {users.role === 'Admin' && (
+                            <FormControl className="ms-2 my-2 ">
+                                <Select value={shopFilter} onChange={handleShopFilterChange}>
+                                    <MenuItem value="Shop">Shop</MenuItem>
+                                    {Array.from(new Set(productData.map((product) => product.shop))).map((shop) => (
+                                        <MenuItem key={shop} value={shop}>
+                                            {shop}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        )}
                         <FormControl className="ms-2 mt-2 ">
                             <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
                                 <MenuItem value="Category">Category</MenuItem>
@@ -660,19 +673,6 @@ const Products = () => {
                                 ))}
                             </Select>
                         </FormControl>
-
-                        {users.role === 'Admin' && (
-                            <FormControl className="ms-2 my-2 ">
-                                <Select value={shopFilter} onChange={handleShopFilterChange}>
-                                    <MenuItem value="Shop">Shop</MenuItem>
-                                    {Array.from(new Set(productData.map((product) => product.shop))).map((shop) => (
-                                        <MenuItem key={shop} value={shop}>
-                                            {shop}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        )}
 
                         <FormControl className="ms-2 my-2 ">
                             <Select value={statusFilter} onChange={handleStatusFilterChange}>

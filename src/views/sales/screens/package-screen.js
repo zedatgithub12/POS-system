@@ -238,6 +238,8 @@ const PackageScreen = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
+                        var selectedShop = response.data.data > 0 ? response.data.data[1].shop : 'Shop';
+                        setFilterPShop(selectedShop);
                         setSoldPackage(response.data.data);
                         setLastPPage(response.data.last_page);
                     } else {
@@ -281,16 +283,6 @@ const PackageScreen = () => {
                                 )
                             }}
                         />
-                        <FormControl className="ms-2 my-1">
-                            <Select value={filterPDate} onChange={handlePFilterDateChange}>
-                                <MenuItem value="Date">Date</MenuItem>
-                                {Array.from(new Set(soldPackage.map((sale) => sale.date))).map((date) => (
-                                    <MenuItem key={date} value={date}>
-                                        {date}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
                         {users.role === 'Admin' && (
                             <FormControl className="ms-2 my-1">
                                 <Select value={filterPShop} onChange={handlePFilterShopChange}>
@@ -303,6 +295,17 @@ const PackageScreen = () => {
                                 </Select>
                             </FormControl>
                         )}
+                        <FormControl className="ms-2 my-1">
+                            <Select value={filterPDate} onChange={handlePFilterDateChange}>
+                                <MenuItem value="Date">Date</MenuItem>
+                                {Array.from(new Set(soldPackage.map((sale) => sale.date))).map((date) => (
+                                    <MenuItem key={date} value={date}>
+                                        {date}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
                         <FormControl className="ms-2 my-1">
                             <Select value={filterPPaymentStatus} onChange={handlePFilterPaymentMethodChange}>
                                 <MenuItem value="Payment_Status">Payment_Status</MenuItem>

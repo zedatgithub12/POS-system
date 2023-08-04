@@ -97,7 +97,7 @@ const TransferStock = () => {
             .then((response) => response.json())
             .then((response) => {
                 if (response.success) {
-                    setProductData(response.data);
+                    setProductData(response.data.data);
                     setLoading(false);
                 } else {
                     setProductData([]);

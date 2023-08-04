@@ -113,6 +113,7 @@ const Packages = () => {
                 .then((response) => {
                     if (response.success) {
                         setPackages(response.data);
+                        setShopFilter(response.data.length > 0 ? response.data[1].shopname : 'Shop');
                     } else {
                         setPackages([]);
                     }
@@ -145,19 +146,17 @@ const Packages = () => {
                             </Grid>
                         </Grid>
                         <Grid item>
-                            {users.role === 'Admin' ? (
-                                <>
-                                    <Button
-                                        component={Link}
-                                        to="/create-package"
-                                        variant="outlined"
-                                        color="primary"
-                                        sx={{ textDecoration: 'none', marginRight: 2 }}
-                                    >
-                                        Create Package
-                                    </Button>
-                                </>
-                            ) : null}
+                            {users.role === 'Admin' && (
+                                <Button
+                                    component={Link}
+                                    to="/create-package"
+                                    variant="outlined"
+                                    color="primary"
+                                    sx={{ textDecoration: 'none', marginRight: 2 }}
+                                >
+                                    Create Package
+                                </Button>
+                            )}
                         </Grid>
                     </Grid>
                 </Grid>

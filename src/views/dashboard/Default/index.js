@@ -29,6 +29,7 @@ import SalesTargets from './components/sales-against-target';
 import { IconX, IconBuildingStore, IconChartInfographic } from '@tabler/icons';
 import TargetListing from './components/target-listing';
 import { useNavigate } from 'react-router-dom';
+import { Preferences } from 'preferences';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
@@ -41,7 +42,7 @@ const Dashboard = () => {
     const theme = useTheme();
 
     const navigate = useNavigate();
-
+    const defaultShop = Preferences.defaultshop;
     const [shopId, setShopId] = useState(null);
     const [shopName, setShopsName] = useState();
     const [shops, setShops] = useState([]);
@@ -196,6 +197,10 @@ const Dashboard = () => {
             .then((response) => {
                 if (response.success) {
                     setShops(response.data);
+                    setShopFilter(response.data[defaultShop].name);
+                    setTargetShopFilter(response.data[defaultShop].name);
+                    getLowStocks(response.data[defaultShop].name);
+                    getTargets(response.data[defaultShop].name);
                 } else {
                     setShops(shops);
                 }

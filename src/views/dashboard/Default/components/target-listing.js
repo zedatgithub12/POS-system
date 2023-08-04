@@ -27,9 +27,8 @@ import Pagination from '@mui/material/Pagination';
 import { Preferences } from 'preferences';
 import { useEffect } from 'react';
 import Connections from 'api';
-import { CSVLink } from 'react-csv';
-import { saveAs } from 'file-saver';
-import * as XLSX from 'xlsx';
+// import { saveAs } from 'file-saver';
+// import * as XLSX from 'xlsx';
 
 // project imports
 
@@ -131,23 +130,23 @@ const TargetListing = (props) => {
 
     //const targetList = thirtydays.slice((page - 1) * Preferences.numPerPage, page * Preferences.numPerPage);
 
-    const handleDownloadExcel = () => {
-        const sheetData = thirtydays.map((item) => [
-            item.date,
-            lists.target.r_daily,
-            item.totalRevenue,
-            parseInt(item.totalRevenue) - parseInt(lists.target.r_daily),
-            calculatePercentage(parseInt(item.totalRevenue), parseInt(lists.target.r_daily)) + '%'
-        ]);
+    // const handleDownloadExcel = () => {
+    //     const sheetData = thirtydays.map((item) => [
+    //         item.date,
+    //         lists.target.r_daily,
+    //         item.totalRevenue,
+    //         parseInt(item.totalRevenue) - parseInt(lists.target.r_daily),
+    //         calculatePercentage(parseInt(item.totalRevenue), parseInt(lists.target.r_daily)) + '%'
+    //     ]);
 
-        const sheet = XLSX.utils.aoa_to_sheet(sheetData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, sheet, 'Sheet 1');
+    //     const sheet = XLSX.utils.aoa_to_sheet(sheetData);
+    //     const workbook = XLSX.utils.book_new();
+    //     XLSX.utils.book_append_sheet(workbook, sheet, 'Sheet 1');
 
-        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        saveAs(blob, 'excel-report.xlsx');
-    };
+    //     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    //     const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    //     saveAs(blob, 'excel-report.xlsx');
+    // };
 
     return (
         <Grid container sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 1 }}>
@@ -207,7 +206,7 @@ const TargetListing = (props) => {
                             }
                         }}
                     >
-                        <MenuItem onClick={handleDownloadExcel}> Excel Export</MenuItem>
+                        <MenuItem onClick={() => alert('not now')}> Excel Export</MenuItem>
                         {/* <MenuItem onClick={handleDownloadCSV}>CSV</MenuItem> */}
                     </Menu>
                 </div>

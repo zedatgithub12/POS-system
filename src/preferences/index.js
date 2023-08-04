@@ -1,3 +1,4 @@
 export const Preferences = {
-    numPerPage: 12
+    numPerPage: 12,
+    defaultshop: 1
 };

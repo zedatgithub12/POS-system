@@ -63,19 +63,6 @@ const ViewSale = () => {
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
                                 <Paper variant="outlined">
-                                    <Typography className="px-3 py-2 fs-6 fw-semibold">Customer Information</Typography>
-                                    <Box p={2} display="flex" alignItems="center">
-                                        <Avatar className="bg-light">
-                                            <AccountCircleOutlined />
-                                        </Avatar>
-                                        <Box ml={2}>
-                                            <Typography variant="h6">{item.customer}</Typography>
-                                        </Box>
-                                    </Box>
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <Paper variant="outlined">
                                     <Typography className="px-3 py-2 fs-6  fw-semibold">Invoice Info</Typography>
                                     <Box p={1} ml={2} display="flex" alignItems="center">
                                         <Avatar className="bg-light">
@@ -124,6 +111,19 @@ const ViewSale = () => {
                                         <Box ml={2}>
                                             <Typography variant="h6">Grand Total</Typography>
                                             <Typography color="text.secondary"> {parseInt(item.grandtotal).toFixed(2)} ETB</Typography>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <Paper variant="outlined">
+                                    <Typography className="px-3 py-2 fs-6 fw-semibold">Customer Information</Typography>
+                                    <Box p={2} display="flex" alignItems="center">
+                                        <Avatar className="bg-light">
+                                            <AccountCircleOutlined />
+                                        </Avatar>
+                                        <Box ml={2}>
+                                            <Typography variant="h6">{item.customer}</Typography>
                                         </Box>
                                     </Box>
                                 </Paper>
