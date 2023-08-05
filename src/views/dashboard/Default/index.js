@@ -30,6 +30,7 @@ import { IconX, IconBuildingStore, IconChartInfographic } from '@tabler/icons';
 import TargetListing from './components/target-listing';
 import { useNavigate } from 'react-router-dom';
 import { Preferences } from 'preferences';
+import { ActivityIndicators } from 'ui-component/activityIndicator';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
@@ -49,6 +50,8 @@ const Dashboard = () => {
     const [revenueTarget, setRevenueTarget] = useState([]);
     const [shopFilter, setShopFilter] = useState('Select Shop');
     const [targetShopFilter, setTargetShopFilter] = useState('Select Shop');
+    const [targetLoader, setTargetLoader] = useState(true);
+    const [loading, setLoading] = useState(true);
     const [spinner, setSpinner] = useState(false);
     const [lowstock, setLowStock] = useState([]);
     const [totalCustomer, setTotalCustomer] = useState();
@@ -215,6 +218,7 @@ const Dashboard = () => {
             });
     };
     const getTargets = (name) => {
+        setTargetLoader(true);
         var Api = Connections.api + Connections.againsttarget + name;
         var headers = {
             accept: 'application/json',
@@ -230,8 +234,10 @@ const Dashboard = () => {
             .then((response) => {
                 if (response.success) {
                     setRevenueTarget(response.data);
+                    setTargetLoader(false);
                 } else {
                     setRevenueTarget([]);
+                    setTargetLoader(false);
                 }
             })
             .catch(() => {
@@ -241,10 +247,12 @@ const Dashboard = () => {
                     severity: 'error',
                     message: 'There is error fetching targets!'
                 });
+                setTargetLoader(false);
             });
     };
 
     const getLowStocks = (name) => {
+        setLoading(true);
         var Api = Connections.api + Connections.lowstock + name;
         var headers = {
             accept: 'application/json',
@@ -260,8 +268,10 @@ const Dashboard = () => {
             .then((response) => {
                 if (response.success) {
                     setLowStock(response.data);
+                    setLoading(false);
                 } else {
                     setLowStock(lowstock);
+                    setLoading(false);
                 }
             })
             .catch(() => {
@@ -271,6 +281,7 @@ const Dashboard = () => {
                     severity: 'error',
                     message: 'There is error fetching low stocks!'
                 });
+                setLoading(false);
             });
     };
 
@@ -360,7 +371,13 @@ const Dashboard = () => {
                                         <Typography sx={{ fontSize: theme.typography.h5, marginRight: 2 }}>{user.store_name}</Typography>
                                     )}
                                 </Box>
-                                <SalesTargets targets={revenueTarget} />
+                                {targetLoader ? (
+                                    <Box sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        <ActivityIndicators />
+                                    </Box>
+                                ) : (
+                                    <SalesTargets targets={revenueTarget} />
+                                )}
                             </Grid>
                             <TargetListing lists={revenueTarget ? revenueTarget : []} shopname={shopFilter} />
                         </Grid>
@@ -402,7 +419,11 @@ const Dashboard = () => {
                                     )}
                                 </Box>
                                 <Divider />
-                                {shopFilter ? (
+                                {loading ? (
+                                    <Box sx={{ minHeight: 205, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        <ActivityIndicators />
+                                    </Box>
+                                ) : shopFilter ? (
                                     <LowStocks stocks={lowstock} />
                                 ) : (
                                     <Box

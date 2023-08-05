@@ -38,6 +38,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Connections from 'api';
 import 'react-lazy-load-image-component/src/effects/blur.css';
+import { ActivityIndicators } from 'ui-component/activityIndicator';
+
 // ==============================|| PACKAGES PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -53,7 +55,7 @@ const Packages = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
     const [packages, setPackages] = useState([]);
-
+    const [loading, setLoading] = useState(true);
     const handleSearchTextChange = (event) => {
         setSearchText(event.target.value);
     };
@@ -96,6 +98,7 @@ const Packages = () => {
 
     useEffect(() => {
         const getPackages = () => {
+            setLoading(true);
             var AdminApi = Connections.api + Connections.viewpackages;
             var saleApi = Connections.api + Connections.viewstorepackage + users.store_name;
             var Api = users.role === 'Admin' ? AdminApi : saleApi;
@@ -114,8 +117,10 @@ const Packages = () => {
                     if (response.success) {
                         setPackages(response.data);
                         setShopFilter(response.data.length > 0 ? response.data[1].shopname : 'Shop');
+                        setLoading(false);
                     } else {
                         setPackages([]);
+                        setLoading(false);
                     }
                 })
                 .catch(() => {
@@ -123,8 +128,9 @@ const Packages = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error fetching product!'
+                        message: 'There is error fetching packages!'
                     });
+                    setLoading(false);
                 });
         };
 
@@ -220,7 +226,15 @@ const Packages = () => {
                                         <TableCell>Actions</TableCell>
                                     </TableRow>
                                 </TableHead>
-                                {paginatedData.length > 0 ? (
+                                {loading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={7} align="center">
+                                            <Box sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                <ActivityIndicators />
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : paginatedData.length > 0 ? (
                                     <TableBody>
                                         {paginatedData.map((product, index) => (
                                             <ProductRow key={index} product={product} />

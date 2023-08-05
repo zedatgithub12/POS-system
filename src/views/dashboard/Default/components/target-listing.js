@@ -30,6 +30,7 @@ import { useEffect } from 'react';
 import Connections from 'api';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
+import { ActivityIndicators } from 'ui-component/activityIndicator';
 
 // project imports
 
@@ -236,7 +237,9 @@ const TargetListing = (props) => {
                             {loading ? (
                                 <TableRow>
                                     <TableCell colSpan={5} align="center">
-                                        <CircularProgress size={26} />
+                                        <Box sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                            <ActivityIndicators />
+                                        </Box>
                                     </TableCell>
                                 </TableRow>
                             ) : days.length > 0 ? (

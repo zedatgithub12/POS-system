@@ -37,6 +37,7 @@ import Connections from 'api';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import { CSVLink } from 'react-csv';
+import { ActivityIndicators } from 'ui-component/activityIndicator';
 
 // ==============================|| SALES PAGE ||============================== //
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -61,7 +62,7 @@ const StockScreen = () => {
     const [rowsPerPage, setRowsPerPage] = useState(15);
     const [selectedRows, setSelectedRows] = useState([]);
     const [selectedItem, setSelectedItems] = useState();
-
+    const [loading, setLoading] = useState(true);
     const [spinner, setSpinner] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     //stock sales related code
@@ -238,6 +239,7 @@ const StockScreen = () => {
 
     useEffect(() => {
         const getSales = () => {
+            setLoading(true);
             var AdminApi = Connections.api + Connections.viewsale + `?page=${page}&limit=${rowsPerPage}`;
             var SalesApi = Connections.api + Connections.viewstoresale + users.store_name + `?page=${page}&limit=${rowsPerPage}`;
             var Api = users.role === 'Admin' ? AdminApi : SalesApi;
@@ -259,8 +261,10 @@ const StockScreen = () => {
                         setFilterShop(selectedShop);
                         setSalesData(response.data.data);
                         setLastPage(response.data.last_page);
+                        setLoading(false);
                     } else {
                         setSalesData(salesData);
+                        setLoading(false);
                     }
                 })
                 .catch(() => {
@@ -270,6 +274,7 @@ const StockScreen = () => {
                         severity: 'error',
                         message: 'There is error fetching Sales!'
                     });
+                    setLoading(false);
                 });
         };
         getSales();
@@ -287,7 +292,7 @@ const StockScreen = () => {
                       customer: sale.customer,
                       GrandTotal: sale.grandtotal,
                       Payment_Status: sale.payment_status,
-                      payment_method: sale.payment_method,
+                      Payment_method: sale.payment_method,
                       Note: sale.note,
                       Time: sale.time
                   };
@@ -438,52 +443,66 @@ const StockScreen = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {filteredSalesData.map((soldItem) => (
-                                        <TableRow key={soldItem.id} hover onClick={(event) => handleRowClick(event, soldItem.id)}>
-                                            <TableCell padding="checkbox">
-                                                <Checkbox checked={selectedRows.indexOf(soldItem.id) !== -1} />
-                                            </TableCell>
-                                            <TableCell>{soldItem.reference}</TableCell>
-                                            <TableCell>{soldItem.customer}</TableCell>
-                                            <TableCell>{soldItem.shop}</TableCell>
-                                            <TableCell>{parseInt(soldItem.grandtotal).toFixed(2)}</TableCell>
-                                            <TableCell>{soldItem.payment_status}</TableCell>
-                                            <TableCell>{soldItem.payment_method}</TableCell>
-                                            <TableCell>{soldItem.date}</TableCell>
-                                            <TableCell>
-                                                <IconButton
-                                                    aria-controls="row-menu"
-                                                    aria-haspopup="true"
-                                                    onClick={(event) => handleSelectItem(event, soldItem)}
+                                    {loading ? (
+                                        <TableRow>
+                                            <TableCell colSpan={9} align="center">
+                                                <Box
+                                                    sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                                                 >
-                                                    <MoreVert />
-                                                </IconButton>
-                                                <Menu
-                                                    id="row-menu"
-                                                    anchorEl={anchorEl}
-                                                    keepMounted
-                                                    open={Boolean(anchorEl)}
-                                                    onClose={handleMenuClose}
-                                                    className="shadow-sm"
-                                                >
-                                                    <MenuItem onClick={() => navigate('/view-sale', { state: { ...selectedItem } })}>
-                                                        View Sale
-                                                    </MenuItem>
-
-                                                    {users.role === 'Admin' && (
-                                                        <>
-                                                            <MenuItem
-                                                                onClick={() => navigate('/update-sale', { state: { ...selectedItem } })}
-                                                            >
-                                                                Edit Sale
-                                                            </MenuItem>
-                                                            <MenuItem onClick={() => handleTrashClick(selectedItem)}>Delete Sale</MenuItem>
-                                                        </>
-                                                    )}
-                                                </Menu>
+                                                    <ActivityIndicators />
+                                                </Box>
                                             </TableCell>
                                         </TableRow>
-                                    ))}
+                                    ) : (
+                                        filteredSalesData.map((soldItem) => (
+                                            <TableRow key={soldItem.id} hover onClick={(event) => handleRowClick(event, soldItem.id)}>
+                                                <TableCell padding="checkbox">
+                                                    <Checkbox checked={selectedRows.indexOf(soldItem.id) !== -1} />
+                                                </TableCell>
+                                                <TableCell>{soldItem.reference}</TableCell>
+                                                <TableCell>{soldItem.customer}</TableCell>
+                                                <TableCell>{soldItem.shop}</TableCell>
+                                                <TableCell>{parseInt(soldItem.grandtotal).toFixed(2)}</TableCell>
+                                                <TableCell>{soldItem.payment_status}</TableCell>
+                                                <TableCell>{soldItem.payment_method}</TableCell>
+                                                <TableCell>{soldItem.date}</TableCell>
+                                                <TableCell>
+                                                    <IconButton
+                                                        aria-controls="row-menu"
+                                                        aria-haspopup="true"
+                                                        onClick={(event) => handleSelectItem(event, soldItem)}
+                                                    >
+                                                        <MoreVert />
+                                                    </IconButton>
+                                                    <Menu
+                                                        id="row-menu"
+                                                        anchorEl={anchorEl}
+                                                        keepMounted
+                                                        open={Boolean(anchorEl)}
+                                                        onClose={handleMenuClose}
+                                                        className="shadow-sm"
+                                                    >
+                                                        <MenuItem onClick={() => navigate('/view-sale', { state: { ...selectedItem } })}>
+                                                            View Sale
+                                                        </MenuItem>
+
+                                                        {users.role === 'Admin' && (
+                                                            <>
+                                                                <MenuItem
+                                                                    onClick={() => navigate('/update-sale', { state: { ...selectedItem } })}
+                                                                >
+                                                                    Edit Sale
+                                                                </MenuItem>
+                                                                <MenuItem onClick={() => handleTrashClick(selectedItem)}>
+                                                                    Delete Sale
+                                                                </MenuItem>
+                                                            </>
+                                                        )}
+                                                    </Menu>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
                                 </TableBody>
                             </Table>
                             <TablePagination

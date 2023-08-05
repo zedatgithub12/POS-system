@@ -38,6 +38,8 @@ import Connections from 'api';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import notransfer from 'assets/images/notransfer.png';
 import { DateFormatter } from 'utils/functions';
+import { ActivityIndicators } from 'ui-component/activityIndicator';
+
 // ==============================|| TRANSFERS PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -54,7 +56,7 @@ const Transfers = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
     const [stocktransfers, setStockTransfers] = useState([]);
-
+    const [loading, setLoading] = useState(true);
     const handleShopFilterChange = (event) => {
         setShopFilter(event.target.value);
     };
@@ -100,6 +102,7 @@ const Transfers = () => {
 
     useEffect(() => {
         const getTransfers = () => {
+            setLoading(true);
             var Api = Connections.api + Connections.alltransfers;
             var headers = {
                 accept: 'application/json',
@@ -115,8 +118,10 @@ const Transfers = () => {
                 .then((response) => {
                     if (response.success) {
                         setStockTransfers(response.data);
+                        setLoading(false);
                     } else {
                         setStockTransfers([]);
+                        setLoading(false);
                     }
                 })
                 .catch(() => {
@@ -124,8 +129,9 @@ const Transfers = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error fetching product!'
+                        message: 'There is error fetching transfers!'
                     });
+                    setLoading(false);
                 });
         };
 
@@ -226,7 +232,15 @@ const Transfers = () => {
                                         <TableCell>Action</TableCell>
                                     </TableRow>
                                 </TableHead>
-                                {paginatedData.length > 0 ? (
+                                {loading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={8} align="center">
+                                            <Box sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                <ActivityIndicators />
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : paginatedData.length > 0 ? (
                                     <TableBody>
                                         {paginatedData.map((product, index) => (
                                             <ProductRow key={index} product={product} />

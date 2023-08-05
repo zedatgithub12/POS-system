@@ -32,6 +32,7 @@ import { IconSearch } from '@tabler/icons';
 import { gridSpacing } from 'store/constant';
 import { useNavigate } from 'react-router-dom';
 import Connections from 'api';
+import { ActivityIndicators } from 'ui-component/activityIndicator';
 
 // ==============================|| SALES PAGE ||============================== //
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -55,8 +56,10 @@ const PackageScreen = () => {
     const [prowsPerPage, setRowsPPerPage] = useState(15);
     const [selectedPRows, setSelectedPRows] = useState([]);
     const [selectedPItem, setSelectedPItems] = useState();
+    const [loading, setLoading] = useState(true);
     const [spinner, setSpinner] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
+
     //stock sales related code
     //goes here
     // the package sell related code will be continue after stock sale code completed
@@ -221,6 +224,7 @@ const PackageScreen = () => {
 
     useEffect(() => {
         const getSoldPackage = () => {
+            setLoading(true);
             var AdminApi = Connections.api + Connections.viewpackagesale + `?page=${ppage}&limit=${prowsPerPage}`;
             var SalesApi = Connections.api + Connections.viewstorepackagesale + users.store_name + `?page=${ppage}&limit=${prowsPerPage}`;
             var Api = users.role === 'Admin' ? AdminApi : SalesApi;
@@ -242,8 +246,10 @@ const PackageScreen = () => {
                         setFilterPShop(selectedShop);
                         setSoldPackage(response.data.data);
                         setLastPPage(response.data.last_page);
+                        setLoading(false);
                     } else {
                         setSoldPackage(soldPackage);
+                        setLoading(false);
                     }
                 })
                 .catch(() => {
@@ -253,6 +259,7 @@ const PackageScreen = () => {
                         severity: 'error',
                         message: 'There is error fetching sold packages!'
                     });
+                    setLoading(false);
                 });
         };
         getSoldPackage();
@@ -340,59 +347,71 @@ const PackageScreen = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {filteredPSalesData.map((soldItem) => (
-                                        <TableRow key={soldItem.id} hover onClick={(event) => handlePRowClick(event, soldItem.id)}>
-                                            <TableCell padding="checkbox">
-                                                <Checkbox checked={selectedPRows.indexOf(soldItem.id) !== -1} />
-                                            </TableCell>
-                                            <TableCell>{soldItem.shop}</TableCell>
-                                            <TableCell>{soldItem.reference}</TableCell>
-                                            <TableCell>{soldItem.p_name}</TableCell>
-                                            <TableCell>{soldItem.customer}</TableCell>
-                                            <TableCell>{parseInt(soldItem.grandtotal).toFixed(2)}</TableCell>
-                                            <TableCell>{soldItem.payment_status}</TableCell>
-                                            <TableCell>{soldItem.payment_method}</TableCell>
-
-                                            <TableCell>
-                                                <IconButton
-                                                    aria-controls="row-menu"
-                                                    aria-haspopup="true"
-                                                    onClick={(event) => handleSelectPItem(event, soldItem)}
+                                    {loading ? (
+                                        <TableRow>
+                                            <TableCell colSpan={9} align="center">
+                                                <Box
+                                                    sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                                                 >
-                                                    <MoreVert />
-                                                </IconButton>
-                                                <Menu
-                                                    id="row-menu"
-                                                    anchorEl={anchorEl}
-                                                    keepMounted
-                                                    open={Boolean(anchorEl)}
-                                                    onClose={handleMenuClose}
-                                                    className="shadow-sm"
-                                                >
-                                                    <MenuItem
-                                                        onClick={() => navigate('/view-sold-package', { state: { ...selectedPItem } })}
-                                                    >
-                                                        View Sale
-                                                    </MenuItem>
-
-                                                    {users.role === 'Admin' && (
-                                                        <>
-                                                            <MenuItem
-                                                                onClick={() =>
-                                                                    navigate('/update-sold-package', { state: { ...selectedPItem } })
-                                                                }
-                                                            >
-                                                                Edit Sale
-                                                            </MenuItem>
-                                                            <MenuItem onClick={() => handlePTrashClick(selectedPItem)}>
-                                                                Delete Sale
-                                                            </MenuItem>
-                                                        </>
-                                                    )}
-                                                </Menu>
+                                                    <ActivityIndicators />
+                                                </Box>
                                             </TableCell>
                                         </TableRow>
-                                    ))}
+                                    ) : (
+                                        filteredPSalesData.map((soldItem) => (
+                                            <TableRow key={soldItem.id} hover onClick={(event) => handlePRowClick(event, soldItem.id)}>
+                                                <TableCell padding="checkbox">
+                                                    <Checkbox checked={selectedPRows.indexOf(soldItem.id) !== -1} />
+                                                </TableCell>
+                                                <TableCell>{soldItem.shop}</TableCell>
+                                                <TableCell>{soldItem.reference}</TableCell>
+                                                <TableCell>{soldItem.p_name}</TableCell>
+                                                <TableCell>{soldItem.customer}</TableCell>
+                                                <TableCell>{parseInt(soldItem.grandtotal).toFixed(2)}</TableCell>
+                                                <TableCell>{soldItem.payment_status}</TableCell>
+                                                <TableCell>{soldItem.payment_method}</TableCell>
+
+                                                <TableCell>
+                                                    <IconButton
+                                                        aria-controls="row-menu"
+                                                        aria-haspopup="true"
+                                                        onClick={(event) => handleSelectPItem(event, soldItem)}
+                                                    >
+                                                        <MoreVert />
+                                                    </IconButton>
+                                                    <Menu
+                                                        id="row-menu"
+                                                        anchorEl={anchorEl}
+                                                        keepMounted
+                                                        open={Boolean(anchorEl)}
+                                                        onClose={handleMenuClose}
+                                                        className="shadow-sm"
+                                                    >
+                                                        <MenuItem
+                                                            onClick={() => navigate('/view-sold-package', { state: { ...selectedPItem } })}
+                                                        >
+                                                            View Sale
+                                                        </MenuItem>
+
+                                                        {users.role === 'Admin' && (
+                                                            <>
+                                                                <MenuItem
+                                                                    onClick={() =>
+                                                                        navigate('/update-sold-package', { state: { ...selectedPItem } })
+                                                                    }
+                                                                >
+                                                                    Edit Sale
+                                                                </MenuItem>
+                                                                <MenuItem onClick={() => handlePTrashClick(selectedPItem)}>
+                                                                    Delete Sale
+                                                                </MenuItem>
+                                                            </>
+                                                        )}
+                                                    </Menu>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
                                 </TableBody>
                             </Table>
                             <TablePagination

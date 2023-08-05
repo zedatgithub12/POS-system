@@ -26,6 +26,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Connections from 'api';
 import ShopMap from './maps';
+import { ActivityIndicators } from 'ui-component/activityIndicator';
 // ==============================|| SHOP LISTING PAGE ||============================== //
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -219,7 +220,7 @@ const Shops = () => {
 
                         {loading ? (
                             <Grid container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 5 }}>
-                                <CircularProgress />
+                                <ActivityIndicators />
                             </Grid>
                         ) : (
                             <Grid container spacing={gridSpacing} alignItems="center" style={{ paddingLeft: 20 }}>

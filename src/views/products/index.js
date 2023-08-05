@@ -59,6 +59,8 @@ import PropTypes from 'prop-types';
 import Connections from 'api';
 import { useTheme } from '@mui/material/styles';
 import 'react-lazy-load-image-component/src/effects/blur.css';
+import { ActivityIndicators } from 'ui-component/activityIndicator';
+
 // ==============================|| PRODUCT PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -91,7 +93,8 @@ const Products = () => {
     const [selectedStock, setSelectedStock] = useState([]);
     const [addedAmount, setAddedAmount] = useState();
     const [spinner, setSpinner] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [stockLoader, setStockLoader] = useState(false);
     const [checked, setChecked] = useState(false);
 
     const [popup, setPopup] = useState({
@@ -321,7 +324,7 @@ const Products = () => {
         getStock(value.name);
     };
     const getStock = (shop) => {
-        setLoading(true);
+        setStockLoader(true);
         var Api = Connections.api + Connections.viewstoreproduct + shop;
         var headers = {
             accept: 'application/json',
@@ -337,10 +340,10 @@ const Products = () => {
             .then((response) => {
                 if (response.success) {
                     setStockData(response.data.data);
-                    setLoading(false);
+                    setStockLoader(false);
                 } else {
                     setStockData([]);
-                    setLoading(false);
+                    setStockLoader(false);
                 }
             })
             .catch(() => {
@@ -350,7 +353,7 @@ const Products = () => {
                     severity: 'error',
                     message: 'There is error fetching product!'
                 });
-                setLoading(false);
+                setStockLoader(false);
             });
     };
 
@@ -472,6 +475,7 @@ const Products = () => {
 
     useEffect(() => {
         const getProducts = () => {
+            setLoading(true);
             var AdminApi = Connections.api + Connections.viewproduct + `?page=${page}&limit=${rowsPerPage}`;
             var saleApi = Connections.api + Connections.viewstoreproduct + users.store_name + `?page=${page}&limit=${rowsPerPage}`;
             var Api = users.role === 'Admin' ? AdminApi : saleApi;
@@ -492,8 +496,10 @@ const Products = () => {
                         setProductData(response.data.data);
                         setTotalRecords(response.data.last_page);
                         setShopFilter(selectedShop);
+                        setLoading(false);
                     } else {
                         setProductData(productData);
+                        setLoading(false);
                     }
                 })
                 .catch(() => {
@@ -503,6 +509,7 @@ const Products = () => {
                         severity: 'error',
                         message: 'There is error fetching product!'
                     });
+                    setLoading(false);
                 });
         };
 
@@ -702,9 +709,19 @@ const Products = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {filteredData.map((product, index) => (
-                                        <ProductRow key={index} product={product} />
-                                    ))}
+                                    {loading ? (
+                                        <TableRow>
+                                            <TableCell colSpan={9} align="center">
+                                                <Box
+                                                    sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                                                >
+                                                    <ActivityIndicators />
+                                                </Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        filteredData.map((product, index) => <ProductRow key={index} product={product} />)
+                                    )}
                                 </TableBody>
                             </Table>
                             <TablePagination
@@ -780,11 +797,11 @@ const Products = () => {
                                                     sx={{ backgroundColor: theme.palette.background.default }}
                                                 />
                                             )}
-                                            noOptionsText={loading ? <CircularProgress size={20} /> : 'No item in this shop'}
+                                            noOptionsText={stockLoader ? <CircularProgress size={20} /> : 'No item in this shop'}
                                         />
                                     </Grid>
 
-                                    {loading && (
+                                    {stockLoader && (
                                         <Grid
                                             item
                                             xs={12}
@@ -921,11 +938,11 @@ const Products = () => {
                                                 sx={{ backgroundColor: theme.palette.background.default }}
                                             />
                                         )}
-                                        noOptionsText={loading ? <CircularProgress size={20} /> : 'No item in this shop'}
+                                        noOptionsText={stockLoader ? <CircularProgress size={20} /> : 'No item in this shop'}
                                     />
                                 </Grid>
 
-                                {loading && (
+                                {stockLoader && (
                                     <Grid
                                         item
                                         xs={12}
