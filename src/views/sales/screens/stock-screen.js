@@ -28,22 +28,28 @@ import {
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { MoreVert } from '@mui/icons-material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IconSearch } from '@tabler/icons';
 // project imports
 import { gridSpacing } from 'store/constant';
 import { useNavigate } from 'react-router-dom';
 import Connections from 'api';
+import { saveAs } from 'file-saver';
+import * as XLSX from 'xlsx';
+import { CSVLink } from 'react-csv';
 
 // ==============================|| SALES PAGE ||============================== //
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
+
+const ITEM_HEIGHT = 20;
 const StockScreen = () => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
-
+    const [exportSales, setExportSales] = useState(null);
     //stock states
     const [salesData, setSalesData] = useState([]);
     const [searchText, setSearchText] = useState('');
@@ -75,7 +81,16 @@ const StockScreen = () => {
             ...popup,
             status: false
         });
+        setExportSales(null);
     };
+    const expand = Boolean(exportSales);
+    const handleClick = (event) => {
+        setExportSales(event.currentTarget);
+    };
+    // const handleClose = () => {
+    //     setAnchorEl(null);
+    // };
+
     const handleMenuClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -171,6 +186,7 @@ const StockScreen = () => {
         }
         setDialogOpen(false);
         handleMenuClose();
+        setExportSales(null);
     };
 
     const handleDelete = (id) => {
@@ -259,63 +275,147 @@ const StockScreen = () => {
         getSales();
         return () => {};
     }, [page, rowsPerPage]);
+
+    const csvData =
+        selectedRows.length > 0
+            ? selectedRows.map((id) => {
+                  const sale = salesData.find((item) => item.id === id);
+                  return {
+                      Shop: sale.shop,
+                      SoldOn: sale.date,
+                      Reference: sale.reference,
+                      customer: sale.customer,
+                      GrandTotal: sale.grandtotal,
+                      Payment_Status: sale.payment_status,
+                      payment_method: sale.payment_method,
+                      Note: sale.note,
+                      Time: sale.time
+                  };
+              })
+            : filteredSalesData.map((sale) => ({
+                  Shop: sale.shop,
+                  SoldOn: sale.date,
+                  Reference: sale.reference,
+                  customer: sale.customer,
+                  GrandTotal: sale.grandtotal,
+                  Payment_Status: sale.payment_status,
+                  payment_method: sale.payment_method,
+                  Note: sale.note,
+
+                  Time: sale.time
+              }));
+
+    const handleDownloadExcel = () => {
+        const worksheet = XLSX.utils.json_to_sheet(csvData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sales');
+        const excelBuffer = XLSX.write(workbook, {
+            bookType: 'xlsx',
+            type: 'array'
+        });
+        const fileData = new Blob([excelBuffer], {
+            type: 'application/octet-stream'
+        });
+        saveAs(fileData, 'sales.xlsx');
+    };
     return (
         <>
             <Grid container spacing={gridSpacing}>
                 <Grid item xs={12}>
                     <Box paddingX={2} className="shadow-1 p-4 pt-2 rounded">
-                        <TextField
-                            label="Search stock sales"
-                            variant="outlined"
-                            color="primary"
-                            value={searchText}
-                            onChange={handleSearchTextChange}
-                            className="mb-2 mt-1  "
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton>
-                                            <IconSearch />
-                                        </IconButton>
-                                    </InputAdornment>
-                                )
-                            }}
-                        />
+                        <Grid
+                            item
+                            xs={12}
+                            sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+                        >
+                            <Box>
+                                <TextField
+                                    label="Search stock sales"
+                                    variant="outlined"
+                                    color="primary"
+                                    value={searchText}
+                                    onChange={handleSearchTextChange}
+                                    className="mb-2 mt-1  "
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton>
+                                                    <IconSearch />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
 
-                        {users.role === 'Admin' && (
-                            <FormControl className="ms-2 my-1">
-                                <Select value={filterShop} onChange={handleFilterShopChange}>
-                                    <MenuItem value="Shop">Shop</MenuItem>
-                                    {Array.from(new Set(salesData.map((sale) => sale.shop))).map((shop) => (
-                                        <MenuItem key={shop} value={shop}>
-                                            {shop}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        )}
+                                {users.role === 'Admin' && (
+                                    <FormControl className="ms-2 my-1">
+                                        <Select value={filterShop} onChange={handleFilterShopChange}>
+                                            <MenuItem value="Shop">Shop</MenuItem>
+                                            {Array.from(new Set(salesData.map((sale) => sale.shop))).map((shop) => (
+                                                <MenuItem key={shop} value={shop}>
+                                                    {shop}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                )}
 
-                        <FormControl className="ms-2 my-1">
-                            <Select value={filterDate} onChange={handleFilterDateChange}>
-                                <MenuItem value="Date">Date</MenuItem>
-                                {Array.from(new Set(salesData.map((sale) => sale.date))).map((date) => (
-                                    <MenuItem key={date} value={date}>
-                                        {date}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                                <FormControl className="ms-2 my-1">
+                                    <Select value={filterDate} onChange={handleFilterDateChange}>
+                                        <MenuItem value="Date">Date</MenuItem>
+                                        {Array.from(new Set(salesData.map((sale) => sale.date))).map((date) => (
+                                            <MenuItem key={date} value={date}>
+                                                {date}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
 
-                        <FormControl className="ms-2 my-1">
-                            <Select value={filterPaymentStatus} onChange={handleFilterPaymentMethodChange}>
-                                <MenuItem value="Payment_Status">Payment_Status</MenuItem>
-                                {Array.from(new Set(salesData.map((sale) => sale.payment_status))).map((paymentstatus) => (
-                                    <MenuItem key={paymentstatus} value={paymentstatus}>
-                                        {paymentstatus}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                                <FormControl className="ms-2 my-1">
+                                    <Select value={filterPaymentStatus} onChange={handleFilterPaymentMethodChange}>
+                                        <MenuItem value="Payment_Status">Payment_Status</MenuItem>
+                                        {Array.from(new Set(salesData.map((sale) => sale.payment_status))).map((paymentstatus) => (
+                                            <MenuItem key={paymentstatus} value={paymentstatus}>
+                                                {paymentstatus}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Box>
+
+                            <IconButton
+                                aria-label="more"
+                                id="long-button"
+                                aria-controls={expand ? 'long-menu' : undefined}
+                                aria-expanded={expand ? 'true' : undefined}
+                                aria-haspopup="true"
+                                onClick={handleClick}
+                            >
+                                <MoreVertIcon />
+                            </IconButton>
+                            <Menu
+                                id="long-menu"
+                                MenuListProps={{
+                                    'aria-labelledby': 'long-button'
+                                }}
+                                anchorEl={exportSales}
+                                open={expand}
+                                onClose={handleClose}
+                                PaperProps={{
+                                    style: {
+                                        maxHeight: ITEM_HEIGHT * 4.5,
+                                        width: '20ch'
+                                    }
+                                }}
+                            >
+                                <MenuItem onClick={handleDownloadExcel}>Export Excel </MenuItem>
+                                <MenuItem>
+                                    <CSVLink data={csvData} filename={'sales.csv'} className="text-decoration-none text-dark">
+                                        Export CSV
+                                    </CSVLink>
+                                </MenuItem>
+                            </Menu>
+                        </Grid>
                         <TableContainer component={Paper}>
                             <Table className="" aria-label="Sales Table">
                                 <TableHead>

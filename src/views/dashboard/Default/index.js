@@ -360,7 +360,6 @@ const Dashboard = () => {
                                         <Typography sx={{ fontSize: theme.typography.h5, marginRight: 2 }}>{user.store_name}</Typography>
                                     )}
                                 </Box>
-
                                 <SalesTargets targets={revenueTarget} />
                             </Grid>
                             <TargetListing lists={revenueTarget ? revenueTarget : []} shopname={shopFilter} />
