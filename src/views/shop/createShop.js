@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 // material-ui
-import { Grid, Typography, Button, Divider, Box, TextField } from '@mui/material';
+import { Grid, Typography, Button, Divider, Box, TextField, InputLabel, FormControl } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import { useTheme } from '@mui/material/styles';
 import shop from 'assets/images/placeholder-store.png';
 import Snackbar from '@mui/material/Snackbar';
@@ -201,14 +203,22 @@ const CreateShop = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
-                                        <TextField
-                                            fullWidth
-                                            label="Category"
-                                            name="category"
-                                            onChange={handleInputChange}
-                                            value={formData.category}
-                                            required
-                                        />
+                                        <FormControl fullWidth required>
+                                            <InputLabel id="Category-label">Category</InputLabel>
+                                            <Select
+                                                required
+                                                label="Shop Category"
+                                                name="category"
+                                                value={formData.category}
+                                                onChange={handleInputChange}
+                                                displayEmpty
+                                                inputProps={{ 'aria-label': 'Category' }}
+                                            >
+                                                <MenuItem value="Suk">Suk</MenuItem>
+                                                <MenuItem value="Mini Market">Mini Market</MenuItem>
+                                                <MenuItem value="Supermarket">Supermarket</MenuItem>
+                                            </Select>
+                                        </FormControl>
                                     </Grid>
                                     <Grid item xs={12}>
                                         <TextField

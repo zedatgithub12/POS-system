@@ -402,6 +402,23 @@ const ViewShop = () => {
                             container
                             direction="row"
                             alignItems="center"
+                            justifyContent="space-between"
+                            spacing={1}
+                            className="bg-light"
+                            style={{ marginTop: 10, borderRadius: 6, padding: 6, paddingRight: 20, paddingLeft: 20 }}
+                        >
+                            <Grid item>
+                                <Typography variant="body2">Shop ID</Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="h4">{activeShops.id}</Typography>
+                            </Grid>
+                        </Grid>
+
+                        <Grid
+                            container
+                            direction="row"
+                            alignItems="center"
                             justifyContent="center"
                             spacing={1}
                             className="bg-light"

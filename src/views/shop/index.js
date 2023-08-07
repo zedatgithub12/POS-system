@@ -152,7 +152,7 @@ const Shops = () => {
                     <Grid item>
                         <Grid container direction="column" spacing={1}>
                             <Grid item>
-                                <Typography variant="h3">Shops</Typography>
+                                <Typography variant="h3">Manage Shops</Typography>
                             </Grid>
                         </Grid>
                     </Grid>
@@ -166,8 +166,8 @@ const Shops = () => {
             <TabContext value={value}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <TabList onChange={handleChange} aria-label="Shop Tabs">
-                        <Tab label="Card Listing" value="1" />
-                        <Tab label="Map" value="2" />
+                        <Tab label="Card View" value="1" />
+                        <Tab label="Map View" value="2" />
                     </TabList>
                 </Box>
                 <TabPanel value="1">

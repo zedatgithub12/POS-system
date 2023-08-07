@@ -16,7 +16,7 @@ const getDashboardItems = (role) => {
     const adminItems = [
         {
             id: 'default',
-            title: 'Dashboard',
+            title: 'Home',
             type: 'item',
             url: '/dashboard/default',
             icon: icons.IconDashboard,
@@ -24,7 +24,7 @@ const getDashboardItems = (role) => {
         },
         {
             id: 'shops',
-            title: 'Shops',
+            title: 'Manage Shops',
             type: 'item',
             url: '/shops',
             icon: icons.IconBuildingStore,
@@ -32,7 +32,7 @@ const getDashboardItems = (role) => {
         },
         {
             id: 'stocks',
-            title: 'Stocks',
+            title: 'Manage Stock',
             type: 'collapse',
             url: '/products',
             icon: icons.IconBox,
