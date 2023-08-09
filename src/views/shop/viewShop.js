@@ -1,6 +1,18 @@
 import React, { useState, forwardRef, useEffect } from 'react';
 // material-ui
-import { Grid, Box, Typography, Button, Divider, TextField, MenuItem, FormControl, Select, CircularProgress } from '@mui/material';
+import {
+    Grid,
+    Box,
+    Typography,
+    Button,
+    Divider,
+    TextField,
+    MenuItem,
+    FormControl,
+    Select,
+    CircularProgress,
+    InputLabel
+} from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -17,6 +29,7 @@ import Connections from 'api';
 import SalesTargets from 'views/dashboard/Default/components/sales-against-target';
 import TargetListing from 'views/dashboard/Default/components/target-listing';
 import { useTheme } from '@mui/material/styles';
+import { ShopStatus } from 'data/shopStatus';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -49,6 +62,8 @@ const ViewShop = () => {
     const [open, setOpen] = useState(false);
     const [alerttype, setAlertType] = useState('close');
     const [spinner, setSpinner] = useState(false);
+    const [shopStatus, setShopStatus] = useState('Open');
+    const [statusDialog, setStatusDialog] = useState(false);
 
     const [popup, setPopup] = useState({
         status: false,
@@ -61,6 +76,15 @@ const ViewShop = () => {
 
     const handleAddDialogClose = () => {
         setAddDialogOpen(false);
+    };
+
+    const handleStatusOpen = (event) => {
+        setShopStatus(event.target.value);
+        setStatusDialog(true);
+    };
+
+    const handleStatusClose = () => {
+        setStatusDialog(false);
     };
 
     const handleSnackClose = (event, reason) => {
@@ -303,6 +327,10 @@ const ViewShop = () => {
 
         return () => {};
     }, []);
+
+    const handleShopStatus = (event) => {
+        setShopStatus(event.target.value);
+    };
     return (
         <>
             <MainCard>
@@ -408,13 +436,18 @@ const ViewShop = () => {
                             style={{ marginTop: 10, borderRadius: 6, padding: 6, paddingRight: 20, paddingLeft: 20 }}
                         >
                             <Grid item>
-                                <Typography variant="body2">Shop ID</Typography>
+                                <Typography variant="body2">Status</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="h4">{activeShops.id}</Typography>
+                                <Select value={shopStatus} onChange={handleStatusOpen}>
+                                    {ShopStatus.map((status, index) => (
+                                        <MenuItem key={index} value={status.title}>
+                                            {status.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
                             </Grid>
                         </Grid>
-
                         <Grid
                             container
                             direction="row"
@@ -442,7 +475,22 @@ const ViewShop = () => {
                                 />
                             </Grid>
                         </Grid>
-
+                        <Grid
+                            container
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            spacing={1}
+                            className="bg-light"
+                            style={{ marginTop: 10, borderRadius: 6, padding: 6, paddingRight: 20, paddingLeft: 20 }}
+                        >
+                            <Grid item>
+                                <Typography variant="body2">Shop ID</Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="h4">{activeShops.id}</Typography>
+                            </Grid>
+                        </Grid>
                         <Grid
                             container
                             direction="row"
@@ -459,6 +507,25 @@ const ViewShop = () => {
                                 <Typography variant="h5">{activeShops.address}</Typography>
                             </Grid>
                         </Grid>
+                        {activeShops.tin_number != 0 && (
+                            <Grid
+                                container
+                                direction="row"
+                                alignItems="center"
+                                justifyContent="space-between"
+                                spacing={1}
+                                className="bg-light"
+                                style={{ marginTop: 10, borderRadius: 6, padding: 6, paddingRight: 20, paddingLeft: 20 }}
+                            >
+                                <Grid item>
+                                    <Typography variant="body2">TIN Number</Typography>
+                                </Grid>
+                                <Grid item>
+                                    <Typography variant="h5">{activeShops.tin_number}</Typography>
+                                </Grid>
+                            </Grid>
+                        )}
+
                         <Grid
                             container
                             direction="row"
@@ -593,7 +660,7 @@ const ViewShop = () => {
                         >
                             <Grid item>
                                 <Button
-                                    variant="outlined"
+                                    variant="text"
                                     color="primary"
                                     className="me-3 w-25"
                                     onClick={() =>
@@ -684,6 +751,27 @@ const ViewShop = () => {
                     )}
                 </DialogActions>
             </Dialog>
+
+            <Dialog open={statusDialog} onClose={handleStatusClose}>
+                <DialogContent>
+                    Do you want to <strong>{shopStatus} </strong> {shop.name ? shop.name : ''} ?
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="text" sx={{ color: theme.palette.primary.main }} onClick={handleStatusClose}>
+                        No
+                    </Button>
+                    <Button variant="contained" color="primary" onClick={() => alert("i'm closing")}>
+                        {spinner ? (
+                            <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        ) : (
+                            'Yes'
+                        )}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleSnackClose}>
                 <Alert onClose={handleSnackClose} severity={popup.severity} sx={{ width: '100%' }}>
                     {popup.message}

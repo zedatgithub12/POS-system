@@ -58,6 +58,7 @@ const UpdateShop = () => {
         city: state.city ? state.city : '',
         subcity: state.subcity ? state.subcity : '',
         address: state.address ? state.address : '',
+        tinnumber: state.tin_number ? state.tin_number : '',
         latitude: state.latitude ? state.latitude : 9.0108,
         longitude: state.longitude ? state.longitude : 38.7617,
         description: state.description ? state.description : '',
@@ -87,6 +88,7 @@ const UpdateShop = () => {
         data.append('city', formData.city);
         data.append('subcity', formData.subcity);
         data.append('address', formData.address);
+        data.append('tin_number', formData.tinnumber);
         data.append('latitude', formData.latitude);
         data.append('longitude', formData.longitude);
         data.append('description', formData.description);
@@ -335,6 +337,15 @@ const UpdateShop = () => {
                                         onChange={handleInputChange}
                                         value={formData.address}
                                         required
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Tin number"
+                                        name="tinnumber"
+                                        onChange={handleInputChange}
+                                        value={formData.tinnumber}
                                     />
                                 </Grid>
 

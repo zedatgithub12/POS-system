@@ -56,6 +56,7 @@ const CreateShop = () => {
         city: '',
         subcity: '',
         address: '',
+        tinnumber: '',
         latitude: '',
         longitude: '',
         description: '',
@@ -98,6 +99,7 @@ const CreateShop = () => {
         data.append('city', formData.city);
         data.append('subcity', formData.subcity);
         data.append('address', formData.address);
+        data.append('tin_number', formData.tinnumber);
         data.append('latitude', formData.latitude);
         data.append('longitude', formData.longitude);
         data.append('description', formData.description);
@@ -282,6 +284,17 @@ const CreateShop = () => {
                                             value={formData.address}
                                         />
                                     </Grid>
+
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            fullWidth
+                                            label="TIN number"
+                                            name="tinnumber"
+                                            onChange={handleInputChange}
+                                            value={formData.tinnumber}
+                                        />
+                                    </Grid>
+
                                     <Grid item xs={12}>
                                         <Typography sx={{ paddingBottom: 1 }}>Select location on the map</Typography>
                                         <Box sx={{ height: 400, width: '100%' }}>
