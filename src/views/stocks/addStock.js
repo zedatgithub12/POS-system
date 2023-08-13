@@ -1,42 +1,22 @@
 // material-ui
-import {
-    Grid,
-    Box,
-    Typography,
-    Button,
-    Divider,
-    TextField,
-    Container,
-    FormControl,
-    MenuItem,
-    Select,
-    InputLabel,
-    Autocomplete
-} from '@mui/material';
+import { Grid, Typography, Button, Divider, TextField, Container, FormControl, MenuItem, Select, Autocomplete } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { useTheme } from '@mui/material/styles';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Connections from 'api';
-import { IconBox } from '@tabler/icons';
-import { Item_Sku } from 'data/sku';
-
 // ==============================|| Add Product PAGE ||============================== //
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-const AddProduct = () => {
+const AddStock = () => {
     const navigate = useNavigate();
     const GoBack = () => {
         navigate(-1);
     };
-
-    const theme = useTheme();
-
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -61,35 +41,89 @@ const AddProduct = () => {
     const [picturePreview, setPicturePreview] = useState(null);
     const [productName, setProductName] = useState('');
     const [productCategory, setProductCategory] = useState('Main Category');
-    const [categoryId, setCategoryId] = useState(null);
     const [productSubCategory, setProductSubCategory] = useState('Sub Category');
     const [brand, setBrand] = useState('');
+    const [productCode, setProductCode] = useState('');
+    const [productCost, setProductCost] = useState('');
     const [productUnit, setProductUnit] = useState('');
     const [productPrice, setProductPrice] = useState('');
+    const [productQuantity, setProductQuantity] = useState('');
+    const [productMinQuantity, setProductMinQuantity] = useState('');
     const [productDescription, setProductDescription] = useState('');
+    const [warehouses, setWarehouses] = useState('Shops');
     const [spinner, setSpinner] = useState(false);
 
     const handleCategoryChange = (event) => {
         setProductCategory(event.target.value);
-        var selectedName = event.target.value;
-        if (selectedName !== 'Main Category') {
-            var cat = CategoryData.find((cat) => cat.name === selectedName);
-            setCategoryId(cat.id);
-
-            getSubCatgeory(event.target.value);
-        }
+        getSubCatgeory(event.target.value);
     };
 
     const handleSubCategoryChange = (event) => {
         setProductSubCategory(event.target.value);
     };
 
-    const handleUnitChange = (value) => {
-        setProductUnit(value.name);
+    const handleShopChange = (event) => {
+        setWarehouses(event.target.value);
     };
 
-    const handleUnitInput = (unit) => {
-        setProductUnit(unit);
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        setSpinner(true);
+        // Handle form submission here
+        // Declare the data to be sent to the API
+        var Api = Connections.api + Connections.addproduct;
+
+        const data = new FormData();
+        data.append('picture', productPicture);
+        data.append('name', productName);
+        data.append('category', productCategory);
+        data.append('sub_category', productSubCategory);
+        data.append('brand', brand);
+        data.append('code', productCode);
+        data.append('cost', productCost);
+        data.append('unit', productUnit);
+        data.append('price', productPrice);
+        data.append('quantity', productQuantity);
+        data.append('min_quantity', productMinQuantity);
+        data.append('description', productDescription);
+        data.append('shop', warehouses);
+        data.append('status', 'In-stock');
+
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'POST',
+            body: data,
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error adding  product!'
+                });
+                setSpinner(false);
+            });
     };
 
     const handlePictureChange = (event) => {
@@ -205,61 +239,6 @@ const AddProduct = () => {
         getCatgeory();
         return () => {};
     }, [popup]);
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        setSpinner(true);
-        // Handle form submission here
-        // Declare the data to be sent to the API
-        var Api = Connections.api + Connections.addItems;
-
-        const data = new FormData();
-        data.append('item_image', productPicture);
-        data.append('item_name', productName);
-        data.append('item_category', productCategory);
-        data.append('category_id', categoryId);
-        data.append('item_sub_category', productSubCategory);
-        data.append('item_brand', brand);
-        data.append('item_unit', productUnit);
-        data.append('item_price', productPrice);
-        data.append('item_description', productDescription);
-
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'POST',
-            body: data,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'success',
-                        message: response.message
-                    });
-                    setSpinner(false);
-                } else {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: response.message
-                    });
-                    setSpinner(false);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error adding  product!'
-                });
-                setSpinner(false);
-            });
-    };
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -268,7 +247,7 @@ const AddProduct = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Add Product</Typography>
+                                    <Typography variant="h3">Add Stock</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -287,18 +266,8 @@ const AddProduct = () => {
             </Grid>
             <Container maxWidth="sm">
                 <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleSubmit}>
-                    <Grid container spacing={1}>
-                        <Grid
-                            item
-                            xs={12}
-                            sm={6}
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                backgroundColor: theme.palette.primary.light,
-                                borderRadius: 2
-                            }}
-                        >
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
                             <input
                                 type="file"
                                 accept="image/*"
@@ -307,7 +276,7 @@ const AddProduct = () => {
                                 id="product-picture"
                             />
                             <label htmlFor="product-picture">
-                                <div>
+                                <Button variant="contained" color="primary" component="span" fullWidth style={{ height: '100%' }}>
                                     {picturePreview ? (
                                         <img
                                             src={picturePreview}
@@ -316,35 +285,16 @@ const AddProduct = () => {
                                             className="img-fluid rounded m-auto"
                                         />
                                     ) : (
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                justifyContent: 'center',
-                                                alignItems: 'center'
-                                            }}
-                                        >
-                                            <IconBox size={24} />
-                                            <Typography
-                                                variant="contained"
-                                                color="primary"
-                                                component="span"
-                                                fullWidth
-                                                style={{ height: '100%' }}
-                                            >
-                                                Upload Picture
-                                            </Typography>
-                                        </Box>
+                                        'Upload Picture'
                                     )}
-                                </div>
+                                </Button>
                             </label>
                         </Grid>
-
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 color="primary"
                                 fullWidth
-                                label="Item Name"
+                                label="Product Name"
                                 value={productName}
                                 onChange={(event) => setProductName(event.target.value)}
                                 required
@@ -378,51 +328,87 @@ const AddProduct = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Item Brand"
+                                label="Brand"
                                 color="primary"
                                 value={brand}
                                 onChange={(event) => setBrand(event.target.value)}
                                 required
                             />
                         </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <Autocomplete
-                                freeSolo
-                                options={Item_Sku}
-                                getOptionLabel={(option) => option.name}
-                                onChange={(event, value) => {
-                                    if (value) {
-                                        handleUnitChange(value);
-                                    }
-                                }}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        label="Item Unit"
-                                        variant="outlined"
-                                        value={productUnit}
-                                        onChange={(event) => handleUnitInput(event.target.value)}
-                                    />
-                                )}
-                            />
-                        </Grid>
-
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Item Price"
+                                label="Product Code"
+                                value={productCode}
+                                color="primary"
+                                onChange={(event) => setProductCode(event.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Product Cost"
+                                color="primary"
+                                value={productCost}
+                                onChange={(event) => setProductCost(event.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Product Unit"
+                                color="primary"
+                                value={productUnit}
+                                onChange={(event) => setProductUnit(event.target.value)}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Product Price"
                                 color="primary"
                                 value={productPrice}
                                 onChange={(event) => setProductPrice(event.target.value)}
                                 required
                             />
                         </Grid>
-
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Product Quantity"
+                                color="primary"
+                                value={productQuantity}
+                                onChange={(event) => setProductQuantity(event.target.value)}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Min Quantity"
+                                color="primary"
+                                value={productMinQuantity}
+                                onChange={(event) => setProductMinQuantity(event.target.value)}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth>
+                                <Select value={warehouses} onChange={handleShopChange}>
+                                    <MenuItem value="Shops"> Select Shop</MenuItem>
+                                    {Array.from(new Set(shops.map((stores) => stores.name))).map((shop) => (
+                                        <MenuItem key={shop} value={shop}>
+                                            {shop}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
-                                label="Item Description"
+                                label="Product Description"
                                 color="primary"
                                 value={productDescription}
                                 onChange={(event) => setProductDescription(event.target.value)}
@@ -449,4 +435,4 @@ const AddProduct = () => {
     );
 };
 
-export default AddProduct;
+export default AddStock;

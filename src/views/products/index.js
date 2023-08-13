@@ -71,31 +71,18 @@ const Products = () => {
     const users = JSON.parse(userString);
     const theme = useTheme();
 
-    const [shopId, setShopId] = useState(null);
-    const [shopName, setShopsName] = useState();
-    const [shops, setShops] = useState([]);
-
     const [searchText, setSearchText] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('Category');
     const [subCategoryFilter, setSubCategoryFilter] = useState('Sub Category');
     const [brandFilter, setBrandFilter] = useState('Brand');
     const [shopFilter, setShopFilter] = useState('Shop');
-    const [statusFilter, setStatusFilter] = useState('In-stock');
+    const [statusFilter, setStatusFilter] = useState('Status');
     const [page, setPage] = useState(0);
     const [totalRecords, setTotalRecords] = useState();
     const [rowsPerPage, setRowsPerPage] = useState(15);
     const [productData, setProductData] = useState([]);
-    const [inputValue, setInputValue] = React.useState('');
-    const [updating, setUpdating] = useState(false);
-    const [openUpdatePDialog, setOpenUpdatePDialog] = useState(false);
-    const [openReplanishDialog, setOpenReplanishDialog] = useState(false);
-    const [stockData, setStockData] = useState([]);
-    const [selectedStock, setSelectedStock] = useState([]);
-    const [addedAmount, setAddedAmount] = useState();
-    const [spinner, setSpinner] = useState(false);
+
     const [loading, setLoading] = useState(true);
-    const [stockLoader, setStockLoader] = useState(false);
-    const [checked, setChecked] = useState(false);
 
     const [popup, setPopup] = useState({
         status: false,
@@ -111,146 +98,6 @@ const Products = () => {
             ...popup,
             status: false
         });
-    };
-
-    //price update dialog functions
-    const handleUpdatePriceClick = () => {
-        setOpenUpdatePDialog(true);
-        getShops();
-    };
-
-    const handleUpdateDialogClose = () => {
-        setOpenUpdatePDialog(false);
-    };
-
-    const handleCheckboxChange = (event) => {
-        setChecked(event.target.checked);
-    };
-
-    const handleInputChange = (event) => {
-        setInputValue(event.target.value);
-    };
-
-    const handlePUSubmit = (event) => {
-        event.preventDefault();
-
-        if (inputValue === '') {
-            setPopup({
-                ...popup,
-                status: true,
-                severity: 'error',
-                message: 'Please enter the new price'
-            });
-        } else if (checked) {
-            setUpdating(true);
-            var Api = Connections.api + Connections.updateallprice;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            var data = {
-                productid: selectedStock.id,
-                productcode: selectedStock.code,
-                name: selectedStock.shop,
-                from: selectedStock.price,
-                to: inputValue
-            };
-
-            fetch(Api, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(data),
-                cache: 'no-cache'
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'success',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    } else {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: 'There is error updating price'
-                    });
-                    setUpdating(false);
-                });
-        } else {
-            setUpdating(true);
-            var Api = Connections.api + Connections.updateprice;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            var data = {
-                productid: selectedStock.id,
-                name: selectedStock.shop,
-                from: selectedStock.price,
-                to: inputValue
-            };
-
-            fetch(Api, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(data),
-                cache: 'no-cache'
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'success',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    } else {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: 'There is error updating price'
-                    });
-                    setUpdating(false);
-                });
-        }
-    };
-
-    //Replanish dialog functions
-    const handleReplanishClick = () => {
-        setOpenReplanishDialog(true);
-        getShops();
-    };
-
-    const handleDialogClose = () => {
-        setOpenReplanishDialog(false);
     };
 
     const handleSubCategoryFilterChange = (event) => {
@@ -291,194 +138,30 @@ const Products = () => {
 
         if (searchText) {
             const searchRegex = new RegExp(searchText, 'i');
-            isMatch = isMatch && (searchRegex.test(product.name) || searchRegex.test(product.code));
+            isMatch = isMatch && (searchRegex.test(product.item_name) || searchRegex.test(product.item_code));
         }
 
         if (categoryFilter !== 'Category') {
-            isMatch = isMatch && product.category === categoryFilter;
+            isMatch = isMatch && product.item_category === categoryFilter;
         }
         if (subCategoryFilter !== 'Sub Category') {
-            isMatch = isMatch && product.sub_category === subCategoryFilter;
+            isMatch = isMatch && product.item_sub_category === subCategoryFilter;
         }
         if (brandFilter !== 'Brand') {
-            isMatch = isMatch && product.brand === brandFilter;
-        }
-
-        if (shopFilter !== 'Shop') {
-            isMatch = isMatch && product.shop.includes(shopFilter);
+            isMatch = isMatch && product.item_brand === brandFilter;
         }
 
         if (statusFilter !== 'Status') {
-            isMatch = isMatch && product.status === statusFilter;
+            isMatch = isMatch && product.item_status === statusFilter;
         }
 
         return isMatch;
     });
 
-    // Stock Item Replanishment related codes
-
-    const handleShopSelection = (value) => {
-        setShopId(value.id);
-        setShopsName(value.name);
-        setSelectedStock([]);
-        getStock(value.name);
-    };
-    const getStock = (shop) => {
-        setStockLoader(true);
-        var Api = Connections.api + Connections.viewstoreproduct + shop;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'GET',
-            headers: headers,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setStockData(response.data.data);
-                    setStockLoader(false);
-                } else {
-                    setStockData([]);
-                    setStockLoader(false);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error fetching product!'
-                });
-                setStockLoader(false);
-            });
-    };
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        setSpinner(true);
-        if (!shopName) {
-            setPopup({
-                ...popup,
-                status: true,
-                severity: 'error',
-                message: 'Please select shop!'
-            });
-            setSpinner(false);
-        }
-        if (!selectedStock) {
-            setPopup({
-                ...popup,
-                status: true,
-                severity: 'error',
-                message: 'Please select stock first!'
-            });
-            setSpinner(false);
-        }
-        if (!addedAmount) {
-            setPopup({
-                ...popup,
-                status: true,
-                severity: 'error',
-                message: 'Please enter the amount to be added!'
-            });
-            setSpinner(false);
-        } else {
-            // Handle form submission here
-            // Declare the data to be sent to the API
-            var Api = Connections.api + Connections.newreplanishment;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            var Data = {
-                shopid: shopId,
-                shopname: shopName,
-                stock_id: selectedStock.id,
-                stock_name: selectedStock.name,
-                stock_code: selectedStock.code,
-                existing_amount: selectedStock.quantity,
-                added_amount: addedAmount,
-                userid: users.id
-            };
-
-            // Make the API call using fetch()
-            fetch(Api, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(Data)
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'success',
-                            message: response.message
-                        });
-                        setSpinner(false);
-                    } else {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: response.message
-                        });
-                        setSpinner(false);
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: 'There is error replanishing stock item!'
-                    });
-                    setSpinner(false);
-                });
-        }
-    };
-
-    const getShops = () => {
-        var Api = Connections.api + Connections.viewstore;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'GET',
-            headers: headers,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setShops(response.data);
-                } else {
-                    setShops(shops);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error fetching shop!'
-                });
-            });
-    };
-
     useEffect(() => {
         const getProducts = () => {
             setLoading(true);
-            var AdminApi = Connections.api + Connections.viewproduct + `?page=${page}&limit=${rowsPerPage}`;
-            var saleApi = Connections.api + Connections.viewstoreproduct + users.store_name + `?page=${page}&limit=${rowsPerPage}`;
-            var Api = users.role === 'Admin' ? AdminApi : saleApi;
+            var Api = Connections.api + Connections.items + `?page=${page}&limit=${rowsPerPage}`;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -492,10 +175,9 @@ const Products = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        var selectedShop = response.data.data[1].shop;
                         setProductData(response.data.data);
                         setTotalRecords(response.data.last_page);
-                        setShopFilter(selectedShop);
+
                         setLoading(false);
                     } else {
                         setProductData(productData);
@@ -527,96 +209,28 @@ const Products = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Stocks</Typography>
+                                    <Typography variant="h3" sx={{ marginLeft: 2 }}>
+                                        Products
+                                    </Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
+
+                        {users.role === 'Admin' && (
+                            <Grid item>
+                                <Button
+                                    component={Link}
+                                    to="/add-product"
+                                    variant="outlined"
+                                    color="primary"
+                                    sx={{ textDecoration: 'none' }}
+                                >
+                                    Add Product
+                                </Button>
+                            </Grid>
+                        )}
                     </Grid>
                 </Grid>
-
-                {users.role === 'Admin' && (
-                    <Grid container paddingX={4} paddingTop={5}>
-                        <Grid item xs={12} sm={12} md={6} lg={3} xl={2} sx={{ alignItems: 'center', justifyContent: 'center' }}>
-                            <Button
-                                component={Link}
-                                to="/add-product"
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-evenly',
-                                    backgroundColor: theme.palette.primary.light,
-                                    borderRadius: 2,
-                                    padding: 2,
-                                    marginX: 1,
-                                    marginTop: 1
-                                }}
-                            >
-                                <IconPlus />
-                                <Typography variant="h4">Add New</Typography>
-                            </Button>
-                        </Grid>
-
-                        <Grid item xs={12} sm={12} md={6} lg={3} xl={2}>
-                            <Button
-                                onClick={() => handleUpdatePriceClick()}
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-evenly',
-                                    backgroundColor: theme.palette.primary.light,
-                                    borderRadius: 2,
-                                    padding: 2,
-                                    paddingX: 4,
-                                    marginX: 1,
-                                    marginTop: 1
-                                }}
-                            >
-                                <IconCoins />
-                                <Typography variant="h4">Update Price</Typography>
-                            </Button>
-                        </Grid>
-
-                        <Grid item xs={12} sm={12} md={6} lg={3} xl={2}>
-                            <Button
-                                onClick={() => handleReplanishClick()}
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-evenly',
-                                    backgroundColor: theme.palette.primary.light,
-                                    borderRadius: 2,
-                                    padding: 2,
-                                    paddingX: 4,
-                                    marginX: 1,
-                                    marginTop: 1
-                                }}
-                            >
-                                <IconTestPipe />
-                                <Typography variant="h4">Replanish</Typography>
-                            </Button>
-                        </Grid>
-
-                        <Grid item xs={12} sm={12} md={6} lg={3} xl={2}>
-                            <Button
-                                component={Link}
-                                to="/make-transfer"
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-evenly',
-                                    backgroundColor: theme.palette.primary.light,
-                                    borderRadius: 2,
-                                    padding: 2,
-                                    marginX: 1,
-                                    marginTop: 1
-                                }}
-                            >
-                                <IconArrowsTransferDown />
-                                <Typography variant="h4">Transfer</Typography>
-                            </Button>
-                        </Grid>
-                    </Grid>
-                )}
 
                 <Grid item xs={12}>
                     <Box paddingX="2" className="shadow-1 p-3 rounded ">
@@ -637,22 +251,11 @@ const Products = () => {
                                 )
                             }}
                         />
-                        {users.role === 'Admin' && (
-                            <FormControl className="ms-2 my-2 ">
-                                <Select value={shopFilter} onChange={handleShopFilterChange}>
-                                    <MenuItem value="Shop">Shop</MenuItem>
-                                    {Array.from(new Set(productData.map((product) => product.shop))).map((shop) => (
-                                        <MenuItem key={shop} value={shop}>
-                                            {shop}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        )}
+
                         <FormControl className="ms-2 mt-2 ">
                             <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
                                 <MenuItem value="Category">Category</MenuItem>
-                                {Array.from(new Set(productData.map((product) => product.category))).map((category) => (
+                                {Array.from(new Set(productData.map((product) => product.item_category))).map((category) => (
                                     <MenuItem key={category} value={category}>
                                         {category}
                                     </MenuItem>
@@ -662,7 +265,7 @@ const Products = () => {
                         <FormControl className="ms-2 mt-2 ">
                             <Select value={subCategoryFilter} onChange={handleSubCategoryFilterChange}>
                                 <MenuItem value="Sub Category">Sub Category</MenuItem>
-                                {Array.from(new Set(productData.map((product) => product.sub_category))).map((category) => (
+                                {Array.from(new Set(productData.map((product) => product.item_sub_category))).map((category) => (
                                     <MenuItem key={category} value={category}>
                                         {category}
                                     </MenuItem>
@@ -673,7 +276,7 @@ const Products = () => {
                         <FormControl className="ms-2 mt-2 ">
                             <Select value={brandFilter} onChange={handleBrandFilterChange}>
                                 <MenuItem value="Brand">Brand</MenuItem>
-                                {Array.from(new Set(productData.map((product) => product.brand))).map((brand) => (
+                                {Array.from(new Set(productData.map((product) => product.item_brand))).map((brand) => (
                                     <MenuItem key={brand} value={brand}>
                                         {brand}
                                     </MenuItem>
@@ -684,7 +287,7 @@ const Products = () => {
                         <FormControl className="ms-2 my-2 ">
                             <Select value={statusFilter} onChange={handleStatusFilterChange}>
                                 <MenuItem value="Status">Status</MenuItem>
-                                {Array.from(new Set(productData.map((product) => product.status))).map((status) => (
+                                {Array.from(new Set(productData.map((product) => product.item_status))).map((status) => (
                                     <MenuItem key={status} value={status}>
                                         {status}
                                     </MenuItem>
@@ -697,13 +300,12 @@ const Products = () => {
                                     <TableRow>
                                         <TableCell></TableCell>
                                         <TableCell>Name</TableCell>
+                                        <TableCell>Code</TableCell>
                                         <TableCell>Category</TableCell>
                                         <TableCell>Sub Category</TableCell>
                                         <TableCell>Brand</TableCell>
-
+                                        <TableCell>SKU</TableCell>
                                         <TableCell>Price</TableCell>
-                                        <TableCell>Quantity</TableCell>
-
                                         <TableCell>Status</TableCell>
                                         <TableCell>Actions</TableCell>
                                     </TableRow>
@@ -716,6 +318,16 @@ const Products = () => {
                                                     sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                                                 >
                                                     <ActivityIndicators />
+                                                </Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : filteredData.length == 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={9} align="center">
+                                                <Box
+                                                    sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                                                >
+                                                    <Typography>No Product</Typography>
                                                 </Box>
                                             </TableCell>
                                         </TableRow>
@@ -737,277 +349,6 @@ const Products = () => {
                     </Box>
                 </Grid>
             </Grid>
-
-            <Dialog open={openUpdatePDialog} onClose={handleUpdateDialogClose}>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        backgroundColor: theme.palette.primary.main
-                    }}
-                >
-                    <DialogTitle sx={{ fontSize: theme.typography.h4 }}>Price Update </DialogTitle>
-                    <Button variant="text" color="dark" onClick={handleUpdateDialogClose}>
-                        <IconX />
-                    </Button>
-                </Box>
-
-                <Divider />
-                <DialogContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handlePUSubmit}>
-                            <Grid container>
-                                <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Grid item xs={12} sm={12}>
-                                        <Autocomplete
-                                            required
-                                            options={shops}
-                                            getOptionLabel={(option) => option.name}
-                                            onChange={(event, value) => {
-                                                if (value) {
-                                                    handleShopSelection(value);
-                                                }
-                                            }}
-                                            renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" />}
-                                            noOptionsText="Loading..."
-                                        />
-                                    </Grid>
-                                </Grid>
-
-                                <Grid container>
-                                    <Grid item xs={12} sm={12}>
-                                        <Autocomplete
-                                            required
-                                            key={stockData.id}
-                                            disabled={shopId ? false : true}
-                                            options={stockData}
-                                            getOptionLabel={(option) => option.name}
-                                            onChange={(event, value) => {
-                                                if (value) {
-                                                    setSelectedStock(value);
-                                                }
-                                            }}
-                                            sx={{ marginTop: 2 }}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    label="Stock"
-                                                    variant="outlined"
-                                                    sx={{ backgroundColor: theme.palette.background.default }}
-                                                />
-                                            )}
-                                            noOptionsText={stockLoader ? <CircularProgress size={20} /> : 'No item in this shop'}
-                                        />
-                                    </Grid>
-
-                                    {stockLoader && (
-                                        <Grid
-                                            item
-                                            xs={12}
-                                            sm={6}
-                                            sx={{ color: '#ffbb00', display: 'flex', alignItems: 'center', paddingLeft: 1 }}
-                                        >
-                                            <CircularProgress size={20} />
-                                        </Grid>
-                                    )}
-                                </Grid>
-
-                                <Grid container>
-                                    <Grid
-                                        item
-                                        xs={12}
-                                        sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            padding: 2,
-                                            marginY: 2,
-                                            backgroundColor: theme.palette.primary.light,
-                                            borderRadius: 2
-                                        }}
-                                    >
-                                        <Typography sx={{ fontSize: theme.typography.h5 }}>Current price</Typography>
-                                        <Typography sx={{ fontSize: theme.typography.h4 }}>{selectedStock.price} ETB</Typography>
-                                    </Grid>
-                                </Grid>
-                                <Grid container>
-                                    <Grid item xs={12} sm={8}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            sx={{ marginTop: 1 }}
-                                            label="New Price"
-                                            variant="outlined"
-                                            value={inputValue}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <FormControlLabel
-                                            label="Apply to all"
-                                            control={
-                                                <Checkbox
-                                                    checked={checked}
-                                                    onChange={handleCheckboxChange}
-                                                    name="checked"
-                                                    color="primary"
-                                                />
-                                            }
-                                            className="mt-2 ms-2"
-                                        />
-                                    </Grid>
-                                </Grid>
-                                <Grid item xs={12} sm={6} sx={{ display: 'flex', alignItems: 'flex-baseline', justifyContent: 'flex-end' }}>
-                                    <Button
-                                        fullWidth
-                                        type="submit"
-                                        variant="contained"
-                                        color="primary"
-                                        sx={{ paddingX: 4, paddingY: 1.6, marginTop: 4 }}
-                                    >
-                                        {updating ? (
-                                            <div className="spinner-border spinner-border-sm text-dark " role="status">
-                                                <span className="visually-hidden">Loading...</span>
-                                            </div>
-                                        ) : (
-                                            'Submit'
-                                        )}
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </form>
-                    </Box>
-                </DialogContent>
-            </Dialog>
-
-            <Dialog open={openReplanishDialog} onClose={handleDialogClose}>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        backgroundColor: theme.palette.primary.main
-                    }}
-                >
-                    <DialogTitle sx={{ fontSize: theme.typography.h4 }}>Replanish Stock </DialogTitle>
-                    <Button variant="text" color="dark" onClick={handleDialogClose}>
-                        <IconX />
-                    </Button>
-                </Box>
-
-                <Divider />
-                <DialogContent>
-                    <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleSubmit}>
-                        <Grid container>
-                            <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Grid item xs={12} sm={12}>
-                                    <Autocomplete
-                                        required
-                                        options={shops}
-                                        getOptionLabel={(option) => option.name}
-                                        onChange={(event, value) => {
-                                            if (value) {
-                                                handleShopSelection(value);
-                                            }
-                                        }}
-                                        renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" />}
-                                        noOptionsText="Loading..."
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            <Grid container>
-                                <Grid item xs={12} sm={12}>
-                                    <Autocomplete
-                                        key={stockData.id}
-                                        disabled={shopId ? false : true}
-                                        options={stockData}
-                                        getOptionLabel={(option) => option.name}
-                                        onChange={(event, value) => {
-                                            if (value) {
-                                                setSelectedStock(value);
-                                            }
-                                        }}
-                                        sx={{ marginTop: 2 }}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Stock"
-                                                variant="outlined"
-                                                sx={{ backgroundColor: theme.palette.background.default }}
-                                            />
-                                        )}
-                                        noOptionsText={stockLoader ? <CircularProgress size={20} /> : 'No item in this shop'}
-                                    />
-                                </Grid>
-
-                                {stockLoader && (
-                                    <Grid
-                                        item
-                                        xs={12}
-                                        sm={6}
-                                        sx={{ color: '#ffbb00', display: 'flex', alignItems: 'center', paddingLeft: 1 }}
-                                    >
-                                        <CircularProgress size={20} />
-                                    </Grid>
-                                )}
-                            </Grid>
-
-                            <Grid container>
-                                <Grid
-                                    item
-                                    xs={12}
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        padding: 2,
-                                        marginY: 2,
-                                        backgroundColor: theme.palette.primary.light,
-                                        borderRadius: 2
-                                    }}
-                                >
-                                    <Typography sx={{ fontSize: theme.typography.h5 }}>Current amount</Typography>
-                                    <Typography sx={{ fontSize: theme.typography.h4 }}>
-                                        {selectedStock.quantity} - {selectedStock.unit}
-                                    </Typography>
-                                </Grid>
-                            </Grid>
-
-                            <Grid container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <Grid item xs={12} sm={8}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        type="text"
-                                        label="New Amount"
-                                        value={addedAmount}
-                                        onChange={(event) => setAddedAmount(event.target.value)}
-                                        sx={{ marginTop: 2, backgroundColor: theme.palette.background.default }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Button
-                                        type="submit"
-                                        variant="contained"
-                                        color="primary"
-                                        sx={{ paddingX: 4, paddingY: 1.6, marginTop: 2 }}
-                                    >
-                                        {spinner ? (
-                                            <div className="spinner-border spinner-border-sm text-dark " role="status">
-                                                <span className="visually-hidden">Loading...</span>
-                                            </div>
-                                        ) : (
-                                            'Submit'
-                                        )}
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                    </form>
-                </DialogContent>
-            </Dialog>
 
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
@@ -1058,7 +399,7 @@ const ProductRow = ({ product }) => {
     const Delete = () => {
         // Do something with the deleted category
         setSpinner(true);
-        var Api = Connections.api + Connections.deleteproduct + selectedProduct.id;
+        var Api = Connections.api + Connections.deleteItems + selectedProduct.id;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
@@ -1107,24 +448,37 @@ const ProductRow = ({ product }) => {
         <>
             <TableRow
                 hover
-                className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary rounded' : 'border-0 rounded'}
+                className={
+                    open
+                        ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary rounded bg-light'
+                        : 'border-0 rounded'
+                }
             >
                 <TableCell>
                     <IconButton aria-label="expand row" size="small" onClick={handleOpen}>
                         {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                     </IconButton>
                 </TableCell>
-                <TableCell component="th" scope="row">
-                    {product.name}
+                <TableCell>{product.item_name}</TableCell>
+                <TableCell>{product.item_code}</TableCell>
+                <TableCell>{product.item_category}</TableCell>
+                <TableCell>{product.item_sub_category}</TableCell>
+                <TableCell>{product.item_brand}</TableCell>
+                <TableCell>
+                    <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded"> {product.item_unit}</span>
                 </TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{product.sub_category}</TableCell>
-                <TableCell>{product.brand}</TableCell>
-
-                <TableCell>{product.price} Birr</TableCell>
-                <TableCell>{product.quantity}</TableCell>
-
-                <TableCell>{product.status}</TableCell>
+                <TableCell>{product.item_price} ETB</TableCell>
+                <TableCell sx={{ textTransform: 'capitalize' }}>
+                    <span
+                        className={
+                            product.item_status === 'active'
+                                ? 'bg-success bg-opacity-10 text-success px-2 py-1 rounded'
+                                : 'bg-danger bg-opacity-10 text-danger px-2 py-1 rounded'
+                        }
+                    >
+                        {product.item_status}
+                    </span>
+                </TableCell>
                 <>
                     <TableCell>
                         <IconButton
@@ -1139,7 +493,7 @@ const ProductRow = ({ product }) => {
                             <IconEye />
                         </IconButton>
 
-                        {users.role === 'Admin' ? (
+                        {users.role === 'Admin' && (
                             <>
                                 <IconButton
                                     aria-label="Edit row"
@@ -1152,66 +506,18 @@ const ProductRow = ({ product }) => {
                                 >
                                     <IconEdit />
                                 </IconButton>
-                                <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
+                                {/* <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
                                     <IconTrash />
-                                </IconButton>
+                                </IconButton> */}
                             </>
-                        ) : null}
+                        )}
                     </TableCell>
                 </>
-            </TableRow>
-            <TableRow className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary' : 'border-0'}>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Grid container>
-                            <Grid item xs={12} md={12}>
-                                <Box margin={1}>
-                                    <Typography variant="h6" gutterBottom component="div">
-                                        Product details
-                                    </Typography>
-                                    <Table size="small" aria-label="product details">
-                                        <TableBody>
-                                            <TableRow>
-                                                <TableCell>Code</TableCell>
-                                                <TableCell>{product.code}</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell>Origional Quantity</TableCell>
-                                                <TableCell>{product.origional_quantity}</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell>Min Quantity</TableCell>
-                                                <TableCell>{product.min_quantity}</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell>Unit</TableCell>
-                                                <TableCell>{product.unit}</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell>Cost</TableCell>
-                                                <TableCell>{product.cost}</TableCell>
-                                            </TableRow>
-
-                                            <TableRow>
-                                                <TableCell>Shop</TableCell>
-                                                <TableCell>{product.shop}</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell className="border-0">Description</TableCell>
-                                                <TableCell className="border-0">{product.description}</TableCell>
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
-                                </Box>
-                            </Grid>
-                        </Grid>
-                    </Collapse>
-                </TableCell>
             </TableRow>
 
             <Dialog open={dialogOpen} onClose={handleDialogClose}>
                 <DialogTitle>Delete Product</DialogTitle>
-                <DialogContent>Do you want to delete {selectedProduct ? selectedProduct.name : ''} ?</DialogContent>
+                <DialogContent>Do you want to delete {selectedProduct ? selectedProduct.item_name : ''} ?</DialogContent>
                 <DialogActions>
                     <Button variant="text" color="primary" onClick={handleDialogClose}>
                         Cancel
@@ -1239,21 +545,16 @@ const ProductRow = ({ product }) => {
 ProductRow.propTypes = {
     product: PropTypes.shape({
         id: PropTypes.number,
-        picture: PropTypes.string,
-        name: PropTypes.string.isRequired,
-        category: PropTypes.string.isRequired,
-        sub_category: PropTypes.string.isRequired,
-        brand: PropTypes.string.isRequired,
-        price: PropTypes.number.isRequired,
-        quantity: PropTypes.number.isRequired,
-        min_quantity: PropTypes.number.isRequired,
-        origional_quantity: PropTypes.number.isRequired,
-        status: PropTypes.string.isRequired,
-        code: PropTypes.string.isRequired,
-        cost: PropTypes.number.isRequired,
-        unit: PropTypes.string.isRequired,
-        shop: PropTypes.string.isRequired,
-        description: PropTypes.string.isRequired
+        item_image: PropTypes.string,
+        item_name: PropTypes.string.isRequired,
+        item_category: PropTypes.string.isRequired,
+        item_sub_category: PropTypes.string.isRequired,
+        item_brand: PropTypes.string.isRequired,
+        item_price: PropTypes.number.isRequired,
+        item_status: PropTypes.string.isRequired,
+        item_code: PropTypes.string.isRequired,
+        item_unit: PropTypes.string.isRequired,
+        item_description: PropTypes.string.isRequired
     }).isRequired
 };
 export default Products;

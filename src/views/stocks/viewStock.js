@@ -18,7 +18,7 @@ import PriceUpdate from './tabs/price_update';
 
 // ==============================|| View Product ||============================== //
 
-const ViewProduct = () => {
+const ViewStock = () => {
     const navigate = useNavigate();
     const { state } = useLocation();
 
@@ -68,7 +68,7 @@ const ViewProduct = () => {
             setIsLoading(true);
 
             var id = state.itemid ? state.itemid : state.id;
-            var Api = Connections.api + Connections.getItems + id;
+            var Api = Connections.api + Connections.productdetail + id;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -87,6 +87,8 @@ const ViewProduct = () => {
                         setPrice(response.priceupdates);
                         setAvailablity(response.items);
                         setIsLoading(false);
+                        console.log(response);
+                        console.log(price);
                     } else {
                         setIsLoading(true);
                     }
@@ -133,6 +135,9 @@ const ViewProduct = () => {
                             <TabList onChange={handleChange} aria-label="Item Tabs">
                                 <Tab label="Item Detail" value="1" />
                                 <Tab label="Availability" value="2" />
+
+                                <Tab label="Price Updates" value="3" />
+                                <Tab label="Replanishments" value="4" />
                             </TabList>
                         </Box>
                         <TabPanel value="1">
@@ -142,10 +147,17 @@ const ViewProduct = () => {
                         <TabPanel value="2">
                             <ItemAvailablity Items={availablity} />
                         </TabPanel>
+                        <TabPanel value="3">
+                            <PriceUpdate prices={price} />
+                        </TabPanel>
+
+                        <TabPanel value="4">
+                            <ReplanishmentHistory History={replanishment} />
+                        </TabPanel>
                     </TabContext>
                 </>
             )}
         </MainCard>
     );
 };
-export default ViewProduct;
+export default ViewStock;

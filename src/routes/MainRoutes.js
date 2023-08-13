@@ -32,6 +32,13 @@ const Products = Loadable(lazy(() => import('views/products')));
 const AddProduct = Loadable(lazy(() => import('views/products/addProduct')));
 const ViewProduct = Loadable(lazy(() => import('views/products/viewProduct')));
 const UpdateProduct = Loadable(lazy(() => import('views/products/updateProduct')));
+
+// Stock routing
+const Stock = Loadable(lazy(() => import('views/stocks')));
+const AddStock = Loadable(lazy(() => import('views/stocks/addStock')));
+const ViewStock = Loadable(lazy(() => import('views/stocks/viewStock')));
+const UpdateStock = Loadable(lazy(() => import('views/stocks/updateStock')));
+
 // Category routing
 const Category = Loadable(lazy(() => import('views/category')));
 
@@ -168,6 +175,22 @@ const MainRoutes = {
         {
             path: 'update-product',
             element: <UpdateProduct />
+        },
+        {
+            path: 'stocks',
+            element: <Stock />
+        },
+        {
+            path: 'add-stock',
+            element: <AddStock />
+        },
+        {
+            path: 'view-stock',
+            element: <ViewStock />
+        },
+        {
+            path: 'update-stock',
+            element: <UpdateStock />
         },
         {
             path: 'categories',

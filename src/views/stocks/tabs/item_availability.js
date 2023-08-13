@@ -18,14 +18,12 @@ const ItemAvailablity = ({ Items }) => {
                     <TableBody>
                         {Items.map((item) => (
                             <TableRow key={item.id}>
-                                <TableCell>{item.stock_shop}</TableCell>
+                                <TableCell>{item.shop}</TableCell>
                                 <TableCell>
-                                    <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded me-1">
-                                        {item.stock_quantity}
-                                    </span>
-                                    <span className="bg-success bg-opacity-10 text-success px-4 py-1 rounded">{item.stock_unit}</span>
+                                    <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded me-1">{item.quantity}</span>
+                                    <span className="bg-success bg-opacity-10 text-success px-4 py-1 rounded">{item.unit}</span>
                                 </TableCell>
-                                <TableCell>{item.stock_price} ETB</TableCell>
+                                <TableCell>{item.price} ETB</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

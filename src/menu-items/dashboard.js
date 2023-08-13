@@ -1,8 +1,17 @@
 // assets
-import { IconDashboard, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers, IconPackages } from '@tabler/icons';
+import {
+    IconDashboard,
+    IconBox,
+    IconCategory,
+    IconBuildingStore,
+    IconTimeline,
+    IconUsers,
+    IconPackages,
+    IconClipboardList
+} from '@tabler/icons';
 
 // constant
-const icons = { IconDashboard, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers, IconPackages };
+const icons = { IconDashboard, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers, IconPackages, IconClipboardList };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
@@ -31,18 +40,26 @@ const getDashboardItems = (role) => {
             breadcrumbs: false
         },
         {
-            id: 'stocks',
-            title: 'Manage Stock',
-            type: 'collapse',
+            id: 'products',
+            title: 'Products',
+            type: 'item',
             url: '/products',
             icon: icons.IconBox,
+            breadcrumbs: false
+        },
+        {
+            id: 'stocks',
+            title: 'Manage Stocks',
+            type: 'collapse',
+            url: '/stocks',
+            icon: icons.IconClipboardList,
             breadcrumbs: false,
             children: [
                 {
                     id: 'stocks',
                     title: 'Stocks',
                     type: 'item',
-                    url: '/products',
+                    url: '/stocks',
                     breadcrumbs: false
                 },
                 {
@@ -54,6 +71,7 @@ const getDashboardItems = (role) => {
                 }
             ]
         },
+
         {
             id: 'packages',
             title: 'Packages',

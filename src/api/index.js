@@ -15,12 +15,15 @@ const Connections = {
     // admin dashboard sidebar
     lowstock: '/lowstock/',
     customercount: '/customercount',
+
     //stores api
     createstore: '/createstore',
     viewstore: '/viewstore',
     updatestore: '/updatestore/',
     deletestore: '/deletestore/',
     addmanager: '/addmanager/',
+    changeStatus: '/changeStatus',
+    updateStatus: '/updateStatus',
 
     //product api's
     addproduct: '/addproduct',
@@ -29,6 +32,21 @@ const Connections = {
     viewstoreproduct: '/viewstoreproduct/', //an api to fetch view sales role in store product
     updateproduct: '/updateproduct/',
     deleteproduct: '/deleteproduct/',
+
+    //item api's
+    items: '/items',
+    addItems: '/add-items',
+    getItems: '/get-items/',
+    updateItems: '/update-items/',
+    deleteItems: '/delete-items/',
+
+    //Stock api's
+    stocks: '/stocks',
+    createStocks: '/create-stocks',
+    getStocks: '/get-stocks/',
+    updateStocks: '/update-stocks/',
+    updateStockStatus: '/update-stock-status/',
+    deleteStocks: '/delete-stocks/',
 
     //package api's
     addpackage: '/addpackage',

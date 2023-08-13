@@ -46,6 +46,8 @@ const ViewShop = () => {
     const GoBack = () => {
         navigate(-1);
     };
+    const userString = sessionStorage.getItem('user');
+    const user = JSON.parse(userString);
 
     const theme = useTheme();
     const [shops, setShops] = useState([]);
@@ -62,8 +64,9 @@ const ViewShop = () => {
     const [open, setOpen] = useState(false);
     const [alerttype, setAlertType] = useState('close');
     const [spinner, setSpinner] = useState(false);
-    const [shopStatus, setShopStatus] = useState('Open');
+    const [shopStatus, setShopStatus] = useState('Pending');
     const [statusDialog, setStatusDialog] = useState(false);
+    const [statusLoader, setStatusLoader] = useState(false);
 
     const [popup, setPopup] = useState({
         status: false,
@@ -254,6 +257,7 @@ const ViewShop = () => {
             if (data.success) {
                 setStat(data.data);
                 setActiveShops(data.data.shopInfo);
+                setShopStatus(data.data.shopInfo.last_status ? data.data.shopInfo.last_status : 'Pending');
                 setLoading(false);
             }
         };
@@ -287,7 +291,7 @@ const ViewShop = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error creating shop!'
+                        message: 'There is error getting shop!'
                     });
                 });
         };
@@ -328,8 +332,56 @@ const ViewShop = () => {
         return () => {};
     }, []);
 
-    const handleShopStatus = (event) => {
-        setShopStatus(event.target.value);
+    const handleStatusUpdate = () => {
+        setStatusLoader(true);
+        var ApiUrl = Connections.api + Connections.changeStatus;
+        const headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        const data = {
+            shop_id: activeShops.id,
+            user_id: user.id,
+            status: shopStatus
+        };
+
+        fetch(ApiUrl, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(data)
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setStatusLoader(false);
+                    setStatusDialog(false);
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: 'Successfully done!'
+                    });
+                } else {
+                    setStatusLoader(false);
+                    setStatusDialog(false);
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'Unable to change status'
+                    });
+                }
+            })
+            .catch(() => {
+                setStatusLoader(false);
+                setStatusDialog(false);
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error changing shop status!'
+                });
+            });
     };
     return (
         <>
@@ -441,7 +493,7 @@ const ViewShop = () => {
                             <Grid item>
                                 <Select value={shopStatus} onChange={handleStatusOpen}>
                                     {ShopStatus.map((status, index) => (
-                                        <MenuItem key={index} value={status.title}>
+                                        <MenuItem key={index} value={status.label}>
                                             {status.label}
                                         </MenuItem>
                                     ))}
@@ -754,14 +806,14 @@ const ViewShop = () => {
 
             <Dialog open={statusDialog} onClose={handleStatusClose}>
                 <DialogContent>
-                    Do you want to <strong>{shopStatus} </strong> {shop.name ? shop.name : ''} ?
+                    Does {shop.name ? shop.name : ''} is <strong>{shopStatus} </strong> ?
                 </DialogContent>
                 <DialogActions>
                     <Button variant="text" sx={{ color: theme.palette.primary.main }} onClick={handleStatusClose}>
                         No
                     </Button>
-                    <Button variant="contained" color="primary" onClick={() => alert("i'm closing")}>
-                        {spinner ? (
+                    <Button variant="contained" color="primary" onClick={() => handleStatusUpdate()}>
+                        {statusLoader ? (
                             <div className="spinner-border spinner-border-sm text-dark " role="status">
                                 <span className="visually-hidden">Loading...</span>
                             </div>
