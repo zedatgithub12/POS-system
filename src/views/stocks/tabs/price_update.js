@@ -24,7 +24,7 @@ const PriceUpdate = ({ prices }) => {
                                 <TableCell>{item.from}</TableCell>
                                 <TableCell>{item.to}</TableCell>
                                 <TableCell>
-                                    {item.to > item.from ? (
+                                    {parseInt(item.to) > parseInt(item.from) ? (
                                         <>
                                             {item.to - item.from}
                                             <IconChevronsUp size={18} className="text-success" />

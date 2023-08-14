@@ -1,12 +1,11 @@
 // material-ui
-import { Grid, Divider, Box, Button, Typography, Table, TableBody, TableRow, TableCell, TableHead } from '@mui/material';
+import { Grid, Box, Button, Typography } from '@mui/material';
 import Connections from 'api';
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
-import { gridSpacing } from 'store/constant';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -16,7 +15,7 @@ import ReplanishmentHistory from './tabs/replanishment_history';
 import ItemAvailablity from './tabs/item_availability';
 import PriceUpdate from './tabs/price_update';
 
-// ==============================|| View Product ||============================== //
+// ==============================|| View stock ||============================== //
 
 const ViewStock = () => {
     const navigate = useNavigate();
@@ -30,7 +29,7 @@ const ViewStock = () => {
 
     // state declarations
 
-    const [product, setProduct] = useState({});
+    const [stock, setstock] = useState({});
     const [price, setPrice] = useState([]);
     const [availablity, setAvailablity] = useState([]);
     const [replanishment, setReplanishment] = useState([]);
@@ -63,12 +62,12 @@ const ViewStock = () => {
             });
             statusChecked = false;
         }
-        //fetch product informationa when component get mounted
-        const FetchProductInfo = () => {
+        //fetch stock informationa when component get mounted
+        const FetchstockInfo = () => {
             setIsLoading(true);
 
             var id = state.itemid ? state.itemid : state.id;
-            var Api = Connections.api + Connections.productdetail + id;
+            var Api = Connections.api + Connections.getStock + id;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -82,13 +81,11 @@ const ViewStock = () => {
             req.then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        setProduct(response.product);
+                        setstock(response.stock);
                         setReplanishment(response.replanishments);
                         setPrice(response.priceupdates);
-                        setAvailablity(response.items);
+                        setAvailablity(response.availablity);
                         setIsLoading(false);
-                        console.log(response);
-                        console.log(price);
                     } else {
                         setIsLoading(true);
                     }
@@ -98,7 +95,7 @@ const ViewStock = () => {
                 });
         };
 
-        FetchProductInfo();
+        FetchstockInfo();
 
         return () => {};
     }, [state]);
@@ -119,7 +116,7 @@ const ViewStock = () => {
                             <Grid item>
                                 <Grid container direction="column" spacing={1}>
                                     <Grid item>
-                                        <Typography variant="h3">{state.name}</Typography>
+                                        <Typography variant="h3">{state.item_name}</Typography>
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -141,7 +138,7 @@ const ViewStock = () => {
                             </TabList>
                         </Box>
                         <TabPanel value="1">
-                            <ItemDetail product={product} />
+                            <ItemDetail stock={stock} />
                         </TabPanel>
 
                         <TabPanel value="2">

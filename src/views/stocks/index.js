@@ -60,6 +60,8 @@ import Connections from 'api';
 import { useTheme } from '@mui/material/styles';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { ActivityIndicators } from 'ui-component/activityIndicator';
+import { Preferences } from 'preferences';
+import { DateFormatter } from 'utils/functions';
 
 // ==============================|| PRODUCT PAGE ||============================== //
 
@@ -80,7 +82,7 @@ const Stock = () => {
     const [subCategoryFilter, setSubCategoryFilter] = useState('Sub Category');
     const [brandFilter, setBrandFilter] = useState('Brand');
     const [shopFilter, setShopFilter] = useState('Shop');
-    const [statusFilter, setStatusFilter] = useState('In-stock');
+    const [statusFilter, setStatusFilter] = useState('in-stock');
     const [page, setPage] = useState(0);
     const [totalRecords, setTotalRecords] = useState();
     const [rowsPerPage, setRowsPerPage] = useState(15);
@@ -286,30 +288,30 @@ const Stock = () => {
         setPage(0);
     };
 
-    const filteredData = productData.filter((product) => {
+    const filteredData = productData.filter((stock) => {
         let isMatch = true;
 
         if (searchText) {
             const searchRegex = new RegExp(searchText, 'i');
-            isMatch = isMatch && (searchRegex.test(product.name) || searchRegex.test(product.code));
+            isMatch = isMatch && (searchRegex.test(stock.item_name) || searchRegex.test(stock.item_code));
         }
 
         if (categoryFilter !== 'Category') {
-            isMatch = isMatch && product.category === categoryFilter;
+            isMatch = isMatch && stock.item_category === categoryFilter;
         }
         if (subCategoryFilter !== 'Sub Category') {
-            isMatch = isMatch && product.sub_category === subCategoryFilter;
+            isMatch = isMatch && stock.item_sub_category === subCategoryFilter;
         }
         if (brandFilter !== 'Brand') {
-            isMatch = isMatch && product.brand === brandFilter;
+            isMatch = isMatch && stock.item_brand === brandFilter;
         }
 
         if (shopFilter !== 'Shop') {
-            isMatch = isMatch && product.shop.includes(shopFilter);
+            isMatch = isMatch && stock.stock_shop.includes(shopFilter);
         }
 
         if (statusFilter !== 'Status') {
-            isMatch = isMatch && product.status === statusFilter;
+            isMatch = isMatch && stock.stock_status === statusFilter;
         }
 
         return isMatch;
@@ -325,7 +327,7 @@ const Stock = () => {
     };
     const getStock = (shop) => {
         setStockLoader(true);
-        var Api = Connections.api + Connections.viewstoreproduct + shop;
+        var Api = Connections.api + Connections.stocks;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
@@ -459,6 +461,7 @@ const Stock = () => {
             .then((response) => {
                 if (response.success) {
                     setShops(response.data);
+                    console.log(response.data);
                 } else {
                     setShops(shops);
                 }
@@ -476,8 +479,8 @@ const Stock = () => {
     useEffect(() => {
         const getProducts = () => {
             setLoading(true);
-            var AdminApi = Connections.api + Connections.viewproduct + `?page=${page}&limit=${rowsPerPage}`;
-            var saleApi = Connections.api + Connections.viewstoreproduct + users.store_name + `?page=${page}&limit=${rowsPerPage}`;
+            var AdminApi = Connections.api + Connections.stocks + `?page=${page}&limit=${rowsPerPage}`;
+            var saleApi = Connections.api + Connections.shopStocks + users.store_name + `?page=${page}&limit=${rowsPerPage}`;
             var Api = users.role === 'Admin' ? AdminApi : saleApi;
             var headers = {
                 accept: 'application/json',
@@ -492,10 +495,10 @@ const Stock = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        var selectedShop = response.data.data[1].shop;
+                        var selectedShop = response.data.data[Preferences.defaultshop].stock_shop;
                         setProductData(response.data.data);
                         setTotalRecords(response.data.last_page);
-                        setShopFilter(selectedShop);
+                        // setShopFilter(selectedShop);
                         setLoading(false);
                     } else {
                         setProductData(productData);
@@ -527,7 +530,7 @@ const Stock = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Stocks</Typography>
+                                    <Typography variant="h3">Manage Stocks</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -552,7 +555,7 @@ const Stock = () => {
                                 }}
                             >
                                 <IconPlus />
-                                <Typography variant="h4">Add New</Typography>
+                                <Typography variant="h4">Create Item</Typography>
                             </Button>
                         </Grid>
 
@@ -592,7 +595,7 @@ const Stock = () => {
                                 }}
                             >
                                 <IconTestPipe />
-                                <Typography variant="h4">Replanish</Typography>
+                                <Typography variant="h4">Replenish</Typography>
                             </Button>
                         </Grid>
 
@@ -641,7 +644,7 @@ const Stock = () => {
                             <FormControl className="ms-2 my-2 ">
                                 <Select value={shopFilter} onChange={handleShopFilterChange}>
                                     <MenuItem value="Shop">Shop</MenuItem>
-                                    {Array.from(new Set(productData.map((product) => product.shop))).map((shop) => (
+                                    {Array.from(new Set(productData.map((stock) => stock.stock_shop))).map((shop) => (
                                         <MenuItem key={shop} value={shop}>
                                             {shop}
                                         </MenuItem>
@@ -652,7 +655,7 @@ const Stock = () => {
                         <FormControl className="ms-2 mt-2 ">
                             <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
                                 <MenuItem value="Category">Category</MenuItem>
-                                {Array.from(new Set(productData.map((product) => product.category))).map((category) => (
+                                {Array.from(new Set(productData.map((stock) => stock.item_category))).map((category) => (
                                     <MenuItem key={category} value={category}>
                                         {category}
                                     </MenuItem>
@@ -662,7 +665,7 @@ const Stock = () => {
                         <FormControl className="ms-2 mt-2 ">
                             <Select value={subCategoryFilter} onChange={handleSubCategoryFilterChange}>
                                 <MenuItem value="Sub Category">Sub Category</MenuItem>
-                                {Array.from(new Set(productData.map((product) => product.sub_category))).map((category) => (
+                                {Array.from(new Set(productData.map((stock) => stock.stock_sub_category))).map((category) => (
                                     <MenuItem key={category} value={category}>
                                         {category}
                                     </MenuItem>
@@ -673,7 +676,7 @@ const Stock = () => {
                         <FormControl className="ms-2 mt-2 ">
                             <Select value={brandFilter} onChange={handleBrandFilterChange}>
                                 <MenuItem value="Brand">Brand</MenuItem>
-                                {Array.from(new Set(productData.map((product) => product.brand))).map((brand) => (
+                                {Array.from(new Set(productData.map((stock) => stock.item_brand))).map((brand) => (
                                     <MenuItem key={brand} value={brand}>
                                         {brand}
                                     </MenuItem>
@@ -684,7 +687,7 @@ const Stock = () => {
                         <FormControl className="ms-2 my-2 ">
                             <Select value={statusFilter} onChange={handleStatusFilterChange}>
                                 <MenuItem value="Status">Status</MenuItem>
-                                {Array.from(new Set(productData.map((product) => product.status))).map((status) => (
+                                {Array.from(new Set(productData.map((stock) => stock.stock_status))).map((status) => (
                                     <MenuItem key={status} value={status}>
                                         {status}
                                     </MenuItem>
@@ -696,11 +699,11 @@ const Stock = () => {
                                 <TableHead className="bg-light">
                                     <TableRow>
                                         <TableCell></TableCell>
-                                        <TableCell>Name</TableCell>
+                                        <TableCell>Item name</TableCell>
+                                        <TableCell>Item code</TableCell>
                                         <TableCell>Category</TableCell>
-                                        <TableCell>Sub Category</TableCell>
                                         <TableCell>Brand</TableCell>
-
+                                        <TableCell>SKU</TableCell>
                                         <TableCell>Price</TableCell>
                                         <TableCell>Quantity</TableCell>
 
@@ -720,7 +723,7 @@ const Stock = () => {
                                             </TableCell>
                                         </TableRow>
                                     ) : (
-                                        filteredData.map((product, index) => <ProductRow key={index} product={product} />)
+                                        filteredData.map((stock, index) => <ProductRow key={index} product={stock} />)
                                     )}
                                 </TableBody>
                             </Table>
@@ -1115,23 +1118,35 @@ const ProductRow = ({ product }) => {
                     </IconButton>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                    {product.name}
+                    {product.item_name}
                 </TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{product.sub_category}</TableCell>
-                <TableCell>{product.brand}</TableCell>
+                <TableCell>{product.item_code}</TableCell>
+                <TableCell>{product.item_category}</TableCell>
+                <TableCell>{product.item_brand}</TableCell>
+                <TableCell>
+                    <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded">{product.stock_unit}</span>
+                </TableCell>
+                <TableCell>{product.stock_price} Birr</TableCell>
+                <TableCell>{product.stock_quantity}</TableCell>
 
-                <TableCell>{product.price} Birr</TableCell>
-                <TableCell>{product.quantity}</TableCell>
-
-                <TableCell>{product.status}</TableCell>
+                <TableCell sx={{ textTransform: 'capitalize' }}>
+                    <span
+                        className={
+                            product.stock_status === 'In-stock'
+                                ? 'bg-success bg-opacity-10 text-success px-2 py-1 rounded'
+                                : 'bg-danger bg-opacity-10 text-danger px-2 py-1 rounded'
+                        }
+                    >
+                        {product.stock_status}
+                    </span>
+                </TableCell>
                 <>
                     <TableCell>
                         <IconButton
                             aria-label="Edit row"
                             size="small"
                             onClick={() =>
-                                navigate('/view-product', {
+                                navigate('/view-stock', {
                                     state: { ...product }
                                 })
                             }
@@ -1139,13 +1154,13 @@ const ProductRow = ({ product }) => {
                             <IconEye />
                         </IconButton>
 
-                        {users.role === 'Admin' ? (
+                        {users.role === 'Admin' && (
                             <>
                                 <IconButton
                                     aria-label="Edit row"
                                     size="small"
                                     onClick={() =>
-                                        navigate('/update-product', {
+                                        navigate('/update-stock', {
                                             state: { ...product }
                                         })
                                     }
@@ -1156,7 +1171,7 @@ const ProductRow = ({ product }) => {
                                     <IconTrash />
                                 </IconButton>
                             </>
-                        ) : null}
+                        )}
                     </TableCell>
                 </>
             </TableRow>
@@ -1167,38 +1182,31 @@ const ProductRow = ({ product }) => {
                             <Grid item xs={12} md={12}>
                                 <Box margin={1}>
                                     <Typography variant="h6" gutterBottom component="div">
-                                        Product details
+                                        Item detail
                                     </Typography>
                                     <Table size="small" aria-label="product details">
                                         <TableBody>
                                             <TableRow>
-                                                <TableCell>Code</TableCell>
-                                                <TableCell>{product.code}</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell>Origional Quantity</TableCell>
-                                                <TableCell>{product.origional_quantity}</TableCell>
+                                                <TableCell>Shop</TableCell>
+                                                <TableCell>{product.stock_shop}</TableCell>
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell>Min Quantity</TableCell>
-                                                <TableCell>{product.min_quantity}</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell>Unit</TableCell>
-                                                <TableCell>{product.unit}</TableCell>
+                                                <TableCell>{product.stock_min_quantity}</TableCell>
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell>Cost</TableCell>
-                                                <TableCell>{product.cost}</TableCell>
+                                                <TableCell>{product.stock_cost}</TableCell>
                                             </TableRow>
 
                                             <TableRow>
-                                                <TableCell>Shop</TableCell>
-                                                <TableCell>{product.shop}</TableCell>
+                                                <TableCell>Expire date</TableCell>
+                                                <TableCell>{DateFormatter(product.stock_expire_date)}</TableCell>
                                             </TableRow>
+
                                             <TableRow>
-                                                <TableCell className="border-0">Description</TableCell>
-                                                <TableCell className="border-0">{product.description}</TableCell>
+                                                <TableCell>Created at</TableCell>
+                                                <TableCell>{DateFormatter(product.created_at)}</TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>

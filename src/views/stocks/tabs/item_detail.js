@@ -1,11 +1,10 @@
-import { Grid, Box, Typography, Table, TableBody, TableRow, TableCell, TableHead } from '@mui/material';
+import { Grid, Box, Table, TableBody, TableRow, TableCell } from '@mui/material';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import Connections from 'api';
-import Barcode from 'react-barcode';
 
-const ItemDetail = ({ product }) => {
+const ItemDetail = ({ stock }) => {
     const theme = useTheme();
     const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -17,55 +16,57 @@ const ItemDetail = ({ product }) => {
                         <TableBody>
                             <TableRow>
                                 <TableCell>Item code</TableCell>
-                                <TableCell>{product.code}</TableCell>
+                                <TableCell>{stock.item_code}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Item name</TableCell>
-                                <TableCell>{product.name}</TableCell>
+                                <TableCell>{stock.item_name}</TableCell>
                             </TableRow>
 
                             <TableRow>
                                 <TableCell>Shop</TableCell>
-                                <TableCell>{product.shop}</TableCell>
+                                <TableCell>{stock.stock_shop}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Category</TableCell>
-                                <TableCell>{product.category}</TableCell>
+                                <TableCell>{stock.item_category}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Sub category</TableCell>
-                                <TableCell>{product.sub_category}</TableCell>
+                                <TableCell>{stock.item_sub_category}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Quantity</TableCell>
-                                <TableCell>{product.quantity}</TableCell>
+                                <TableCell>{stock.stock_quantity}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Min quantity</TableCell>
-                                <TableCell>{product.min_quantity}</TableCell>
+                                <TableCell>{stock.stock_min_quantity}</TableCell>
                             </TableRow>
 
                             <TableRow>
                                 <TableCell> Brand</TableCell>
-                                <TableCell>{product.brand}</TableCell>
+                                <TableCell>{stock.item_brand}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Cost</TableCell>
-                                <TableCell>{product.cost}ETB</TableCell>
+                                <TableCell>{stock.stock_cost} ETB</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Price </TableCell>
-                                <TableCell>{product.price}ETB</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Unit</TableCell>
                                 <TableCell>
-                                    <span className="bg-success bg-opacity-10 text-success px-4 py-1 rounded">{product.unit}</span>
+                                    {stock.stock_price} {''}ETB
                                 </TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell>status</TableCell>
-                                <TableCell>{product.status}</TableCell>
+                                <TableCell>SKU</TableCell>
+                                <TableCell>
+                                    <span className="bg-success bg-opacity-10 text-success px-4 py-1 rounded">{stock.stock_unit}</span>
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Status</TableCell>
+                                <TableCell>{stock.stock_status}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
@@ -74,18 +75,18 @@ const ItemDetail = ({ product }) => {
 
             <Grid item lg={5} md={6} sm={12} xs={12} hidden={isMediumScreen}>
                 <Box marginTop={7} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {product.picture ? (
+                    {stock.item_image ? (
                         <LazyLoadImage
-                            alt={product.name}
+                            alt={stock.item_name}
                             effect="blur"
                             delayTime={500}
-                            src={Connections.images + product.picture}
+                            src={Connections.images + stock.item_image}
                             style={{ width: 300, height: 300 }}
                             className="img-fluid rounded m-auto me-2"
                         />
                     ) : (
                         <LazyLoadImage
-                            alt="product"
+                            alt="stock"
                             effect="blur"
                             delayTime={500}
                             src="http://placehold.it/120x120&text=image"
@@ -93,9 +94,6 @@ const ItemDetail = ({ product }) => {
                             className="img-fluid rounded m-auto me-2"
                         />
                     )}
-                </Box>
-                <Box paddingX={2} marginTop={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Barcode value={product.id} />
                 </Box>
             </Grid>
         </Grid>

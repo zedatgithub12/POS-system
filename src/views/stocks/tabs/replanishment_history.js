@@ -20,7 +20,9 @@ const ReplanishmentHistory = ({ History }) => {
                             <TableRow key={index}>
                                 <TableCell>{DateFormatter(item.created_at)}</TableCell>
                                 <TableCell>{item.existing_amount}</TableCell>
-                                <TableCell>{item.added_amount}</TableCell>
+                                <TableCell>
+                                    <span className="bg-success bg-opacity-10 text-success px-3 py-1 rounded">{item.added_amount}</span>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
