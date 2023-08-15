@@ -35,6 +35,7 @@ const Connections = {
 
     //item api's
     items: '/items',
+    allItems: '/getallitems',
     addItems: '/add-items',
     getItems: '/get-items/',
     updateItems: '/update-items/',

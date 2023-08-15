@@ -82,7 +82,7 @@ const Stock = () => {
     const [subCategoryFilter, setSubCategoryFilter] = useState('Sub Category');
     const [brandFilter, setBrandFilter] = useState('Brand');
     const [shopFilter, setShopFilter] = useState('Shop');
-    const [statusFilter, setStatusFilter] = useState('in-stock');
+    const [statusFilter, setStatusFilter] = useState('In-Stock');
     const [page, setPage] = useState(0);
     const [totalRecords, setTotalRecords] = useState();
     const [rowsPerPage, setRowsPerPage] = useState(15);
@@ -542,7 +542,7 @@ const Stock = () => {
                         <Grid item xs={12} sm={12} md={6} lg={3} xl={2} sx={{ alignItems: 'center', justifyContent: 'center' }}>
                             <Button
                                 component={Link}
-                                to="/add-product"
+                                to="/add-stock"
                                 sx={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -1132,8 +1132,10 @@ const ProductRow = ({ product }) => {
                 <TableCell sx={{ textTransform: 'capitalize' }}>
                     <span
                         className={
-                            product.stock_status === 'In-stock'
+                            product.stock_status === 'In-Stock'
                                 ? 'bg-success bg-opacity-10 text-success px-2 py-1 rounded'
+                                : product.stock_status === 'Out-Of-Stock'
+                                ? 'bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded'
                                 : 'bg-danger bg-opacity-10 text-danger px-2 py-1 rounded'
                         }
                     >

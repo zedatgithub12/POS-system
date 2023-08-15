@@ -32,38 +32,31 @@ const AddStock = () => {
             status: false
         });
     };
-    //category data
-    const [CategoryData, setCategoryData] = useState([]);
-    const [SubCategoryData, setSubCategoryData] = useState([]);
-    //shops data
+
+    const [items, setItems] = useState([]);
     const [shops, setShops] = useState([]);
-    const [productPicture, setProductPicture] = useState(null);
-    const [picturePreview, setPicturePreview] = useState(null);
-    const [productName, setProductName] = useState('');
-    const [productCategory, setProductCategory] = useState('Main Category');
-    const [productSubCategory, setProductSubCategory] = useState('Sub Category');
-    const [brand, setBrand] = useState('');
-    const [productCode, setProductCode] = useState('');
+    const [itemName, setItemName] = useState('Select Item');
+    const [ItemCode, setItemCode] = useState();
     const [productCost, setProductCost] = useState('');
     const [productUnit, setProductUnit] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [productQuantity, setProductQuantity] = useState('');
     const [productMinQuantity, setProductMinQuantity] = useState('');
-    const [productDescription, setProductDescription] = useState('');
     const [warehouses, setWarehouses] = useState('Shops');
     const [spinner, setSpinner] = useState(false);
+    const [expireDate, setExpireDate] = useState(null);
 
-    const handleCategoryChange = (event) => {
-        setProductCategory(event.target.value);
-        getSubCatgeory(event.target.value);
-    };
-
-    const handleSubCategoryChange = (event) => {
-        setProductSubCategory(event.target.value);
+    const handleItemChange = (event) => {
+        setItemName(event.target.value.item_name);
+        setItemCode(event.target.value.item_code);
     };
 
     const handleShopChange = (event) => {
         setWarehouses(event.target.value);
+    };
+
+    const handleExpireDateChange = (event) => {
+        setExpireDate(event.target.value);
     };
 
     const handleSubmit = (event) => {
@@ -71,23 +64,18 @@ const AddStock = () => {
         setSpinner(true);
         // Handle form submission here
         // Declare the data to be sent to the API
-        var Api = Connections.api + Connections.addproduct;
+        var Api = Connections.api + Connections.createStocks;
 
         const data = new FormData();
-        data.append('picture', productPicture);
-        data.append('name', productName);
-        data.append('category', productCategory);
-        data.append('sub_category', productSubCategory);
-        data.append('brand', brand);
-        data.append('code', productCode);
-        data.append('cost', productCost);
-        data.append('unit', productUnit);
-        data.append('price', productPrice);
-        data.append('quantity', productQuantity);
-        data.append('min_quantity', productMinQuantity);
-        data.append('description', productDescription);
-        data.append('shop', warehouses);
-        data.append('status', 'In-stock');
+        data.append('item_name', itemName);
+        data.append('item_code', ItemCode);
+        data.append('stock_cost', productCost);
+        data.append('stock_unit', productUnit);
+        data.append('stock_price', productPrice);
+        data.append('stock_quantity', productQuantity);
+        data.append('stock_min_quantity', productMinQuantity);
+        data.append('stock_expire_date', expireDate);
+        data.append('stock_shop', warehouses);
 
         // Make the API call using fetch()
         fetch(Api, {
@@ -126,51 +114,9 @@ const AddStock = () => {
             });
     };
 
-    const handlePictureChange = (event) => {
-        const file = event.target.files[0];
-        setProductPicture(file);
-        if (file) {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => {
-                setPicturePreview(reader.result);
-            };
-        }
-    };
-
-    const getSubCatgeory = (name) => {
-        var Api = Connections.api + Connections.subcategory + name;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'GET',
-            headers: headers,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setSubCategoryData((prevCat) => {
-                        // Combine the previous shops with the new ones from the API
-                        return [...prevCat, ...response.data];
-                    });
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error fetching sub categories!'
-                });
-            });
-    };
     useEffect(() => {
-        const getCatgeory = () => {
-            var Api = Connections.api + Connections.viewcategory;
+        const getItems = () => {
+            var Api = Connections.api + Connections.allItems;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -184,10 +130,9 @@ const AddStock = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        setCategoryData((prevCat) => {
-                            // Combine the previous shops with the new ones from the API
-                            return [...prevCat, ...response.data];
-                        });
+                        setItems(response.data);
+                    } else {
+                        setItems(productData);
                     }
                 })
                 .catch(() => {
@@ -195,8 +140,9 @@ const AddStock = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error fetching categories!'
+                        message: 'There is error fetching product!'
                     });
+                    setLoading(false);
                 });
         };
 
@@ -235,8 +181,10 @@ const AddStock = () => {
                     });
                 });
         };
+
+        getItems();
         getShops();
-        getCatgeory();
+
         return () => {};
     }, [popup]);
     return (
@@ -247,7 +195,7 @@ const AddStock = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Add Stock</Typography>
+                                    <Typography variant="h3">Create Item</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -268,45 +216,29 @@ const AddStock = () => {
                 <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleSubmit}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handlePictureChange}
-                                style={{ display: 'none' }}
-                                id="product-picture"
-                            />
-                            <label htmlFor="product-picture">
-                                <Button variant="contained" color="primary" component="span" fullWidth style={{ height: '100%' }}>
-                                    {picturePreview ? (
-                                        <img
-                                            src={picturePreview}
-                                            alt="Product"
-                                            style={{ width: '100%' }}
-                                            className="img-fluid rounded m-auto"
-                                        />
-                                    ) : (
-                                        'Upload Picture'
-                                    )}
-                                </Button>
-                            </label>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                color="primary"
-                                fullWidth
-                                label="Product Name"
-                                value={productName}
-                                onChange={(event) => setProductName(event.target.value)}
-                                required
-                            />
+                            <FormControl fullWidth>
+                                <Select value={warehouses} onChange={handleShopChange}>
+                                    <MenuItem value="Shops"> Select Shop</MenuItem>
+                                    {Array.from(new Set(shops.map((stores) => stores.name))).map((shop) => (
+                                        <MenuItem key={shop} value={shop}>
+                                            {shop}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <FormControl fullWidth required>
-                                <Select value={productCategory} onChange={handleCategoryChange}>
-                                    <MenuItem value="Main Category">Main Category</MenuItem>
-                                    {Array.from(new Set(CategoryData.map((product) => product.name))).map((category) => (
-                                        <MenuItem key={category} value={category}>
-                                            {category}
+                                <Select value={itemName} onChange={(event) => handleItemChange(event)}>
+                                    <MenuItem value={itemName}>{itemName}</MenuItem>
+                                    {items.map((item, index) => (
+                                        <MenuItem
+                                            key={index}
+                                            value={item}
+                                            sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                        >
+                                            <span>{item.item_name} </span>
+                                            <span>{item.item_code} </span>
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -314,40 +246,20 @@ const AddStock = () => {
                         </Grid>
 
                         <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth>
-                                <Select value={productSubCategory} onChange={handleSubCategoryChange}>
-                                    <MenuItem value="Sub Category">Sub Category</MenuItem>
-                                    {Array.from(new Set(SubCategoryData.map((product) => product.sub_category))).map((category) => (
-                                        <MenuItem key={category} value={category}>
-                                            {category}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Brand"
+                                label="Item Unit"
                                 color="primary"
-                                value={brand}
-                                onChange={(event) => setBrand(event.target.value)}
+                                value={productUnit}
+                                onChange={(event) => setProductUnit(event.target.value)}
                                 required
                             />
                         </Grid>
+
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Product Code"
-                                value={productCode}
-                                color="primary"
-                                onChange={(event) => setProductCode(event.target.value)}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Product Cost"
+                                label="Item Cost"
                                 color="primary"
                                 value={productCost}
                                 onChange={(event) => setProductCost(event.target.value)}
@@ -356,17 +268,7 @@ const AddStock = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Product Unit"
-                                color="primary"
-                                value={productUnit}
-                                onChange={(event) => setProductUnit(event.target.value)}
-                                required
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Product Price"
+                                label="Item Price"
                                 color="primary"
                                 value={productPrice}
                                 onChange={(event) => setProductPrice(event.target.value)}
@@ -376,7 +278,7 @@ const AddStock = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Product Quantity"
+                                label="Item Quantity"
                                 color="primary"
                                 value={productQuantity}
                                 onChange={(event) => setProductQuantity(event.target.value)}
@@ -394,25 +296,7 @@ const AddStock = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth>
-                                <Select value={warehouses} onChange={handleShopChange}>
-                                    <MenuItem value="Shops"> Select Shop</MenuItem>
-                                    {Array.from(new Set(shops.map((stores) => stores.name))).map((shop) => (
-                                        <MenuItem key={shop} value={shop}>
-                                            {shop}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label="Product Description"
-                                color="primary"
-                                value={productDescription}
-                                onChange={(event) => setProductDescription(event.target.value)}
-                            />
+                            <TextField fullWidth color="primary" type="date" value={expireDate} onChange={handleExpireDateChange} />
                         </Grid>
                     </Grid>
                     <Button type="submit" fullWidth variant="contained" color="primary" style={{ margin: '1rem 0' }}>
