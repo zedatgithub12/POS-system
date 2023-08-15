@@ -70,10 +70,6 @@ const UpdateStock = () => {
         // Handle form submission here
         // Declare the data to be sent to the API
         var Api = Connections.api + Connections.updateStock + state.id;
-        // var headers = {
-        //     accept: 'application/json',
-        //     'Content-Type': 'application/json'
-        // };
 
         const data = new FormData();
         data.append('item_name', itemName);
@@ -88,7 +84,7 @@ const UpdateStock = () => {
 
         // Make the API call using fetch()
         fetch(Api, {
-            method: 'PUT',
+            method: 'POST',
             body: data,
             cache: 'no-cache'
         })

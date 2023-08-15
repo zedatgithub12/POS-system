@@ -14,6 +14,7 @@ import {
     IconButton,
     TextField,
     InputAdornment,
+    Menu,
     MenuItem,
     TablePagination,
     Dialog,
@@ -27,30 +28,13 @@ import {
     FormControlLabel,
     Checkbox,
     Select,
-    List,
-    ListItem,
-    ListItemText,
     Autocomplete,
     CircularProgress
 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
-import {
-    IconCheck,
-    IconChevronsDown,
-    IconChevronsUp,
-    IconTrash,
-    IconEdit,
-    IconSearch,
-    IconEye,
-    IconPlus,
-    IconTestPipe,
-    IconArrowsTransferDown,
-    IconX,
-    IconChargingPile,
-    IconCoins
-} from '@tabler/icons';
+import { IconEdit, IconSearch, IconEye, IconPlus, IconTestPipe, IconArrowsTransferDown, IconX, IconCoins } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
@@ -62,7 +46,8 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 import { ActivityIndicators } from 'ui-component/activityIndicator';
 import { Preferences } from 'preferences';
 import { DateFormatter } from 'utils/functions';
-
+import { MoreVert } from '@mui/icons-material';
+import { stock_status } from 'data/stock_statuses';
 // ==============================|| PRODUCT PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -82,7 +67,7 @@ const Stock = () => {
     const [subCategoryFilter, setSubCategoryFilter] = useState('Sub Category');
     const [brandFilter, setBrandFilter] = useState('Brand');
     const [shopFilter, setShopFilter] = useState('Shop');
-    const [statusFilter, setStatusFilter] = useState('In-Stock');
+    const [statusFilter, setStatusFilter] = useState('Status');
     const [page, setPage] = useState(0);
     const [totalRecords, setTotalRecords] = useState();
     const [rowsPerPage, setRowsPerPage] = useState(15);
@@ -520,8 +505,6 @@ const Stock = () => {
         return () => {};
     }, [page, rowsPerPage]);
 
-    // const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -665,7 +648,7 @@ const Stock = () => {
                         <FormControl className="ms-2 mt-2 ">
                             <Select value={subCategoryFilter} onChange={handleSubCategoryFilterChange}>
                                 <MenuItem value="Sub Category">Sub Category</MenuItem>
-                                {Array.from(new Set(productData.map((stock) => stock.stock_sub_category))).map((category) => (
+                                {Array.from(new Set(productData.map((stock) => stock.item_sub_category))).map((category) => (
                                     <MenuItem key={category} value={category}>
                                         {category}
                                     </MenuItem>
@@ -1061,7 +1044,7 @@ const ProductRow = ({ product }) => {
     const Delete = () => {
         // Do something with the deleted category
         setSpinner(true);
-        var Api = Connections.api + Connections.deleteproduct + selectedProduct.id;
+        var Api = Connections.api + Connections.deleteStocks + selectedProduct.id;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
@@ -1106,6 +1089,64 @@ const ProductRow = ({ product }) => {
             });
     };
 
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [selectedItem, setSelectedItems] = useState();
+    const handleMenuClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleSelectItem = (event, item) => {
+        handleMenuClick(event);
+        setSelectedItems({ ...item });
+    };
+
+    const handleStatusChange = (status, id) => {
+        var Api = Connections.api + Connections.updateStockStatus + id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        const data = {
+            stock_status: status
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'PUT',
+            headers: headers,
+            body: JSON.stringify(data),
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error updating stock status!'
+                });
+            });
+    };
     return (
         <>
             <TableRow
@@ -1136,6 +1177,8 @@ const ProductRow = ({ product }) => {
                                 ? 'bg-success bg-opacity-10 text-success px-2 py-1 rounded'
                                 : product.stock_status === 'Out-Of-Stock'
                                 ? 'bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded'
+                                : product.stock_status === 'Hold'
+                                ? 'bg-info bg-opacity-10 text-info px-2 py-1 rounded'
                                 : 'bg-danger bg-opacity-10 text-danger px-2 py-1 rounded'
                         }
                     >
@@ -1169,9 +1212,30 @@ const ProductRow = ({ product }) => {
                                 >
                                     <IconEdit />
                                 </IconButton>
-                                <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
-                                    <IconTrash />
+
+                                <IconButton
+                                    aria-controls="row-menu"
+                                    aria-haspopup="true"
+                                    onClick={(event) => handleSelectItem(event, product)}
+                                >
+                                    <MoreVert />
                                 </IconButton>
+                                <Menu
+                                    id="row-menu"
+                                    anchorEl={anchorEl}
+                                    keepMounted
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleMenuClose}
+                                    className="shadow-sm"
+                                >
+                                    {stock_status
+                                        .filter((item) => item.label !== product.stock_status)
+                                        .map((item) => (
+                                            <MenuItem key={item.id} onClick={() => handleStatusChange(item.label, product.id)}>
+                                                {item.label}
+                                            </MenuItem>
+                                        ))}
+                                </Menu>
                             </>
                         )}
                     </TableCell>
@@ -1198,7 +1262,7 @@ const ProductRow = ({ product }) => {
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell>Cost</TableCell>
-                                                <TableCell>{product.stock_cost}</TableCell>
+                                                <TableCell>{product.stock_cost ? product.stock_cost : 0} Birr</TableCell>
                                             </TableRow>
 
                                             <TableRow>

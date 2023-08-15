@@ -5,11 +5,11 @@ export const stock_status = [
     },
     {
         id: 2,
-        label: 'Out-of-Stock'
+        label: 'Out-Of-Stock'
     },
     {
         id: 3,
-        label: 'Right-Off'
+        label: 'Right-OFF'
     },
     {
         id: 4,

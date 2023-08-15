@@ -88,9 +88,6 @@ const StockScreen = () => {
     const handleClick = (event) => {
         setExportSales(event.currentTarget);
     };
-    // const handleClose = () => {
-    //     setAnchorEl(null);
-    // };
 
     const handleMenuClick = (event) => {
         setAnchorEl(event.currentTarget);
