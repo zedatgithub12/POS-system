@@ -44,7 +44,6 @@ import Connections from 'api';
 import { useTheme } from '@mui/material/styles';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { ActivityIndicators } from 'ui-component/activityIndicator';
-import { Preferences } from 'preferences';
 import { DateFormatter } from 'utils/functions';
 import { MoreVert } from '@mui/icons-material';
 import { stock_status } from 'data/stock_statuses';
@@ -57,6 +56,8 @@ const Stock = () => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
     const theme = useTheme();
+
+    const navigate = useNavigate();
 
     const [shopId, setShopId] = useState(null);
     const [shopName, setShopsName] = useState();
@@ -72,8 +73,9 @@ const Stock = () => {
     const [totalRecords, setTotalRecords] = useState();
     const [rowsPerPage, setRowsPerPage] = useState(15);
     const [productData, setProductData] = useState([]);
-    const [inputValue, setInputValue] = React.useState('');
+    const [inputValue, setInputValue] = useState('');
     const [updating, setUpdating] = useState(false);
+
     const [openUpdatePDialog, setOpenUpdatePDialog] = useState(false);
     const [openReplanishDialog, setOpenReplanishDialog] = useState(false);
     const [stockData, setStockData] = useState([]);
@@ -98,114 +100,6 @@ const Stock = () => {
             ...popup,
             status: false
         });
-    };
-
-    //price update dialog functions
-    const handleUpdatePriceClick = () => {
-        setOpenUpdatePDialog(true);
-        getShops();
-    };
-
-    const handleUpdateDialogClose = () => {
-        setOpenUpdatePDialog(false);
-    };
-
-    const handleCheckboxChange = (event) => {
-        setChecked(event.target.checked);
-    };
-
-    const handleInputChange = (event) => {
-        setInputValue(event.target.value);
-    };
-
-    const handlePUSubmit = (event) => {
-        event.preventDefault();
-
-        if (inputValue === '') {
-            setPopup({
-                ...popup,
-                status: true,
-                severity: 'error',
-                message: 'Please enter the new price'
-            });
-        } else if (shopId == null && shopName === '') {
-            selectedStock;
-            setPopup({
-                ...popup,
-                status: true,
-                severity: 'error',
-                message: 'Select shop'
-            });
-        } else if (selectedStock.length == 0) {
-            setPopup({
-                ...popup,
-                status: true,
-                severity: 'error',
-                message: 'Please select stock item first'
-            });
-        } else {
-            setUpdating(true);
-            var singleItem = Connections.api + Connections.updateprice;
-            var allItems = Connections.api + Connections.updateallprice;
-            var Api = checked ? allItems : singleItem;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            var data = {
-                productid: selectedStock.id,
-                productcode: selectedStock.item_code,
-                name: selectedStock.stock_shop,
-                from: selectedStock.stock_price,
-                to: inputValue
-            };
-
-            fetch(Api, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(data),
-                cache: 'no-cache'
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'success',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    } else {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: 'There is error updating price'
-                    });
-                    setUpdating(false);
-                });
-        }
-    };
-
-    //Replanish dialog functions
-    const handleReplanishClick = () => {
-        setOpenReplanishDialog(true);
-        getShops();
-    };
-
-    const handleDialogClose = () => {
-        setOpenReplanishDialog(false);
     };
 
     const handleSubCategoryFilterChange = (event) => {
@@ -385,38 +279,153 @@ const Stock = () => {
         return () => {};
     }, [page, rowsPerPage]);
 
-    const handleSubmit = (event) => {
+    //price update dialog functions
+    const handleUpdatePriceClick = () => {
+        setOpenUpdatePDialog(true);
+        getShops();
+    };
+
+    const handleUpdateDialogClose = () => {
+        setOpenUpdatePDialog(false);
+        setShopId(null);
+        setShopsName(null);
+        setSelectedStock([]);
+        setInputValue(null);
+        setChecked(false);
+        setSpinner(false);
+    };
+
+    const handleCheckboxChange = (event) => {
+        setChecked(event.target.checked);
+    };
+
+    const handleInputChange = (event) => {
+        setInputValue(event.target.value);
+    };
+
+    const handlePUSubmit = (event) => {
         event.preventDefault();
-        setSpinner(true);
-        if (!shopName) {
+
+        if (inputValue === '') {
             setPopup({
                 ...popup,
                 status: true,
                 severity: 'error',
-                message: 'Please select shop!'
+                message: 'Please enter the new price'
             });
-            setSpinner(false);
+        } else if (shopId == null && shopName == null) {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please select shop'
+            });
+        } else if (selectedStock.length == 0) {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please select stock item first'
+            });
+        } else {
+            setUpdating(true);
+            var singleItem = Connections.api + Connections.updateprice;
+            var allItems = Connections.api + Connections.updateallprice;
+            var Api = checked ? allItems : singleItem;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            var data = {
+                productid: selectedStock.id,
+                productcode: selectedStock.item_code,
+                name: selectedStock.stock_shop,
+                from: selectedStock.stock_price,
+                to: inputValue
+            };
+
+            fetch(Api, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(data),
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        setUpdating(false);
+                        handleUpdateDialogClose();
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setUpdating(false);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error updating price'
+                    });
+                    setUpdating(false);
+                });
         }
-        if (!selectedStock) {
+    };
+    //Replanish dialog functions
+    const handleReplanishClick = () => {
+        setOpenReplanishDialog(true);
+        getShops();
+    };
+
+    const handleDialogClose = () => {
+        setOpenReplanishDialog(false);
+        setShopId(null);
+        setShopsName(null);
+        setSelectedStock([]);
+        setAddedAmount(null);
+        setSpinner(false);
+    };
+    const handleReplanishSubmit = (event) => {
+        event.preventDefault();
+
+        if (shopId == null && shopName == null) {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please select shop'
+            });
+        } else if (selectedStock.length == 0) {
             setPopup({
                 ...popup,
                 status: true,
                 severity: 'error',
                 message: 'Please select stock first!'
             });
-            setSpinner(false);
-        }
-        if (!addedAmount) {
+        } else if (addedAmount == '') {
             setPopup({
                 ...popup,
                 status: true,
                 severity: 'error',
                 message: 'Please enter the amount to be added!'
             });
-            setSpinner(false);
         } else {
             // Handle form submission here
             // Declare the data to be sent to the API
+
+            setSpinner(true);
+
             var Api = Connections.api + Connections.newreplanishment;
             var headers = {
                 accept: 'application/json',
@@ -426,9 +435,9 @@ const Stock = () => {
                 shopid: shopId,
                 shopname: shopName,
                 stock_id: selectedStock.id,
-                stock_name: selectedStock.name,
-                stock_code: selectedStock.code,
-                existing_amount: selectedStock.quantity,
+                stock_name: selectedStock.item_name,
+                stock_code: selectedStock.item_code,
+                existing_amount: selectedStock.stock_quantity,
                 added_amount: addedAmount,
                 userid: users.id
             };
@@ -449,6 +458,7 @@ const Stock = () => {
                             message: response.message
                         });
                         setSpinner(false);
+                        handleDialogClose();
                     } else {
                         setPopup({
                             ...popup,
@@ -486,11 +496,10 @@ const Stock = () => {
                 </Grid>
 
                 {users.role === 'Admin' && (
-                    <Grid container paddingX={4} paddingTop={5}>
-                        <Grid item xs={12} sm={12} md={6} lg={3} xl={2} sx={{ alignItems: 'center', justifyContent: 'center' }}>
+                    <Grid container spacing={0} paddingX={4} paddingTop={5}>
+                        <Grid item xs={12} sm={6} md={3} lg={3} xl={2} sx={{ alignItems: 'center', justifyContent: 'center' }}>
                             <Button
-                                component={Link}
-                                to="/add-stock"
+                                onClick={() => navigate('/add-stock')}
                                 sx={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -498,8 +507,8 @@ const Stock = () => {
                                     backgroundColor: theme.palette.primary.light,
                                     borderRadius: 2,
                                     padding: 2,
-                                    marginX: 1,
-                                    marginTop: 1
+                                    paddingX: 3,
+                                    margin: 1
                                 }}
                             >
                                 <IconPlus />
@@ -507,7 +516,7 @@ const Stock = () => {
                             </Button>
                         </Grid>
 
-                        <Grid item xs={12} sm={12} md={6} lg={3} xl={2}>
+                        <Grid item xs={12} sm={6} md={3} lg={3} xl={2}>
                             <Button
                                 onClick={() => handleUpdatePriceClick()}
                                 sx={{
@@ -517,9 +526,8 @@ const Stock = () => {
                                     backgroundColor: theme.palette.primary.light,
                                     borderRadius: 2,
                                     padding: 2,
-                                    paddingX: 4,
-                                    marginX: 1,
-                                    marginTop: 1
+                                    paddingX: 3,
+                                    margin: 1
                                 }}
                             >
                                 <IconCoins />
@@ -527,7 +535,7 @@ const Stock = () => {
                             </Button>
                         </Grid>
 
-                        <Grid item xs={12} sm={12} md={6} lg={3} xl={2}>
+                        <Grid item xs={12} sm={6} md={3} lg={3} xl={2}>
                             <Button
                                 onClick={() => handleReplanishClick()}
                                 sx={{
@@ -537,9 +545,8 @@ const Stock = () => {
                                     backgroundColor: theme.palette.primary.light,
                                     borderRadius: 2,
                                     padding: 2,
-                                    paddingX: 4,
-                                    marginX: 1,
-                                    marginTop: 1
+                                    paddingX: 3,
+                                    margin: 1
                                 }}
                             >
                                 <IconTestPipe />
@@ -547,10 +554,9 @@ const Stock = () => {
                             </Button>
                         </Grid>
 
-                        <Grid item xs={12} sm={12} md={6} lg={3} xl={2}>
+                        <Grid item xs={12} sm={6} md={3} lg={3} xl={2}>
                             <Button
-                                component={Link}
-                                to="/make-transfer"
+                                onClick={() => navigate('/make-transfer')}
                                 sx={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -558,8 +564,8 @@ const Stock = () => {
                                     backgroundColor: theme.palette.primary.light,
                                     borderRadius: 2,
                                     padding: 2,
-                                    marginX: 1,
-                                    marginTop: 1
+                                    paddingX: 3,
+                                    margin: 1
                                 }}
                             >
                                 <IconArrowsTransferDown />
@@ -805,43 +811,43 @@ const Stock = () => {
                                         <Typography sx={{ fontSize: theme.typography.h4 }}>{selectedStock.stock_price} ETB</Typography>
                                     </Grid>
                                 </Grid>
-                                <Grid container>
-                                    <Grid item xs={12} sm={12}>
+                                <Grid
+                                    container
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        marginTop: 1
+                                    }}
+                                >
+                                    <Grid item xs={12} sm={8}>
                                         <TextField
                                             required
                                             fullWidth
-                                            sx={{ marginTop: 1 }}
                                             label="New Price"
                                             variant="outlined"
                                             value={inputValue}
                                             onChange={handleInputChange}
                                         />
                                     </Grid>
-                                </Grid>
-                                <Grid
-                                    item
-                                    xs={12}
-                                    sm={12}
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'flex-end'
-                                    }}
-                                >
-                                    <Button
-                                        type="submit"
-                                        variant="contained"
-                                        color="primary"
-                                        sx={{ paddingX: 8, paddingY: 1.3, marginTop: 3, marginRight: 1 }}
-                                    >
-                                        {updating ? (
-                                            <div className="spinner-border spinner-border-sm text-dark " role="status">
-                                                <span className="visually-hidden">Loading...</span>
-                                            </div>
-                                        ) : (
-                                            'Apply'
-                                        )}
-                                    </Button>
+                                    <Grid item xs={12} sm={3}>
+                                        <Button
+                                            fullWidth
+                                            type="submit"
+                                            variant="contained"
+                                            color="primary"
+                                            sx={{ paddingX: 5, paddingY: 1.5 }}
+                                        >
+                                            {updating ? (
+                                                <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                                    <span className="visually-hidden">Loading...</span>
+                                                </div>
+                                            ) : (
+                                                'Apply'
+                                            )}
+                                        </Button>
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         </form>
@@ -858,15 +864,18 @@ const Stock = () => {
                         backgroundColor: theme.palette.primary.main
                     }}
                 >
-                    <DialogTitle sx={{ fontSize: theme.typography.h4 }}>Replanish Stock </DialogTitle>
-                    <Button variant="text" color="dark" onClick={handleDialogClose}>
+                    <DialogTitle sx={{ fontSize: theme.typography.h4, color: theme.palette.background.default }}>
+                        Replenish Stock
+                    </DialogTitle>
+
+                    <IconButton variant="text" color="dark" onClick={handleDialogClose} sx={{ marginRight: 1 }}>
                         <IconX />
-                    </Button>
+                    </IconButton>
                 </Box>
 
                 <Divider />
                 <DialogContent>
-                    <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleSubmit}>
+                    <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleReplanishSubmit}>
                         <Grid container>
                             <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <Grid item xs={12} sm={12}>
@@ -891,7 +900,7 @@ const Stock = () => {
                                         key={stockData.id}
                                         disabled={shopId ? false : true}
                                         options={stockData}
-                                        getOptionLabel={(option) => option.name}
+                                        getOptionLabel={(option) => option.item_name}
                                         onChange={(event, value) => {
                                             if (value) {
                                                 setSelectedStock(value);
@@ -938,7 +947,7 @@ const Stock = () => {
                                 >
                                     <Typography sx={{ fontSize: theme.typography.h5 }}>Current amount</Typography>
                                     <Typography sx={{ fontSize: theme.typography.h4 }}>
-                                        {selectedStock.quantity} - {selectedStock.unit}
+                                        {selectedStock.stock_quantity} - {selectedStock.stock_unit}
                                     </Typography>
                                 </Grid>
                             </Grid>
@@ -955,12 +964,13 @@ const Stock = () => {
                                         sx={{ marginTop: 2, backgroundColor: theme.palette.background.default }}
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Grid item xs={12} sm={3} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                     <Button
+                                        fullWidth
                                         type="submit"
                                         variant="contained"
                                         color="primary"
-                                        sx={{ paddingX: 4, paddingY: 1.6, marginTop: 2 }}
+                                        sx={{ paddingX: 5, paddingY: 1.5, marginTop: 2 }}
                                     >
                                         {spinner ? (
                                             <div className="spinner-border spinner-border-sm text-dark " role="status">
@@ -1073,6 +1083,7 @@ const ProductRow = ({ product }) => {
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedItem, setSelectedItems] = useState();
+
     const handleMenuClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -1266,7 +1277,7 @@ const ProductRow = ({ product }) => {
                 </TableCell>
             </TableRow>
 
-            <Dialog open={dialogOpen} onClose={handleDialogClose}>
+            {/* <Dialog open={dialogOpen} onClose={handleDialogClose}>
                 <DialogTitle>Delete Product</DialogTitle>
                 <DialogContent>Do you want to delete {selectedProduct ? selectedProduct.name : ''} ?</DialogContent>
                 <DialogActions>
@@ -1283,7 +1294,7 @@ const ProductRow = ({ product }) => {
                         )}
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog> */}
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
                     {popup.message}
