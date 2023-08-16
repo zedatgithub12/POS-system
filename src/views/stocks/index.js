@@ -128,67 +128,35 @@ const Stock = () => {
                 severity: 'error',
                 message: 'Please enter the new price'
             });
-        } else if (checked) {
-            setUpdating(true);
-            var Api = Connections.api + Connections.updateallprice;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            var data = {
-                productid: selectedStock.id,
-                productcode: selectedStock.code,
-                name: selectedStock.shop,
-                from: selectedStock.price,
-                to: inputValue
-            };
-
-            fetch(Api, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(data),
-                cache: 'no-cache'
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'success',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    } else {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: response.message
-                        });
-                        setUpdating(false);
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: 'There is error updating price'
-                    });
-                    setUpdating(false);
-                });
+        } else if (shopId == null && shopName === '') {
+            selectedStock;
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Select shop'
+            });
+        } else if (selectedStock.length == 0) {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please select stock item first'
+            });
         } else {
             setUpdating(true);
-            var Api = Connections.api + Connections.updateprice;
+            var singleItem = Connections.api + Connections.updateprice;
+            var allItems = Connections.api + Connections.updateallprice;
+            var Api = checked ? allItems : singleItem;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
             };
             var data = {
                 productid: selectedStock.id,
-                name: selectedStock.shop,
-                from: selectedStock.price,
+                productcode: selectedStock.item_code,
+                name: selectedStock.stock_shop,
+                from: selectedStock.stock_price,
                 to: inputValue
             };
 
@@ -308,11 +276,12 @@ const Stock = () => {
         setShopId(value.id);
         setShopsName(value.name);
         setSelectedStock([]);
-        getStock(value.name);
+        getShopStock(value.name);
     };
-    const getStock = (shop) => {
+
+    const getShopStock = (shop) => {
         setStockLoader(true);
-        var Api = Connections.api + Connections.stocks;
+        var Api = Connections.api + Connections.getShopStocks + shop;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
@@ -326,7 +295,7 @@ const Stock = () => {
             .then((response) => response.json())
             .then((response) => {
                 if (response.success) {
-                    setStockData(response.data.data);
+                    setStockData(response.data);
                     setStockLoader(false);
                 } else {
                     setStockData([]);
@@ -343,6 +312,78 @@ const Stock = () => {
                 setStockLoader(false);
             });
     };
+
+    const getShops = () => {
+        var Api = Connections.api + Connections.viewstore;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'GET',
+            headers: headers,
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setShops(response.data);
+                } else {
+                    setShops(shops);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error fetching shop!'
+                });
+            });
+    };
+
+    useEffect(() => {
+        const getStocks = () => {
+            setLoading(true);
+            var AdminApi = Connections.api + Connections.stocks + `?page=${page}&limit=${rowsPerPage}`;
+            var saleApi = Connections.api + Connections.shopStocks + users.store_name + `?page=${page}&limit=${rowsPerPage}`;
+            var Api = users.role === 'Admin' ? AdminApi : saleApi;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers,
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setProductData(response.data.data);
+                        setTotalRecords(response.data.last_page);
+                        setLoading(false);
+                    } else {
+                        setProductData(productData);
+                        setLoading(false);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error fetching product!'
+                    });
+                    setLoading(false);
+                });
+        };
+
+        getStocks();
+        return () => {};
+    }, [page, rowsPerPage]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -429,82 +470,6 @@ const Stock = () => {
                 });
         }
     };
-
-    const getShops = () => {
-        var Api = Connections.api + Connections.viewstore;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'GET',
-            headers: headers,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setShops(response.data);
-                    console.log(response.data);
-                } else {
-                    setShops(shops);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error fetching shop!'
-                });
-            });
-    };
-
-    useEffect(() => {
-        const getProducts = () => {
-            setLoading(true);
-            var AdminApi = Connections.api + Connections.stocks + `?page=${page}&limit=${rowsPerPage}`;
-            var saleApi = Connections.api + Connections.shopStocks + users.store_name + `?page=${page}&limit=${rowsPerPage}`;
-            var Api = users.role === 'Admin' ? AdminApi : saleApi;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            // Make the API call using fetch()
-            fetch(Api, {
-                method: 'GET',
-                headers: headers,
-                cache: 'no-cache'
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        var selectedShop = response.data.data[Preferences.defaultshop].stock_shop;
-                        setProductData(response.data.data);
-                        setTotalRecords(response.data.last_page);
-                        // setShopFilter(selectedShop);
-                        setLoading(false);
-                    } else {
-                        setProductData(productData);
-                        setLoading(false);
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: 'There is error fetching product!'
-                    });
-                    setLoading(false);
-                });
-        };
-
-        getProducts();
-        return () => {};
-    }, [page, rowsPerPage]);
-
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -733,10 +698,10 @@ const Stock = () => {
                         backgroundColor: theme.palette.primary.main
                     }}
                 >
-                    <DialogTitle sx={{ fontSize: theme.typography.h4 }}>Price Update </DialogTitle>
-                    <Button variant="text" color="dark" onClick={handleUpdateDialogClose}>
+                    <DialogTitle sx={{ fontSize: theme.typography.h4, color: theme.palette.background.default }}>Update Price</DialogTitle>
+                    <IconButton variant="text" color="dark" onClick={handleUpdateDialogClose} sx={{ marginRight: 1 }}>
                         <IconX />
-                    </Button>
+                    </IconButton>
                 </Box>
 
                 <Divider />
@@ -745,9 +710,10 @@ const Stock = () => {
                         <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handlePUSubmit}>
                             <Grid container>
                                 <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Grid item xs={12} sm={12}>
+                                    <Grid item xs={12} sm={8}>
                                         <Autocomplete
                                             required
+                                            disabled={checked ? true : false}
                                             options={shops}
                                             getOptionLabel={(option) => option.name}
                                             onChange={(event, value) => {
@@ -759,6 +725,29 @@ const Stock = () => {
                                             noOptionsText="Loading..."
                                         />
                                     </Grid>
+                                    <Grid
+                                        item
+                                        xs={12}
+                                        sm={3}
+                                        sx={{
+                                            backgroundColor: theme.palette.primary.light,
+                                            borderRadius: 2,
+                                            borderWidth: 1
+                                        }}
+                                    >
+                                        <FormControlLabel
+                                            label="Apply to all"
+                                            control={
+                                                <Checkbox
+                                                    checked={checked}
+                                                    onChange={handleCheckboxChange}
+                                                    name="checked"
+                                                    color="primary"
+                                                />
+                                            }
+                                            className="my-1 ms-2 "
+                                        />
+                                    </Grid>
                                 </Grid>
 
                                 <Grid container>
@@ -766,9 +755,8 @@ const Stock = () => {
                                         <Autocomplete
                                             required
                                             key={stockData.id}
-                                            disabled={shopId ? false : true}
                                             options={stockData}
-                                            getOptionLabel={(option) => option.name}
+                                            getOptionLabel={(option) => option.item_name}
                                             onChange={(event, value) => {
                                                 if (value) {
                                                     setSelectedStock(value);
@@ -814,11 +802,11 @@ const Stock = () => {
                                         }}
                                     >
                                         <Typography sx={{ fontSize: theme.typography.h5 }}>Current price</Typography>
-                                        <Typography sx={{ fontSize: theme.typography.h4 }}>{selectedStock.price} ETB</Typography>
+                                        <Typography sx={{ fontSize: theme.typography.h4 }}>{selectedStock.stock_price} ETB</Typography>
                                     </Grid>
                                 </Grid>
                                 <Grid container>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid item xs={12} sm={12}>
                                         <TextField
                                             required
                                             fullWidth
@@ -829,35 +817,29 @@ const Stock = () => {
                                             onChange={handleInputChange}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <FormControlLabel
-                                            label="Apply to all"
-                                            control={
-                                                <Checkbox
-                                                    checked={checked}
-                                                    onChange={handleCheckboxChange}
-                                                    name="checked"
-                                                    color="primary"
-                                                />
-                                            }
-                                            className="mt-2 ms-2"
-                                        />
-                                    </Grid>
                                 </Grid>
-                                <Grid item xs={12} sm={6} sx={{ display: 'flex', alignItems: 'flex-baseline', justifyContent: 'flex-end' }}>
+                                <Grid
+                                    item
+                                    xs={12}
+                                    sm={12}
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'flex-end'
+                                    }}
+                                >
                                     <Button
-                                        fullWidth
                                         type="submit"
                                         variant="contained"
                                         color="primary"
-                                        sx={{ paddingX: 4, paddingY: 1.6, marginTop: 4 }}
+                                        sx={{ paddingX: 8, paddingY: 1.3, marginTop: 3, marginRight: 1 }}
                                     >
                                         {updating ? (
                                             <div className="spinner-border spinner-border-sm text-dark " role="status">
                                                 <span className="visually-hidden">Loading...</span>
                                             </div>
                                         ) : (
-                                            'Submit'
+                                            'Apply'
                                         )}
                                     </Button>
                                 </Grid>
@@ -1129,6 +1111,7 @@ const ProductRow = ({ product }) => {
                         severity: 'success',
                         message: response.message
                     });
+                    setAnchorEl(null);
                 } else {
                     setPopup({
                         ...popup,
@@ -1313,21 +1296,19 @@ const ProductRow = ({ product }) => {
 ProductRow.propTypes = {
     product: PropTypes.shape({
         id: PropTypes.number,
-        picture: PropTypes.string,
-        name: PropTypes.string.isRequired,
-        category: PropTypes.string.isRequired,
-        sub_category: PropTypes.string.isRequired,
-        brand: PropTypes.string.isRequired,
-        price: PropTypes.number.isRequired,
-        quantity: PropTypes.number.isRequired,
-        min_quantity: PropTypes.number.isRequired,
-        origional_quantity: PropTypes.number.isRequired,
-        status: PropTypes.string.isRequired,
-        code: PropTypes.string.isRequired,
-        cost: PropTypes.number.isRequired,
-        unit: PropTypes.string.isRequired,
-        shop: PropTypes.string.isRequired,
-        description: PropTypes.string.isRequired
+        item_image: PropTypes.string,
+        item_name: PropTypes.string.isRequired,
+        item_category: PropTypes.string.isRequired,
+        item_sub_category: PropTypes.string.isRequired,
+        item_brand: PropTypes.string.isRequired,
+        stock_price: PropTypes.number.isRequired,
+        stock_quantity: PropTypes.number.isRequired,
+        stock_min_quantity: PropTypes.number.isRequired,
+        stock_status: PropTypes.string.isRequired,
+        item_code: PropTypes.string.isRequired,
+        stock_cost: PropTypes.number,
+        stock_unit: PropTypes.string.isRequired,
+        stock_shop: PropTypes.string.isRequired
     }).isRequired
 };
 export default Stock;

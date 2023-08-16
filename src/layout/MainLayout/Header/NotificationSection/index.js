@@ -102,7 +102,7 @@ const NotificationSection = () => {
 
     const handleOpenNotification = (notificationInfo) => {
         if (notificationInfo.type === 'stock') {
-            navigate('/view-product', { state: { ...notificationInfo } });
+            navigate('/view-stock', { state: { ...notificationInfo } });
             setOpen(false);
         } else {
             var statusChecked = true;

@@ -44,6 +44,7 @@ const Connections = {
     //Stock api's
     stocks: '/stocks',
     shopStocks: '/shopStocks/',
+    getShopStocks: '/getShopStocks/',
     createStocks: '/create-stocks',
     getStock: '/get-stocks/',
     updateStock: '/update-stocks/',

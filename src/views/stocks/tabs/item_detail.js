@@ -61,12 +61,27 @@ const ItemDetail = ({ stock }) => {
                             <TableRow>
                                 <TableCell>SKU</TableCell>
                                 <TableCell>
-                                    <span className="bg-success bg-opacity-10 text-success px-4 py-1 rounded">{stock.stock_unit}</span>
+                                    {' '}
+                                    <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded">{stock.stock_unit}</span>
                                 </TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell>Status</TableCell>
-                                <TableCell>{stock.stock_status}</TableCell>
+                                <TableCell>
+                                    <span
+                                        className={
+                                            stock.stock_status === 'In-Stock'
+                                                ? 'bg-success bg-opacity-10 text-success px-2 py-1 rounded'
+                                                : stock.stock_status === 'Out-Of-Stock'
+                                                ? 'bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded'
+                                                : stock.stock_status === 'Hold'
+                                                ? 'bg-info bg-opacity-10 text-info px-2 py-1 rounded'
+                                                : 'bg-danger bg-opacity-10 text-danger px-2 py-1 rounded'
+                                        }
+                                    >
+                                        {stock.stock_status}
+                                    </span>
+                                </TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
