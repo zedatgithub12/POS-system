@@ -40,6 +40,30 @@ const getDashboardItems = (role) => {
             breadcrumbs: false
         },
         {
+            id: 'category',
+            title: 'Categories',
+            type: 'collapse',
+            url: '/categories',
+            icon: icons.IconCategory,
+            breadcrumbs: false,
+            children: [
+                {
+                    id: 'maincategory',
+                    title: 'Main Category',
+                    type: 'item',
+                    url: '/categories',
+                    breadcrumbs: false
+                },
+                {
+                    id: 'subcategory',
+                    title: 'Sub Category',
+                    type: 'item',
+                    url: '/sub-categories',
+                    breadcrumbs: false
+                }
+            ]
+        },
+        {
             id: 'products',
             title: 'Products',
             type: 'item',
@@ -68,42 +92,17 @@ const getDashboardItems = (role) => {
                     type: 'item',
                     url: '/transfer-stock',
                     breadcrumbs: false
+                },
+                {
+                    id: 'packages',
+                    title: 'Packages',
+                    type: 'item',
+                    url: '/packages',
+                    breadcrumbs: false
                 }
             ]
         },
 
-        {
-            id: 'packages',
-            title: 'Packages',
-            type: 'item',
-            url: '/packages',
-            icon: icons.IconPackages,
-            breadcrumbs: false
-        },
-        {
-            id: 'category',
-            title: 'Categories',
-            type: 'collapse',
-            url: '/categories',
-            icon: icons.IconCategory,
-            breadcrumbs: false,
-            children: [
-                {
-                    id: 'maincategory',
-                    title: 'Main Category',
-                    type: 'item',
-                    url: '/categories',
-                    breadcrumbs: false
-                },
-                {
-                    id: 'subcategory',
-                    title: 'Sub Category',
-                    type: 'item',
-                    url: '/sub-categories',
-                    breadcrumbs: false
-                }
-            ]
-        },
         {
             id: 'sales',
             title: 'Sales',

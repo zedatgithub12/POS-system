@@ -6,10 +6,7 @@ import {
     Divider,
     Box,
     Paper,
-    Autocomplete,
-    InputAdornment,
     Button,
-    IconButton,
     Typography,
     TextField,
     TableContainer,
@@ -28,8 +25,8 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Connections from 'api';
-import { Delete } from '@mui/icons-material';
 import Transfering from 'assets/images/transfering.png';
+import { IconArrowRight } from '@tabler/icons';
 
 // ==============================|| Transfer Stock ||============================== //
 
@@ -47,10 +44,8 @@ const UpdateStockTransfer = () => {
 
     const userString = sessionStorage.getItem('user');
     const user = JSON.parse(userString);
-    const [shopId, setShopId] = useState(item.sendershopid);
-    const [shopName, setShopsName] = useState(item.sendershopname);
-    const [receivingShopId, setReceivingShopId] = useState(item.receivershopid);
-    const [receivingshopName, setReceivingShopsName] = useState(item.receivershopname);
+    const [shopName] = useState(item.sendershopname);
+    const [receivingshopName] = useState(item.receivershopname);
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(false);
     const [productData, setProductData] = useState([]);
@@ -70,102 +65,6 @@ const UpdateStockTransfer = () => {
             ...popup,
             status: false
         });
-    };
-
-    const handleShopSelection = (value) => {
-        setShopId(value.id);
-        setShopsName(value.name);
-        getProducts(value.name);
-    };
-
-    const handleReceivingShopSelection = (value) => {
-        setReceivingShopId(value.id);
-        setReceivingShopsName(value.name);
-    };
-
-    const getProducts = (shop) => {
-        setLoading(true);
-        var Api = Connections.api + Connections.viewstoreproduct + shop;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'GET',
-            headers: headers,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setProductData(response.data);
-                    setLoading(false);
-                } else {
-                    setProductData([]);
-                    setLoading(false);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error fetching product!'
-                });
-                setLoading(false);
-            });
-    };
-    const handleAddToCart = (product) => {
-        const existingItem = JSON.parse(Items).find((item) => item.id === product.id);
-
-        if (existingItem) {
-            // If it does, update the quantity of the existing item
-            const updatedItems = JSON.parse(Items).map((item) => {
-                if (item.id === product.id) {
-                    return { ...item, quantity: item.quantity + 1 };
-                }
-                return item;
-            });
-            setItems(JSON.stringify(updatedItems));
-        } else {
-            const newItem = {
-                id: product.id,
-                name: product.name,
-                code: product.code,
-                unit: product.unit,
-                existing: product.quantity,
-                quantity: 1
-            };
-            var existing = JSON.parse(Items);
-            const updatedItems = [...existing, newItem];
-
-            setItems(JSON.stringify(updatedItems));
-        }
-    };
-
-    const handleRemoveFromCart = (product) => {
-        const updatedItems = JSON.parse(Items).filter((item) => item.id !== product.id);
-        setItems(JSON.stringify(updatedItems));
-    };
-    const handleIncrement = (id) => {
-        const updatedItems = JSON.parse(Items).map((item) => {
-            if (item.id === id) {
-                return { ...item, quantity: item.quantity + 1 };
-            }
-            return item;
-        });
-        setItems(JSON.stringify(updatedItems));
-    };
-
-    const handleDecrement = (id) => {
-        const updatedItems = JSON.parse(Items).map((item) => {
-            if (item.id === id && item.quantity > 0) {
-                return { ...item, quantity: item.quantity - 1 };
-            }
-            return item;
-        });
-        setItems(JSON.stringify(updatedItems));
     };
 
     //submit data to api
@@ -199,11 +98,6 @@ const UpdateStockTransfer = () => {
                 'Content-Type': 'application/json'
             };
             var Data = {
-                sendershopid: shopId,
-                sendershopname: shopName,
-                receivershopid: receivingShopId,
-                receivershopname: receivingshopName,
-
                 note: note,
                 userid: user.id
             };
@@ -292,7 +186,7 @@ const UpdateStockTransfer = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Transfer Stock</Typography>
+                                    <Typography variant="h3">Update Transfer </Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -309,40 +203,17 @@ const UpdateStockTransfer = () => {
                 </Grid>
 
                 <Grid item xs={12}>
-                    <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleSubmit}>
+                    <form style={{ marginBottom: '1rem' }} onSubmit={handleSubmit}>
                         <Grid container>
-                            <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Grid item xs={12} sm={6}>
-                                    <Autocomplete
-                                        required
-                                        options={shops}
-                                        getOptionLabel={(option) => option.name}
-                                        onChange={(event, value) => {
-                                            if (value) {
-                                                handleShopSelection(value);
-                                            }
-                                        }}
-                                        defaultValue={{ name: shopName }}
-                                        renderInput={(params) => <TextField {...params} label="Sending Shop" variant="outlined" />}
-                                        noOptionsText="Loading..."
-                                    />
-                                </Grid>
+                            <Grid item sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Typography variant="h4">{shopName}</Typography>
 
-                                <Grid item xs={12} sm={5}>
-                                    <Autocomplete
-                                        required
-                                        options={shops}
-                                        getOptionLabel={(option) => option.name}
-                                        onChange={(event, value) => {
-                                            if (value) {
-                                                handleReceivingShopSelection(value);
-                                            }
-                                        }}
-                                        defaultValue={{ name: receivingshopName }}
-                                        renderInput={(params) => <TextField {...params} label="Receiving Shop" variant="outlined" />}
-                                        noOptionsText="Loading..."
-                                    />
-                                </Grid>
+                                <Box sx={{ marginX: 2 }}>
+                                    <IconArrowRight size={22} />
+                                </Box>
+                                <Typography variant="h4" color={theme.palette.primary.main}>
+                                    {receivingshopName}
+                                </Typography>
                             </Grid>
 
                             <Grid container>
@@ -373,17 +244,21 @@ const UpdateStockTransfer = () => {
                                             <TableBody>
                                                 {JSON.parse(Items).map((item, index) => (
                                                     <TableRow key={index}>
-                                                        <TableCell>{item.name}</TableCell>
-                                                        <TableCell>{item.code}</TableCell>
+                                                        <TableCell>{item.item_name}</TableCell>
+                                                        <TableCell>{item.item_code}</TableCell>
                                                         <TableCell>{item.existing}</TableCell>
                                                         <TableCell>
                                                             <Box display="flex" alignItems="center">
                                                                 {/* <Button onClick={() => handleDecrement(item.id)}>-</Button> */}
-                                                                <Typography>{item.quantity}</Typography>
+                                                                <Typography>
+                                                                    <span className="bg-success bg-opacity-10 text-success px-3 py-1 rounded">
+                                                                        {item.stock_quantity}
+                                                                    </span>
+                                                                </Typography>
                                                                 {/* <Button onClick={() => handleIncrement(item.id)}>+</Button> */}
                                                             </Box>
                                                         </TableCell>
-                                                        <TableCell>{item.unit}</TableCell>
+                                                        <TableCell>{item.stock_unit}</TableCell>
                                                         {/* 
                                                         <TableCell>
                                                             <IconButton onClick={() => handleRemoveFromCart(item)}>

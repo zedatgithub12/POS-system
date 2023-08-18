@@ -14,10 +14,6 @@ import {
     IconButton,
     MenuItem,
     TablePagination,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
     Button,
     Box,
     Collapse,
@@ -28,7 +24,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
-import { IconTrash, IconEdit } from '@tabler/icons';
+import { IconEdit } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
@@ -80,6 +76,11 @@ const Transfers = () => {
         setPage(0);
     };
 
+    const SliceDate = (date) => {
+        const fromattedDate = date.slice(0, 10);
+        return fromattedDate;
+    };
+
     const filteredData = stocktransfers.filter((record) => {
         let isMatch = true;
 
@@ -91,7 +92,7 @@ const Transfers = () => {
             isMatch = isMatch && record.receivershopname.includes(receiverFilter);
         }
         if (filterDate !== 'Date') {
-            isMatch = isMatch && record.created_at === filterDate;
+            isMatch = isMatch && SliceDate(record.created_at) === filterDate;
         }
         if (statusFilter !== 'Status') {
             isMatch = isMatch && record.status === statusFilter;
@@ -148,12 +149,12 @@ const Transfers = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Transfers</Typography>
+                                    <Typography variant="h3">Stock Transfers</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
                         <Grid item>
-                            {users.role === 'Admin' ? (
+                            {users.role === 'Admin' && (
                                 <>
                                     <Button
                                         component={Link}
@@ -165,7 +166,7 @@ const Transfers = () => {
                                         Make New Transfer
                                     </Button>
                                 </>
-                            ) : null}
+                            )}
                         </Grid>
                     </Grid>
                 </Grid>
@@ -174,7 +175,7 @@ const Transfers = () => {
                     <Divider />
                 </Grid>
                 <Grid item xs={12}>
-                    <Box paddingX="2" className="shadow-1 p-4 rounded ">
+                    <Box paddingX="2" className="shadow-1 p-2 rounded ">
                         <FormControl className="ms-2 my-2 ">
                             <Select value={shopFilter} onChange={handleShopFilterChange}>
                                 <MenuItem value="Sender">Sending Shop</MenuItem>
@@ -200,7 +201,7 @@ const Transfers = () => {
                         <FormControl className="ms-2 my-2">
                             <Select value={filterDate} onChange={handleFilterDateChange}>
                                 <MenuItem value="Date">Transfer Date</MenuItem>
-                                {Array.from(new Set(stocktransfers.map((transfer) => transfer.created_at))).map((date) => (
+                                {Array.from(new Set(stocktransfers.map((transfer) => SliceDate(transfer.created_at)))).map((date) => (
                                     <MenuItem key={date} value={date}>
                                         {DateFormatter(date)}
                                     </MenuItem>
@@ -209,10 +210,12 @@ const Transfers = () => {
                         </FormControl>
 
                         <FormControl className="ms-2 my-2 ">
-                            <Select value={statusFilter} onChange={handleStatusFilterChange}>
-                                <MenuItem value="Status">Status</MenuItem>
+                            <Select value={statusFilter} onChange={handleStatusFilterChange} sx={{ textTransform: 'capitalize' }}>
+                                <MenuItem value="Status" sx={{ textTransform: 'capitalize' }}>
+                                    Status
+                                </MenuItem>
                                 {Array.from(new Set(stocktransfers.map((item) => item.status))).map((status) => (
-                                    <MenuItem key={status} value={status}>
+                                    <MenuItem key={status} value={status} sx={{ textTransform: 'capitalize' }}>
                                         {status}
                                     </MenuItem>
                                 ))}
@@ -395,39 +398,19 @@ const ProductRow = ({ product }) => {
                 <TableCell>{TimeCoverter(product.created_at)}</TableCell>
                 <TableCell>{product.note}</TableCell>
                 <TableCell>
-                    {product.status === 'inactive' ? (
-                        <Box
-                            sx={{
-                                bgcolor: theme.palette.error.light,
-                                color: theme.palette.error.dark,
-                                textTransform: 'capitalize',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: 4,
-                                textAlign: 'center'
-                            }}
-                        >
-                            {product.status}
-                        </Box>
-                    ) : (
-                        <Box
-                            sx={{
-                                bgcolor: theme.palette.success.light,
-                                color: theme.palette.success.dark,
-                                textTransform: 'capitalize',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: 4,
-                                textAlign: 'center'
-                            }}
-                        >
-                            {product.status}
-                        </Box>
-                    )}
+                    <span
+                        className={
+                            product.status === 'done'
+                                ? 'bg-success bg-opacity-10 text-success px-2 py-1 rounded text-capitalize '
+                                : 'bg-danger bg-opacity-10 text-danger px-2 py-1 rounded text-capitalize'
+                        }
+                    >
+                        {product.status}
+                    </span>
                 </TableCell>
                 <>
                     <TableCell>
-                        {users.role === 'Admin' ? (
+                        {users.role === 'Admin' && (
                             <>
                                 <IconButton
                                     aria-label="Edit row"
@@ -440,11 +423,11 @@ const ProductRow = ({ product }) => {
                                 >
                                     <IconEdit />
                                 </IconButton>
-                                <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
+                                {/* <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
                                     <IconTrash />
-                                </IconButton>
+                                </IconButton> */}
                             </>
-                        ) : null}
+                        )}
                     </TableCell>
                 </>
             </TableRow>
@@ -465,19 +448,23 @@ const ProductRow = ({ product }) => {
                                             <TableRow>
                                                 <TableCell>Item Name</TableCell>
                                                 <TableCell>Item Code</TableCell>
-                                                <TableCell>Unit</TableCell>
+                                                <TableCell>SKU</TableCell>
                                                 <TableCell>Existing</TableCell>
-                                                <TableCell>Added</TableCell>
+                                                <TableCell>Transfered</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
                                             {JSON.parse(product.items).map((item, index) => (
                                                 <TableRow key={index}>
-                                                    <TableCell>{item.name}</TableCell>
-                                                    <TableCell>{item.code}</TableCell>
-                                                    <TableCell>{item.unit}</TableCell>
+                                                    <TableCell>{item.item_name}</TableCell>
+                                                    <TableCell>{item.item_code}</TableCell>
+                                                    <TableCell>{item.stock_unit}</TableCell>
                                                     <TableCell>{item.existing}</TableCell>
-                                                    <TableCell>{item.quantity}</TableCell>
+                                                    <TableCell>
+                                                        <span className="bg-primary bg-opacity-10 text-primary px-4 py-1 rounded">
+                                                            {item.stock_quantity}
+                                                        </span>
+                                                    </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
@@ -489,7 +476,7 @@ const ProductRow = ({ product }) => {
                 </TableCell>
             </TableRow>
 
-            <Dialog open={dialogOpen} onClose={handleDialogClose}>
+            {/* <Dialog open={dialogOpen} onClose={handleDialogClose}>
                 <DialogTitle>Delete Record</DialogTitle>
                 <DialogContent>Do you want to delete the transfer?</DialogContent>
                 <DialogActions>
@@ -506,7 +493,7 @@ const ProductRow = ({ product }) => {
                         )}
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog> */}
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
                     {popup.message}
