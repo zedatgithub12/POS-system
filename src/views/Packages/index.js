@@ -30,7 +30,18 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
-import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
+import {
+    IconTrash,
+    IconEdit,
+    IconSearch,
+    IconCheck,
+    IconCircleCheck,
+    IconCircleDashed,
+    IconCheckbox,
+    IconSquare,
+    IconSquareCheck,
+    IconSquareRoundedCheck
+} from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
@@ -39,6 +50,7 @@ import PropTypes from 'prop-types';
 import Connections from 'api';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { ActivityIndicators } from 'ui-component/activityIndicator';
+import { DateFormatter } from 'utils/functions';
 
 // ==============================|| PACKAGES PAGE ||============================== //
 
@@ -115,7 +127,7 @@ const Packages = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        setPackages(response.data);
+                        setPackages(response.data.data);
                         setShopFilter(response.data.length > 0 ? response.data[1].shopname : 'Shop');
                         setLoading(false);
                     } else {
@@ -217,7 +229,6 @@ const Packages = () => {
                             <Table aria-label="product table">
                                 <TableHead className="bg-light">
                                     <TableRow>
-                                        <TableCell></TableCell>
                                         <TableCell>Name</TableCell>
                                         <TableCell>Shop</TableCell>
                                         <TableCell>Price</TableCell>
@@ -349,7 +360,7 @@ const ProductRow = ({ product }) => {
                     ...popup,
                     status: true,
                     severity: 'error',
-                    message: 'There is error deleting product!'
+                    message: 'There is error deleting package!'
                 });
                 setSpinner(false);
             });
@@ -363,110 +374,44 @@ const ProductRow = ({ product }) => {
         <>
             <TableRow
                 hover
-                className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary rounded' : 'border-0 rounded'}
+                className={
+                    open ? 'bg-light border border-5 border-top-0 border-bottom-0 border-end-0 border-primary rounded' : 'border-0 rounded'
+                }
+                onClick={handleOpen}
             >
-                <TableCell>
-                    <IconButton aria-label="expand row" size="small" onClick={handleOpen}>
-                        {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-                    </IconButton>
-                </TableCell>
                 <TableCell>{product.name}</TableCell>
                 <TableCell>{product.shopname}</TableCell>
 
                 <TableCell>{product.price} Birr</TableCell>
-                <TableCell>{product.expiredate}</TableCell>
+                <TableCell>{DateFormatter(product.expiredate)}</TableCell>
 
                 <TableCell>
                     {product.status === 'inactive' ? (
-                        <Box
-                            sx={{
-                                bgcolor: theme.palette.error.light,
-                                color: theme.palette.error.dark,
-                                textTransform: 'capitalize',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: 4,
-                                textAlign: 'center'
-                            }}
-                        >
-                            {product.status}
-                        </Box>
+                        <span className="bg-danger bg-opacity-10 text-danger px-4 py-1 rounded text-capitalize">{product.status}</span>
                     ) : (
-                        <Box
-                            sx={{
-                                bgcolor: theme.palette.success.light,
-                                color: theme.palette.success.dark,
-                                textTransform: 'capitalize',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: 4,
-                                textAlign: 'center'
-                            }}
-                        >
-                            {product.status}
-                        </Box>
+                        <span className="bg-success bg-opacity-10 text-success px-4 py-1 rounded text-capitalize">{product.status}</span>
                     )}
                 </TableCell>
-                <>
-                    <TableCell>
-                        {users.role === 'Admin' ? (
-                            <>
-                                <IconButton
-                                    aria-label="Edit row"
-                                    size="small"
-                                    onClick={() =>
-                                        navigate('/update-package', {
-                                            state: { ...product }
-                                        })
-                                    }
-                                >
-                                    <IconEdit />
-                                </IconButton>
-                                <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
-                                    <IconTrash />
-                                </IconButton>
-                            </>
-                        ) : null}
-                    </TableCell>
-                </>
-            </TableRow>
-            <TableRow
-                className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary' : 'border-0'}
-                sx={{ bgcolor: theme.palette.primary.light }}
-            >
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Grid container>
-                            <Grid item xs={12}>
-                                <Box margin={1}>
-                                    <Typography variant="h5" gutterBottom sx={{ paddingLeft: 2, color: theme.palette.primary.dark }}>
-                                        Items In Package
-                                    </Typography>
-                                    <Table size="small" aria-label="product details">
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell>Item Name</TableCell>
-                                                <TableCell>Item Code</TableCell>
 
-                                                <TableCell>Quantity</TableCell>
-                                                <TableCell>Unit</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {JSON.parse(product.items).map((item, index) => (
-                                                <TableRow key={index}>
-                                                    <TableCell>{item.name}</TableCell>
-                                                    <TableCell>{item.code}</TableCell>
-                                                    <TableCell>{item.quantity}</TableCell>
-                                                    <TableCell>{item.unit}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </Box>
-                            </Grid>
-                        </Grid>
-                    </Collapse>
+                <TableCell sx={{ zIndex: 2 }}>
+                    {users.role === 'Admin' && (
+                        <>
+                            <IconButton
+                                aria-label="Edit row"
+                                size="small"
+                                onClick={() =>
+                                    navigate('/update-package', {
+                                        state: { ...product }
+                                    })
+                                }
+                            >
+                                <IconEdit />
+                            </IconButton>
+                            <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
+                                <IconTrash />
+                            </IconButton>
+                        </>
+                    )}
                 </TableCell>
             </TableRow>
 

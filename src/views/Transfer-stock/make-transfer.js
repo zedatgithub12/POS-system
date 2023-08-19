@@ -155,7 +155,7 @@ const TransferStock = () => {
     const handleIncrement = (id) => {
         const updatedItems = Items.map((item) => {
             if (item.id === id) {
-                return { ...item, stock_quantity: item.stock_quantity + 1 };
+                return { ...item, stock_quantity: parseInt(item.stock_quantity) + 1 };
             }
             return item;
         });
@@ -165,7 +165,7 @@ const TransferStock = () => {
     const handleDecrement = (id) => {
         const updatedItems = Items.map((item) => {
             if (item.id === id && item.stock_quantity > 0) {
-                return { ...item, stock_quantity: item.stock_quantity - 1 };
+                return { ...item, stock_quantity: parseInt(item.stock_quantity) - 1 };
             }
             return item;
         });
@@ -422,7 +422,7 @@ const TransferStock = () => {
                                                                 <Button onClick={() => handleDecrement(item.id)}>-</Button>
 
                                                                 <TextField
-                                                                    type="text"
+                                                                    type="number"
                                                                     value={item.stock_quantity}
                                                                     onChange={(event) => DirectInput(event, item.id)}
                                                                 />
