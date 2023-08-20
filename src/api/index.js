@@ -59,6 +59,11 @@ const Connections = {
     updatepackage: '/updatepackage/',
     deletepackage: '/deletepackage/',
 
+    //packaged items api
+    packagedItems: '/packaged-items/',
+    addPackagedItem: '/add-packaged-items/',
+    deletePackagedItem: '/packaged-items/',
+
     //sold package Api's
     createpackagesale: '/createpackagesale',
     viewpackagesale: '/viewsoldpackages',

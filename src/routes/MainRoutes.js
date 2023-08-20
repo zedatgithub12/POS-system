@@ -11,6 +11,7 @@ const UpdateTransfer = Loadable(lazy(() => import('views/Transfer-stock/update-t
 //package routing
 const Packages = Loadable(lazy(() => import('views/Packages')));
 const CreatePackage = Loadable(lazy(() => import('views/Packages/createPackage')));
+const PackageDetail = Loadable(lazy(() => import('views/Packages/packageDetail')));
 const UpdatePackage = Loadable(lazy(() => import('views/Packages/updatePackage')));
 
 //package selling routing
@@ -255,6 +256,10 @@ const MainRoutes = {
         {
             path: 'create-package',
             element: <CreatePackage />
+        },
+        {
+            path: 'view-package',
+            element: <PackageDetail />
         },
         {
             path: 'update-package',

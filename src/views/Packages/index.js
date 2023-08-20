@@ -14,6 +14,7 @@ import {
     IconButton,
     TextField,
     InputAdornment,
+    Menu,
     MenuItem,
     TablePagination,
     Dialog,
@@ -22,26 +23,14 @@ import {
     DialogActions,
     Button,
     Box,
-    Collapse,
     FormControl,
     Select
 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
-import {
-    IconTrash,
-    IconEdit,
-    IconSearch,
-    IconCheck,
-    IconCircleCheck,
-    IconCircleDashed,
-    IconCheckbox,
-    IconSquare,
-    IconSquareCheck,
-    IconSquareRoundedCheck
-} from '@tabler/icons';
+import { IconSearch } from '@tabler/icons';
+import { MoreVert } from '@mui/icons-material';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
@@ -283,10 +272,11 @@ const Packages = () => {
 const ProductRow = ({ product }) => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
-    const theme = useTheme();
 
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [selectedItem, setSelectedItems] = useState();
     const handleOpen = () => {
         setOpen(!open);
     };
@@ -313,6 +303,7 @@ const ProductRow = ({ product }) => {
         setSelectedProduct(product);
         setDialogOpen(true);
     };
+
     const handleDialogClose = () => {
         setSelectedProduct(null);
         setDialogOpen(false);
@@ -370,6 +361,18 @@ const ProductRow = ({ product }) => {
         return () => {};
     }, [spinner]);
 
+    const handleMenuClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+    const handleSelectItem = (event, item) => {
+        handleMenuClick(event);
+        setSelectedItems({ ...item });
+    };
+
     return (
         <>
             <TableRow
@@ -394,24 +397,28 @@ const ProductRow = ({ product }) => {
                 </TableCell>
 
                 <TableCell sx={{ zIndex: 2 }}>
-                    {users.role === 'Admin' && (
-                        <>
-                            <IconButton
-                                aria-label="Edit row"
-                                size="small"
-                                onClick={() =>
-                                    navigate('/update-package', {
-                                        state: { ...product }
-                                    })
-                                }
-                            >
-                                <IconEdit />
-                            </IconButton>
-                            <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
-                                <IconTrash />
-                            </IconButton>
-                        </>
-                    )}
+                    <IconButton aria-controls="row-menu" aria-haspopup="true" onClick={(event) => handleSelectItem(event, product)}>
+                        <MoreVert />
+                    </IconButton>
+                    <Menu
+                        id="row-menu"
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={Boolean(anchorEl)}
+                        onClose={handleMenuClose}
+                        className="shadow-sm"
+                    >
+                        <MenuItem onClick={() => navigate('/view-package', { state: { ...selectedItem } })}>View Package</MenuItem>
+
+                        {users.role === 'Admin' && (
+                            <>
+                                <MenuItem onClick={() => navigate('/update-package', { state: { ...selectedItem } })}>
+                                    Update Package
+                                </MenuItem>
+                                <MenuItem onClick={() => handleTrashClick(selectedItem)}>Delete Package</MenuItem>
+                            </>
+                        )}
+                    </Menu>
                 </TableCell>
             </TableRow>
 

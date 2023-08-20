@@ -17,7 +17,13 @@ import {
     TableBody,
     TableRow,
     TableCell,
-    TableHead
+    TableHead,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Menu,
+    MenuItem
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
@@ -30,6 +36,10 @@ import MainCard from 'ui-component/cards/MainCard';
 import Connections from 'api';
 import { gridSpacing } from 'store/constant';
 import packages from 'assets/images/packages.svg';
+import { ActivityIndicators } from 'ui-component/activityIndicator';
+import { IconCheck, IconPencil, IconRefresh, IconRotate } from '@tabler/icons';
+import { DialogBox } from './components/dialog';
+import { Stack } from '@mui/system';
 
 // ==============================|| UPDATE PACKAGE PAGE ||============================== //
 const Alert = forwardRef(function Alert(props, ref) {
@@ -50,12 +60,23 @@ const UpdatePackage = () => {
     const [shopName, setShopsName] = useState(item.shopname);
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [productData, setProductData] = useState([]);
+    const [Items, setItems] = useState([]);
+    const [stockData, setStockData] = useState([]);
+    const [selectedStock, setSelectedStock] = useState([]);
+    const [addedAmount, setAddedAmount] = useState();
     const [products, setProducts] = useState(item.items);
     const [name, setName] = useState(item.name);
     const [Price, setPrice] = useState(item.price);
-    const [date, setDate] = useState(item.date);
+    const [date, setDate] = useState(item.expiredate);
     const [spinner, setSpinner] = useState(false);
+    const [packageSpinner, setPackageSpinner] = useState(false);
+    const [stockLoader, setStockLoader] = useState(false);
+    const [itemQuantity, setItemQuantity] = useState();
+    const [addItemDialog, setAddItemDialog] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [selectedItem, setSelectedItems] = useState();
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -71,95 +92,13 @@ const UpdatePackage = () => {
         });
     };
 
-    const handleShopSelection = (value) => {
-        setShopId(value.id);
-        setShopsName(value.name);
-        getProducts(value.name);
-    };
-    const getProducts = (shop) => {
-        setLoading(true);
-        var Api = Connections.api + Connections.viewstoreproduct + shop;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'GET',
-            headers: headers,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setProductData(response.data.data);
-                    setLoading(false);
-                } else {
-                    setProductData([]);
-                    setLoading(false);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error fetching product!'
-                });
-                setLoading(false);
-            });
-    };
-    const handleAddToCart = (product) => {
-        const existingItem = JSON.parse(products).find((item) => item.id === product.id);
-
-        if (existingItem) {
-            // If it does, update the quantity of the existing item
-            const updatedItems = JSON.parse(products).map((item) => {
-                if (item.id === product.id) {
-                    return { ...item, quantity: item.quantity + 1 };
-                }
-                return item;
-            });
-            setProducts(JSON.stringify(updatedItems));
-        } else {
-            var newProduct = JSON.parse(products);
-            setProducts(
-                JSON.stringify([...newProduct, { id: product.id, name: product.name, code: product.code, unit: product.unit, quantity: 1 }])
-            );
-        }
-    };
-
-    const handleRemoveFromCart = (product) => {
-        const updatedItems = JSON.parse(products).filter((item) => item.id !== product.id);
-        setProducts(JSON.stringify(updatedItems));
-    };
-    const handleIncrement = (id) => {
-        const updatedItems = JSON.parse(products).map((item) => {
-            if (item.id === id) {
-                return { ...item, quantity: item.quantity + 1 };
-            }
-            return item;
-        });
-        setProducts(JSON.stringify(updatedItems));
-    };
-
-    const handleDecrement = (id) => {
-        const updatedItems = JSON.parse(products).map((item) => {
-            if (item.id === id && item.quantity > 0) {
-                return { ...item, quantity: item.quantity - 1 };
-            }
-            return item;
-        });
-        setProducts(JSON.stringify(updatedItems));
-    };
-
     const handleDateChange = (event) => {
         setDate(event.target.value);
     };
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        setSpinner(true);
+        setPackageSpinner(true);
         if (!shopName) {
             setPopup({
                 ...popup,
@@ -211,7 +150,7 @@ const UpdatePackage = () => {
                             severity: 'success',
                             message: response.message
                         });
-                        setSpinner(false);
+                        setPackageSpinner(false);
                     } else {
                         setPopup({
                             ...popup,
@@ -219,7 +158,7 @@ const UpdatePackage = () => {
                             severity: 'error',
                             message: response.message
                         });
-                        setSpinner(false);
+                        setPackageSpinner(false);
                     }
                 })
                 .catch(() => {
@@ -229,10 +168,126 @@ const UpdatePackage = () => {
                         severity: 'error',
                         message: 'There is error updating package!'
                     });
-                    setSpinner(false);
+                    setPackageSpinner(false);
                 });
         }
     };
+
+    const handleAddnewItem = (event) => {
+        event.preventDefault();
+        setSpinner(true);
+
+        // Handle form submission here
+        // Declare the data to be sent to the API
+        var Api = Connections.api + Connections.addPackagedItem + item.id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        var Data = {
+            id: selectedStock.id,
+            item_name: selectedStock.item_name,
+            item_code: selectedStock.item_code,
+            item_sku: selectedStock.stock_unit,
+            item_quantity: addedAmount
+        };
+
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(Data)
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error adding new package!'
+                });
+                setSpinner(false);
+            });
+    };
+
+    //delete item functions
+
+    const handleTrashClick = (product) => {
+        setSelectedStock(product);
+        setDialogOpen(true);
+    };
+    const handleDialogClose = () => {
+        setSelectedStock([]);
+        setDialogOpen(false);
+    };
+    const DeleteItem = () => {
+        // Do something with the deleted category
+        setSpinner(true);
+        var Api = Connections.api + Connections.deletePackagedItem + selectedStock.id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'DELETE',
+            headers: headers,
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+
+                    setSpinner(false);
+                    handleDialogClose();
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                    setSpinner(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error deleting package item!'
+                });
+                setSpinner(false);
+            });
+    };
+
     useEffect(() => {
         const getShops = () => {
             var Api = Connections.api + Connections.viewstore;
@@ -264,12 +319,116 @@ const UpdatePackage = () => {
                 });
         };
 
+        const getPackageItems = () => {
+            setLoading(true);
+            var Api = Connections.api + Connections.packagedItems + item.id;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers,
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setItems(response.data);
+                        setLoading(false);
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setLoading(false);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error package items!'
+                    });
+                    setLoading(false);
+                });
+        };
+
+        const getStocks = () => {
+            setLoading(true);
+            var Api = Connections.api + Connections.getShopStocks + item.shopname;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers,
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setStockData(response.data);
+                        setLoading(false);
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setLoading(false);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error fetching items!'
+                    });
+                    setLoading(false);
+                });
+        };
         if (user.role === 'Admin') {
             getShops();
+            getPackageItems();
+            getStocks();
         }
 
         return () => {};
-    }, []);
+    }, [popup]);
+
+    const DialogHideController = () => {
+        setAddItemDialog(false);
+    };
+    const DialogShowController = () => {
+        setAddItemDialog(true);
+    };
+
+    //update quantity mini modal
+    const handleMenuClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+    const handleSelectItem = (event, item) => {
+        handleMenuClick(event);
+        setSelectedItems({ ...item });
+    };
+
+    const handleQuantityUpdate = (event, item) => {
+        event.preventDefault();
+        alert(itemQuantity);
+    };
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -278,9 +437,7 @@ const UpdatePackage = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h4">
-                                        Update <span className="text-primary">{name}</span>
-                                    </Typography>
+                                    <Typography variant="h4">Update Package</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -296,184 +453,326 @@ const UpdatePackage = () => {
                     <Divider />
                 </Grid>
                 <Grid item xs={12}>
-                    <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleSubmit}>
-                        <Grid container>
-                            <Grid item xs={12} sm={6}>
-                                <Autocomplete
+                    <form style={{ marginBottom: '1rem' }} onSubmit={handleSubmit}>
+                        <Grid container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
+                            <Grid item xs={12} sm={12} md={6} lg={4} xl={3}>
+                                <TextField
+                                    fullwidth
+                                    label="Shop"
+                                    variant="outlined"
+                                    disabled={true}
+                                    value={shopName}
+                                    defaultValue={shopName}
+                                    sx={{ marginTop: 2 }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={12} md={6} lg={4} xl={3}>
+                                <TextField
+                                    fullwidth
                                     required
-                                    options={shops}
-                                    getOptionLabel={(option) => option.name}
+                                    label="Package name"
+                                    value={name}
+                                    onChange={(event) => setName(event.target.value)}
+                                    sx={{ marginTop: 2 }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={12} md={6} lg={4} xl={3}>
+                                <TextField
+                                    fullwidth
+                                    required
+                                    label="Package price"
+                                    value={Price}
+                                    onChange={(event) => setPrice(event.target.value)}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <Typography> ETB </Typography>
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                    sx={{ marginTop: 2 }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={12} md={6} lg={4} xl={3}>
+                                <TextField
+                                    fullwidth
+                                    required
+                                    id="date"
+                                    label="Expire date"
+                                    type="date"
+                                    value={date}
+                                    onChange={handleDateChange}
+                                    InputLabelProps={{
+                                        shrink: true
+                                    }}
+                                    sx={{ marginTop: 2 }}
+                                />
+                            </Grid>
+                        </Grid>
+
+                        <Box paddingTop={5} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                            <Button type="submit" variant="text" color="primary" sx={{ paddingX: 1 }}>
+                                {packageSpinner ? (
+                                    <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                ) : (
+                                    'Apply Change'
+                                )}
+                            </Button>
+                        </Box>
+                    </form>
+
+                    <Grid item xs={12}>
+                        <TableContainer component={Paper} sx={{ bgcolor: theme.palette.primary.light, marginY: 3 }}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Item Name</TableCell>
+                                        <TableCell>Item Code</TableCell>
+
+                                        <TableCell>Quantity</TableCell>
+                                        <TableCell>Item SKU</TableCell>
+                                        <TableCell align="center">Action</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                {loading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={4} align="center">
+                                            <Box
+                                                sx={{
+                                                    minHeight: 80,
+                                                    display: 'flex',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center'
+                                                }}
+                                            >
+                                                <ActivityIndicators />
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : Items.length > 0 ? (
+                                    <TableBody>
+                                        {Items.map((item, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell>{item.item_name}</TableCell>
+                                                <TableCell>{item.item_code}</TableCell>
+
+                                                <TableCell sx={{ position: 'relative' }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                        {' '}
+                                                        <Typography> {item.item_quantity}</Typography>{' '}
+                                                        <IconButton
+                                                            aria-controls="update quantity"
+                                                            aria-haspopup="true"
+                                                            onClick={(event) => handleSelectItem(event, item)}
+                                                        >
+                                                            <IconRefresh
+                                                                size={18}
+                                                                sx={{ marginLeft: 2, color: theme.palette.warning.dark }}
+                                                            />
+                                                        </IconButton>
+                                                    </Box>
+
+                                                    <Menu
+                                                        id="row-menu"
+                                                        anchorEl={anchorEl}
+                                                        keepMounted
+                                                        open={Boolean(anchorEl)}
+                                                        onClose={handleMenuClose}
+                                                        className="shadow-sm"
+                                                    >
+                                                        <MenuItem>
+                                                            <form onSubmit={(event) => handleQuantityUpdate(event, item)}>
+                                                                <Box
+                                                                    sx={{
+                                                                        display: 'grid',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'center',
+                                                                        paddingX: 2
+                                                                    }}
+                                                                >
+                                                                    <Typography variant="h5">Update Quantity</Typography>
+
+                                                                    <TextField
+                                                                        fullwidth
+                                                                        required
+                                                                        label="New Quantity"
+                                                                        value={itemQuantity}
+                                                                        onChange={(event) => setItemQuantity(event.target.value)}
+                                                                        sx={{ marginY: 2 }}
+                                                                    />
+                                                                    <Button
+                                                                        type="submit"
+                                                                        variant="outlined"
+                                                                        color="primary"
+                                                                        sx={{ paddingX: 1, marginBottom: 1 }}
+                                                                    >
+                                                                        Apply Change
+                                                                    </Button>
+                                                                </Box>
+                                                            </form>
+                                                        </MenuItem>
+                                                    </Menu>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="bg-primary bg-opacity-10 text-primary px-4 py-1 rounded">
+                                                        {item.item_sku}
+                                                    </span>
+                                                </TableCell>
+
+                                                <TableCell sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                    <IconButton onClick={() => handleTrashClick(item)}>
+                                                        <Delete />
+                                                    </IconButton>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                ) : (
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell colSpan={5} align="center" sx={{ borderBottom: 0 }}>
+                                                <Box padding={3}>
+                                                    <img src={packages} alt="Add Item" width="40%" height="40%" />
+                                                    <Typography variant="h4" color="textSecondary" sx={{ marginY: 4 }}>
+                                                        Add Package Item
+                                                    </Typography>
+                                                </Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                )}
+                            </Table>
+                        </TableContainer>
+
+                        <Box sx={{ display: 'flex' }}>
+                            <Button variant="text" color="primary" sx={{ paddingX: 1 }} onClick={() => DialogShowController()}>
+                                Add item to package
+                            </Button>
+                        </Box>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <DialogBox title="Add new item" openDialog={addItemDialog} handleDialogClose={() => DialogHideController()}>
+                <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleAddnewItem}>
+                    <Grid container>
+                        <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Grid item xs={12} sm={12}>
+                                <Typography>{item.item_name}</Typography>
+                            </Grid>
+                        </Grid>
+
+                        <Grid container>
+                            <Grid item xs={12} sm={12}>
+                                <Autocomplete
+                                    disabled={shopId ? false : true}
+                                    options={stockData}
+                                    getOptionLabel={(option) => option.item_name}
                                     onChange={(event, value) => {
                                         if (value) {
-                                            handleShopSelection(value);
+                                            setSelectedStock(value);
                                         }
                                     }}
-                                    defaultValue={{ name: shopName }}
                                     renderInput={(params) => (
-                                        <TextField {...params} label="Shop" variant="outlined" value={shopName} defaultValue={shopName} />
+                                        <TextField
+                                            {...params}
+                                            label="Select Item"
+                                            variant="outlined"
+                                            sx={{ backgroundColor: theme.palette.background.default }}
+                                        />
                                     )}
-                                    noOptionsText="Loading..."
+                                    noOptionsText={stockLoader ? <CircularProgress size={20} /> : 'No item in this shop'}
                                 />
                             </Grid>
 
-                            <Grid container>
-                                <Grid item xs={12} sm={6}>
-                                    <Autocomplete
-                                        required
-                                        key={productData.id}
-                                        disabled={shopId ? false : true}
-                                        options={productData}
-                                        getOptionLabel={(option) => option.name}
-                                        onChange={(event, value) => {
-                                            if (value) {
-                                                handleAddToCart(value);
-                                            }
-                                        }}
-                                        sx={{ marginTop: 2 }}
-                                        renderInput={(params) => <TextField {...params} label="Select Product" variant="outlined" />}
-                                        noOptionsText={loading ? <CircularProgress size={20} /> : 'No item in this shop'}
-                                    />
+                            {stockLoader && (
+                                <Grid item xs={12} sm={6} sx={{ color: '#ffbb00', display: 'flex', alignItems: 'center', paddingLeft: 1 }}>
+                                    <CircularProgress size={20} />
                                 </Grid>
-                                {loading && (
-                                    <Grid
-                                        item
-                                        xs={12}
-                                        sm={6}
-                                        sx={{ color: '#ffbb00', display: 'flex', alignItems: 'center', paddingLeft: 1 }}
-                                    >
-                                        <CircularProgress size={20} />
-                                    </Grid>
-                                )}
+                            )}
+                        </Grid>
+
+                        <Grid container>
+                            <Grid
+                                item
+                                xs={12}
+                                sx={{
+                                    display: 'grid',
+                                    alignItems: 'center',
+                                    padding: 2,
+                                    marginY: 2,
+                                    backgroundColor: theme.palette.primary.light,
+                                    borderRadius: 2
+                                }}
+                            >
+                                <Typography sx={{ fontSize: theme.typography.h5 }}>
+                                    Item Code {selectedStock.item_code && selectedStock.item_code}
+                                </Typography>
+                                <Typography sx={{ fontSize: theme.typography.h5, marginTop: 2 }}>
+                                    Item SKU{' '}
+                                    {selectedStock.stock_unit && (
+                                        <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 ms-2 rounded">
+                                            {selectedStock.stock_unit}
+                                        </span>
+                                    )}
+                                </Typography>
                             </Grid>
+                        </Grid>
 
-                            <Grid item xs={12}>
-                                <TableContainer component={Paper} sx={{ bgcolor: theme.palette.primary.light, marginY: 3 }}>
-                                    <Table>
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell>Item Name</TableCell>
-                                                <TableCell>Item Code</TableCell>
-
-                                                <TableCell>Quantity</TableCell>
-                                                <TableCell>Unit</TableCell>
-                                                <TableCell>Action</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        {products.length > 0 ? (
-                                            <TableBody>
-                                                {JSON.parse(products).map((item, index) => (
-                                                    <TableRow key={index}>
-                                                        <TableCell>{item.name}</TableCell>
-                                                        <TableCell>{item.code}</TableCell>
-
-                                                        <TableCell>
-                                                            <Box display="flex" alignItems="center">
-                                                                <Button onClick={() => handleDecrement(item.id)}>-</Button>
-                                                                <Typography>{item.quantity}</Typography>
-                                                                <Button onClick={() => handleIncrement(item.id)}>+</Button>
-                                                            </Box>
-                                                        </TableCell>
-                                                        <TableCell>{item.unit}</TableCell>
-
-                                                        <TableCell>
-                                                            <IconButton onClick={() => handleRemoveFromCart(item)}>
-                                                                <Delete />
-                                                            </IconButton>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        ) : (
-                                            <TableBody>
-                                                <TableRow>
-                                                    <TableCell colSpan={5} align="center" sx={{ borderBottom: 0 }}>
-                                                        <Box padding={3}>
-                                                            <img src={packages} alt="Add Item" width="40%" height="40%" />
-                                                            <Typography variant="h4" color="textSecondary" sx={{ marginY: 4 }}>
-                                                                Add Package Item
-                                                            </Typography>
-                                                        </Box>
-                                                    </TableCell>
-                                                </TableRow>
-                                            </TableBody>
-                                        )}
-                                    </Table>
-                                </TableContainer>
+                        <Grid container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Grid item xs={12} sm={8}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    type="text"
+                                    label="New Quantity"
+                                    value={addedAmount}
+                                    onChange={(event) => setAddedAmount(event.target.value)}
+                                    sx={{ marginTop: 2, backgroundColor: theme.palette.background.default }}
+                                />
                             </Grid>
-                            <Grid container>
-                                <Grid
-                                    item
-                                    xs={12}
-                                    sm={6}
-                                    sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginRight: 1 }}
+                            <Grid item xs={12} sm={3} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <Button
+                                    fullWidth
+                                    type="submit"
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{ paddingX: 5, paddingY: 1.5, marginTop: 2 }}
                                 >
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        label="Package Name"
-                                        value={name}
-                                        onChange={(event) => setName(event.target.value)}
-                                        sx={{ marginTop: 2 }}
-                                    />
-                                </Grid>
-
-                                <Grid
-                                    item
-                                    xs={12}
-                                    sm={6}
-                                    sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginRight: 1 }}
-                                >
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        label="Package Price"
-                                        value={Price}
-                                        onChange={(event) => setPrice(event.target.value)}
-                                        InputProps={{
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <Typography> ETB </Typography>
-                                                </InputAdornment>
-                                            )
-                                        }}
-                                        sx={{ marginTop: 2 }}
-                                    />
-                                </Grid>
-
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        required
-                                        fullWidth
-                                        id="date"
-                                        label="Expire Date"
-                                        type="date"
-                                        value={date}
-                                        onChange={handleDateChange}
-                                        InputLabelProps={{
-                                            shrink: true
-                                        }}
-                                        sx={{ marginTop: 2 }}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Box paddingTop={5}>
-                                <Button type="submit" variant="contained" color="primary" sx={{ paddingX: 4 }}>
                                     {spinner ? (
                                         <div className="spinner-border spinner-border-sm text-dark " role="status">
                                             <span className="visually-hidden">Loading...</span>
                                         </div>
                                     ) : (
-                                        'Update'
+                                        'Add'
                                     )}
                                 </Button>
-                                <Button onClick={GoBack} variant="text" color="error" sx={{ paddingX: 4, marginRight: 2 }}>
-                                    Cancel
-                                </Button>
-                            </Box>
+                            </Grid>
                         </Grid>
-                    </form>
-                </Grid>
-            </Grid>
+                    </Grid>
+                </form>
+            </DialogBox>
+
+            <Dialog open={dialogOpen} onClose={handleDialogClose}>
+                <DialogTitle>Delete Packages</DialogTitle>
+                <DialogContent>Do you want to delete {selectedStock ? selectedStock.item_name : ''} ?</DialogContent>
+                <DialogActions>
+                    <Button variant="text" color="primary" onClick={handleDialogClose}>
+                        Cancel
+                    </Button>
+                    <Button variant="text" color="error" onClick={() => DeleteItem(selectedStock.id)}>
+                        {spinner ? (
+                            <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        ) : (
+                            'Yes'
+                        )}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
                     {popup.message}
