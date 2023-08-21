@@ -5,14 +5,18 @@ export const stock_status = [
     },
     {
         id: 2,
-        label: 'Out-Of-Stock'
+        label: 'Critical Stock'
     },
     {
         id: 3,
-        label: 'Right-OFF'
+        label: 'Out-Of-Stock'
     },
     {
         id: 4,
+        label: 'Right-OFF'
+    },
+    {
+        id: 5,
         label: 'Hold'
     }
 ];

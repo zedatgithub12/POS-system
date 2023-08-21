@@ -74,7 +74,6 @@ const UpdatePackage = () => {
     const [itemQuantity, setItemQuantity] = useState();
     const [addItemDialog, setAddItemDialog] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
-
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedItem, setSelectedItems] = useState();
     const [popup, setPopup] = useState({
@@ -319,45 +318,6 @@ const UpdatePackage = () => {
                 });
         };
 
-        const getPackageItems = () => {
-            setLoading(true);
-            var Api = Connections.api + Connections.packagedItems + item.id;
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            // Make the API call using fetch()
-            fetch(Api, {
-                method: 'GET',
-                headers: headers,
-                cache: 'no-cache'
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setItems(response.data);
-                        setLoading(false);
-                    } else {
-                        setPopup({
-                            ...popup,
-                            status: true,
-                            severity: 'error',
-                            message: response.message
-                        });
-                        setLoading(false);
-                    }
-                })
-                .catch(() => {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: 'There is error package items!'
-                    });
-                    setLoading(false);
-                });
-        };
-
         const getStocks = () => {
             setLoading(true);
             var Api = Connections.api + Connections.getShopStocks + item.shopname;
@@ -398,13 +358,59 @@ const UpdatePackage = () => {
         };
         if (user.role === 'Admin') {
             getShops();
-            getPackageItems();
+
             getStocks();
         }
 
         return () => {};
-    }, [popup]);
+    }, []);
 
+    useEffect(() => {
+        const getPackageItems = () => {
+            setLoading(true);
+            var Api = Connections.api + Connections.packagedItems + item.id;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers,
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setItems(response.data);
+                        setLoading(false);
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setLoading(false);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error package items!'
+                    });
+                    setLoading(false);
+                });
+        };
+
+        if (user.role === 'Admin') {
+            getPackageItems();
+        }
+
+        return () => {};
+    }, [spinner]);
     const DialogHideController = () => {
         setAddItemDialog(false);
     };
@@ -425,9 +431,65 @@ const UpdatePackage = () => {
         setSelectedItems({ ...item });
     };
 
-    const handleQuantityUpdate = (event, item) => {
-        event.preventDefault();
-        alert(itemQuantity);
+    const handleQuantityUpdate = () => {
+        // Do something with the deleted category
+
+        if (itemQuantity == 0 || '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Enter new quantity first!'
+            });
+        } else {
+            setSpinner(true);
+            var Api = Connections.api + Connections.quantityUpdate + selectedItem.id;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            const data = {
+                item_quantity: itemQuantity
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'PUT',
+                headers: headers,
+                body: JSON.stringify(data),
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+
+                        setSpinner(false);
+                        handleMenuClose();
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error updating package item!'
+                    });
+                    setSpinner(false);
+                });
+        }
     };
     return (
         <MainCard>
@@ -580,39 +642,49 @@ const UpdatePackage = () => {
                                                         keepMounted
                                                         open={Boolean(anchorEl)}
                                                         onClose={handleMenuClose}
-                                                        className="shadow-sm"
+                                                        anchorOrigin={{
+                                                            vertical: 'bottom',
+                                                            horizontal: 'right'
+                                                        }}
+                                                        transformOrigin={{
+                                                            vertical: 'top',
+                                                            horizontal: 'right'
+                                                        }}
+                                                        getContentAnchorEl={null}
+                                                        sx={{
+                                                            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)'
+                                                        }}
                                                     >
-                                                        <MenuItem>
-                                                            <form onSubmit={(event) => handleQuantityUpdate(event, item)}>
-                                                                <Box
-                                                                    sx={{
-                                                                        display: 'grid',
-                                                                        alignItems: 'center',
-                                                                        justifyContent: 'center',
-                                                                        paddingX: 2
-                                                                    }}
-                                                                >
-                                                                    <Typography variant="h5">Update Quantity</Typography>
+                                                        <Box
+                                                            sx={{
+                                                                display: 'grid',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                paddingX: 2,
+                                                                paddingY: 1
+                                                            }}
+                                                        >
+                                                            <Typography variant="h5" sx={{ marginBottom: 1 }}>
+                                                                Update Quantity
+                                                            </Typography>
 
-                                                                    <TextField
-                                                                        fullwidth
-                                                                        required
-                                                                        label="New Quantity"
-                                                                        value={itemQuantity}
-                                                                        onChange={(event) => setItemQuantity(event.target.value)}
-                                                                        sx={{ marginY: 2 }}
-                                                                    />
-                                                                    <Button
-                                                                        type="submit"
-                                                                        variant="outlined"
-                                                                        color="primary"
-                                                                        sx={{ paddingX: 1, marginBottom: 1 }}
-                                                                    >
-                                                                        Apply Change
-                                                                    </Button>
-                                                                </Box>
-                                                            </form>
-                                                        </MenuItem>
+                                                            <TextField
+                                                                fullwidth
+                                                                required
+                                                                label="New Quantity"
+                                                                value={itemQuantity}
+                                                                onChange={(event) => setItemQuantity(event.target.value)}
+                                                                sx={{ marginY: 2 }}
+                                                            />
+                                                            <Button
+                                                                variant="contained"
+                                                                color="primary"
+                                                                sx={{ paddingX: 1 }}
+                                                                onClick={() => handleQuantityUpdate()}
+                                                            >
+                                                                Apply Change
+                                                            </Button>
+                                                        </Box>
                                                     </Menu>
                                                 </TableCell>
                                                 <TableCell>

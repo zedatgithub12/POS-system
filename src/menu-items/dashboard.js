@@ -124,7 +124,7 @@ const getDashboardItems = (role) => {
     const salesItems = [
         {
             id: 'default',
-            title: 'Dashboard',
+            title: 'Home',
             type: 'item',
             url: '/dashboard/default',
             icon: icons.IconDashboard,
@@ -132,10 +132,10 @@ const getDashboardItems = (role) => {
         },
         {
             id: 'stocks',
-            title: 'Stocks',
+            title: 'Items',
             type: 'item',
-            url: '/products',
-            icon: icons.IconBox,
+            url: '/stocks',
+            icon: icons.IconClipboardList,
             breadcrumbs: false
         },
         {
@@ -161,7 +161,6 @@ const getDashboardItems = (role) => {
 
 const dashboard = {
     id: 'dashboard',
-    title: 'Dashboard',
     type: 'group',
     children: getDashboardItems(getUserRole())
 };

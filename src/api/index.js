@@ -63,7 +63,7 @@ const Connections = {
     packagedItems: '/packaged-items/',
     addPackagedItem: '/add-packaged-items/',
     deletePackagedItem: '/packaged-items/',
-
+    quantityUpdate: '/single-package-item/',
     //sold package Api's
     createpackagesale: '/createpackagesale',
     viewpackagesale: '/viewsoldpackages',

@@ -488,7 +488,11 @@ const Stock = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Manage Stocks</Typography>
+                                    {users.role === 'Admin' ? (
+                                        <Typography variant="h3">Manage Stocks</Typography>
+                                    ) : (
+                                        <Typography variant="h3">Stocks Items</Typography>
+                                    )}
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -655,6 +659,7 @@ const Stock = () => {
                                         <TableCell></TableCell>
                                         <TableCell>Item name</TableCell>
                                         <TableCell>Item code</TableCell>
+                                        <TableCell>Shop</TableCell>
                                         <TableCell>Category</TableCell>
                                         <TableCell>Brand</TableCell>
                                         <TableCell>SKU</TableCell>
@@ -1156,6 +1161,7 @@ const ProductRow = ({ product }) => {
                     {product.item_name}
                 </TableCell>
                 <TableCell>{product.item_code}</TableCell>
+                <TableCell>{product.stock_shop}</TableCell>
                 <TableCell>{product.item_category}</TableCell>
                 <TableCell>{product.item_brand}</TableCell>
                 <TableCell>
@@ -1247,10 +1253,6 @@ const ProductRow = ({ product }) => {
                                     <Table size="small" aria-label="product details">
                                         <TableBody>
                                             <TableRow>
-                                                <TableCell>Shop</TableCell>
-                                                <TableCell>{product.stock_shop}</TableCell>
-                                            </TableRow>
-                                            <TableRow>
                                                 <TableCell>Min Quantity</TableCell>
                                                 <TableCell>{product.stock_min_quantity}</TableCell>
                                             </TableRow>
@@ -1277,24 +1279,6 @@ const ProductRow = ({ product }) => {
                 </TableCell>
             </TableRow>
 
-            {/* <Dialog open={dialogOpen} onClose={handleDialogClose}>
-                <DialogTitle>Delete Product</DialogTitle>
-                <DialogContent>Do you want to delete {selectedProduct ? selectedProduct.name : ''} ?</DialogContent>
-                <DialogActions>
-                    <Button variant="text" color="primary" onClick={handleDialogClose}>
-                        Cancel
-                    </Button>
-                    <Button variant="text" color="error" onClick={() => Delete(selectedProduct.id)}>
-                        {spinner ? (
-                            <div className="spinner-border spinner-border-sm text-dark " role="status">
-                                <span className="visually-hidden">Loading...</span>
-                            </div>
-                        ) : (
-                            'Yes'
-                        )}
-                    </Button>
-                </DialogActions>
-            </Dialog> */}
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>
                     {popup.message}
