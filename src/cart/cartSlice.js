@@ -22,13 +22,13 @@ const cartSlice = createSlice({
             } else {
                 state.items.push({
                     id: product.id,
-                    itemName: product.name,
-                    itemCode: product.code,
-                    brand: product.brand,
-                    unit: product.unit,
-                    unitPrice: product.price,
+                    itemName: product.item_name,
+                    itemCode: product.item_code,
+                    brand: product.item_brand,
+                    unit: product.stock_unit,
+                    unitPrice: product.stock_price,
                     quantity: 1,
-                    subtotal: product.price
+                    subtotal: product.stock_price
                 });
                 state.grandTotal = calculateGrandTotal(state.items);
             }

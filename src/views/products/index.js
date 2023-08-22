@@ -144,9 +144,11 @@ const Products = () => {
         if (categoryFilter !== 'Category') {
             isMatch = isMatch && product.item_category === categoryFilter;
         }
+
         if (subCategoryFilter !== 'Sub Category') {
             isMatch = isMatch && product.item_sub_category === subCategoryFilter;
         }
+
         if (brandFilter !== 'Brand') {
             isMatch = isMatch && product.item_brand === brandFilter;
         }

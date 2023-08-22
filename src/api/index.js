@@ -64,6 +64,7 @@ const Connections = {
     addPackagedItem: '/add-packaged-items/',
     deletePackagedItem: '/packaged-items/',
     quantityUpdate: '/single-package-item/',
+
     //sold package Api's
     createpackagesale: '/createpackagesale',
     viewpackagesale: '/viewsoldpackages',
@@ -91,12 +92,18 @@ const Connections = {
     updatesale: '/updatesale/',
     deletesale: '/deletesale/',
 
+    //sales api
+    getSoldItem: '/sold_items/',
+    updateSoldItem: '/sold_items/',
+    deleteSoldItem: '/sold_items/',
+
     //customer api
     addcustomer: '/addcustomer',
     viewcustomer: '/viewcustomer',
     viewstorecustomer: '/viewstorecustomer/', //an api to fetch customer sales role customer
     updatecustomer: '/updatecustomer/',
     deletecustomer: '/deletecustomer/',
+    customerdetails: '/customer-details/',
 
     //users api
     adduser: '/adduser',

@@ -420,8 +420,8 @@ const CreateSale = () => {
         };
 
         const getProducts = () => {
-            var AdminApi = Connections.api + Connections.viewproduct;
-            var saleApi = Connections.api + Connections.viewstoreproduct + user.store_name;
+            var AdminApi = Connections.api + Connections.getShopStocks + user.store_name;
+            var saleApi = Connections.api + Connections.getShopStocks + user.store_name;
             var Api = user.role === 'Admin' ? AdminApi : saleApi;
             var headers = {
                 accept: 'application/json',
@@ -436,7 +436,7 @@ const CreateSale = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        setProductData(response.data.data);
+                        setProductData(response.data);
                     } else {
                         setProductData(productData);
                     }
@@ -514,7 +514,7 @@ const CreateSale = () => {
                             <Grid item xs={4}>
                                 <Autocomplete
                                     options={productData}
-                                    getOptionLabel={(option) => option.code}
+                                    getOptionLabel={(option) => option.item_code}
                                     onChange={(event, value) => {
                                         if (value) {
                                             handleAddToCart(value);
@@ -532,7 +532,7 @@ const CreateSale = () => {
                             <Grid item xs={8}>
                                 <Autocomplete
                                     options={productData}
-                                    getOptionLabel={(option) => option.name}
+                                    getOptionLabel={(option) => option.item_name}
                                     onChange={(event, value) => {
                                         if (value) {
                                             handleAddToCart(value);

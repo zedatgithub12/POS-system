@@ -29,11 +29,11 @@ import {
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
-import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
+import { IconTrash, IconEdit, IconSearch, IconEye } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 //import CustomersData from 'data/customers';
 import PropTypes from 'prop-types';
 import Connections from 'api';
@@ -253,7 +253,7 @@ const Customers = () => {
 };
 
 const CustomerRow = ({ customer }) => {
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
 
     const [name, setName] = useState(customer.name);
     const [phone, setPhone] = useState(customer.phone);
@@ -407,6 +407,13 @@ const CustomerRow = ({ customer }) => {
                 <TableCell>{customer.shop}</TableCell>
                 <TableCell>{DateSlice(customer.created_at)}</TableCell>
                 <TableCell>
+                    <IconButton
+                        aria-label="view row"
+                        size="small"
+                        onClick={() => navigate('/customer-details', { state: { ...customer } })}
+                    >
+                        <IconEye />
+                    </IconButton>
                     <IconButton aria-label="Edit row" size="small" onClick={handleOpen}>
                         <IconEdit />
                     </IconButton>
