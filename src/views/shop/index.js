@@ -27,6 +27,7 @@ import React, { useState, useEffect } from 'react';
 import Connections from 'api';
 import ShopMap from './maps';
 import { ActivityIndicators } from 'ui-component/activityIndicator';
+import ShopTable from './components/tabular';
 // ==============================|| SHOP LISTING PAGE ||============================== //
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -166,11 +167,15 @@ const Shops = () => {
             <TabContext value={value}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <TabList onChange={handleChange} aria-label="Shop Tabs">
-                        <Tab label="Card View" value="1" />
-                        <Tab label="Map View" value="2" />
+                        <Tab label="Tabular View" value="1" />
+                        <Tab label="Card View" value="2" />
+                        <Tab label="Map View" value="3" />
                     </TabList>
                 </Box>
                 <TabPanel value="1">
+                    <ShopTable shops={filteredData} />
+                </TabPanel>
+                <TabPanel value="2">
                     <Grid container spacing={gridSpacing}>
                         <Grid item xs={12} className="mt-1"></Grid>
                         <FormControl className="ms-4 mt-2">
@@ -267,7 +272,7 @@ const Shops = () => {
                         )}
                     </Grid>
                 </TabPanel>
-                <TabPanel value="2">
+                <TabPanel value="3">
                     <ShopMap shopData={shops} />
                 </TabPanel>
             </TabContext>

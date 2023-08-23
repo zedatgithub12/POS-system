@@ -339,7 +339,7 @@ const PackageScreen = () => {
                                         <TableCell>Package Name</TableCell>
                                         <TableCell>Customer</TableCell>
 
-                                        <TableCell>Total Price</TableCell>
+                                        <TableCell>Total Price(ETB)</TableCell>
                                         <TableCell>Payment Status</TableCell>
                                         <TableCell>Payment Method</TableCell>
 
@@ -367,8 +367,23 @@ const PackageScreen = () => {
                                                 <TableCell>{soldItem.reference}</TableCell>
                                                 <TableCell>{soldItem.p_name}</TableCell>
                                                 <TableCell>{soldItem.customer}</TableCell>
-                                                <TableCell>{parseInt(soldItem.grandtotal).toFixed(2)}</TableCell>
-                                                <TableCell>{soldItem.payment_status}</TableCell>
+                                                <TableCell>
+                                                    {' '}
+                                                    <span className="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded text-capitalize">
+                                                        {parseInt(soldItem.grandtotal).toFixed(2)}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {soldItem.payment_status === 'Unpaid' ? (
+                                                        <span className="bg-danger bg-opacity-10 text-danger px-4 py-1 rounded text-capitalize">
+                                                            {soldItem.payment_status}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="bg-success bg-opacity-10 text-success px-4 py-1 rounded text-capitalize">
+                                                            {soldItem.payment_status}
+                                                        </span>
+                                                    )}
+                                                </TableCell>
                                                 <TableCell>{soldItem.payment_method}</TableCell>
 
                                                 <TableCell>

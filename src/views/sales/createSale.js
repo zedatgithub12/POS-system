@@ -163,6 +163,7 @@ const CreateSale = () => {
     const [customerName, setCustomerName] = useState('');
     const [note, setNote] = useState('');
     const [spinner, setSpinner] = useState(false);
+    const [loading, setLoading] = useState();
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -419,10 +420,23 @@ const CreateSale = () => {
                 });
         };
 
-        const getProducts = () => {
-            var AdminApi = Connections.api + Connections.getShopStocks + user.store_name;
-            var saleApi = Connections.api + Connections.getShopStocks + user.store_name;
-            var Api = user.role === 'Admin' ? AdminApi : saleApi;
+        getCustomers();
+
+        if (user.role === 'Admin') {
+            getShops();
+        }
+
+        return () => {};
+    }, []);
+
+    const handleShopSelection = (value) => {
+        setShopsName(value);
+    };
+
+    useEffect(() => {
+        const getShopStock = () => {
+            setLoading(true);
+            var Api = Connections.api + Connections.getShopStocks + shopName;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -436,9 +450,12 @@ const CreateSale = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
+                        console.log(response);
                         setProductData(response.data);
+                        setLoading(false);
                     } else {
-                        setProductData(productData);
+                        setProductData([]);
+                        setLoading(false);
                     }
                 })
                 .catch(() => {
@@ -448,17 +465,13 @@ const CreateSale = () => {
                         severity: 'error',
                         message: 'There is error fetching product!'
                     });
+                    setLoading(false);
                 });
         };
-        getCustomers();
-        getProducts();
 
-        if (user.role === 'Admin') {
-            getShops();
-        }
-
+        getShopStock();
         return () => {};
-    }, []);
+    }, [shopName]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing} gutterBottom>
@@ -491,10 +504,11 @@ const CreateSale = () => {
                                     getOptionLabel={(option) => option.name}
                                     onInputChange={(event, value) => {
                                         if (value) {
-                                            setShopsName(value);
+                                            handleShopSelection(value);
                                         }
                                     }}
                                     renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" />}
+                                    noOptionsText="Loading..."
                                 />
                             ) : (
                                 <TextField disabled label="Shop" variant="outlined" value={user.store_name} />
@@ -508,6 +522,7 @@ const CreateSale = () => {
                                     setCustomerName(value);
                                 }}
                                 renderInput={(params) => <TextField {...params} label="Customer" variant="outlined" />}
+                                noOptionsText="Loading..."
                             />
                         </Grid>
                         <Grid item container spacing={2} sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -521,6 +536,7 @@ const CreateSale = () => {
                                         }
                                     }}
                                     renderInput={(params) => <TextField {...params} label="Search by code" variant="outlined" />}
+                                    noOptionsText="No item found"
                                 />
                                 <Box style={{ display: 'flex', alignItems: 'center' }}>
                                     <Button className="mt-2" onClick={() => startScanner()} disabled={isScanning}>
@@ -539,6 +555,7 @@ const CreateSale = () => {
                                         }
                                     }}
                                     renderInput={(params) => <TextField {...params} label="Search by name" variant="outlined" />}
+                                    noOptionsText="No item found"
                                 />
                             </Grid>
                         </Grid>
@@ -573,7 +590,12 @@ const CreateSale = () => {
                                                 </TableCell>
                                                 <TableCell>{item.unit}</TableCell>
                                                 <TableCell>{item.unitPrice}</TableCell>
-                                                <TableCell>{parseInt(item.subtotal)}</TableCell>
+                                                <TableCell>
+                                                    {' '}
+                                                    <span className="bg-primary bg-opacity-10 text-primary px-4 py-1 rounded text-capitalize">
+                                                        {parseInt(item.subtotal)}
+                                                    </span>{' '}
+                                                </TableCell>
                                                 <TableCell>
                                                     <IconButton onClick={() => handleRemoveFromCart(item)}>
                                                         <Delete />

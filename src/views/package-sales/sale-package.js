@@ -147,8 +147,6 @@ const SalePackage = () => {
                 customer: customerName,
                 pname: packageBundle.name,
                 products: Items,
-                tax: saleTax,
-                discount: discount,
                 grandTotal: packageBundle.price,
                 payment_status: paymentStatus,
                 payment_method: paymentMethod,
@@ -273,8 +271,9 @@ const SalePackage = () => {
             })
                 .then((response) => response.json())
                 .then((response) => {
+                    console.log(response.data);
                     if (response.success) {
-                        setPackagetData(response.data);
+                        setPackagetData(response.data.data);
                     } else {
                         setPackagetData(packageData);
                     }
@@ -333,6 +332,7 @@ const SalePackage = () => {
                                         }
                                     }}
                                     renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" />}
+                                    noOptionsText="Loading..."
                                 />
                             ) : (
                                 <TextField disabled label="Shop" variant="outlined" value={user.store_name} />
@@ -346,6 +346,7 @@ const SalePackage = () => {
                                     setCustomerName(value);
                                 }}
                                 renderInput={(params) => <TextField {...params} label="Customer" variant="outlined" />}
+                                noOptionsText="Loading..."
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -358,6 +359,7 @@ const SalePackage = () => {
                                     }
                                 }}
                                 renderInput={(params) => <TextField {...params} label="Select Package" variant="outlined" />}
+                                noOptionsText="Loading..."
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -388,26 +390,13 @@ const SalePackage = () => {
                         </Grid>
 
                         <Grid item xs={12} md={6} className="m-auto">
-                            <Box mt={2} className="border rounded mx-5">
+                            <Box mt={2} className=" mx-5">
                                 <TableContainer component={Paper}>
                                     <Table>
                                         <TableBody>
                                             <TableRow>
-                                                <TableCell>Tax</TableCell>
-                                                <TableCell>{saleTax}%</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell>Discount</TableCell>
-                                                <TableCell>{discount} ETB</TableCell>
-                                            </TableRow>
-                                            <TableRow>
                                                 <TableCell>Grand Total</TableCell>
-                                                <TableCell className="fw-semibold fs-4">
-                                                    {parseFloat(grandTotal)} ETB
-                                                    {/* <IconButton className="ms-3" onClick={() => setGrandTotal(grandTotal)}>
-                                                        <IconReload />
-                                                    </IconButton> */}
-                                                </TableCell>
+                                                <TableCell className="fw-semibold fs-4">{parseInt(grandTotal)} ETB</TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>
@@ -418,13 +407,6 @@ const SalePackage = () => {
                         <Grid item xs={12} md={6}>
                             <Box mt={2}>
                                 <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField label="Sale Tax (%)" onChange={(event) => setSaleTax(event.target.value)} fullWidth />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField label="Discount (ETB)" onChange={(event) => setDiscount(event.target.value)} fullWidth />
-                                    </Grid>
-
                                     <Grid item xs={12} sm={6}>
                                         <FormControl fullWidth>
                                             <InputLabel id="payment-status-label">Payment Status</InputLabel>
