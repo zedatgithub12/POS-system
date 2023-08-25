@@ -15,9 +15,11 @@ import {
     InputLabel,
     TablePagination
 } from '@mui/material';
-import { Stack } from '@mui/system';
+import { useNavigate } from 'react-router-dom';
 
 const ShopTable = ({ shops }) => {
+    const navigate = useNavigate();
+
     const [searchQuery, setSearchQuery] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
     const [regionFilter, setRegionFilter] = useState('');
@@ -127,15 +129,39 @@ const ShopTable = ({ shops }) => {
                     </TableHead>
                     <TableBody>
                         {filteredShops.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((shop) => (
-                            <TableRow key={shop.id}>
+                            <TableRow
+                                key={shop.id}
+                                onClick={() =>
+                                    navigate('/view-shop', {
+                                        state: { ...shop }
+                                    })
+                                }
+                                sx={{ cursor: 'pointer' }}
+                            >
                                 <TableCell>{shop.name}</TableCell>
-                                <TableCell>{shop.category}</TableCell>
+                                <TableCell>
+                                    <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded">{shop.category} </span>
+                                </TableCell>
                                 <TableCell>{shop.region}</TableCell>
                                 <TableCell>{shop.city}</TableCell>
                                 <TableCell>{shop.subcity}</TableCell>
                                 <TableCell>{shop.address}</TableCell>
                                 <TableCell>{shop.phone}</TableCell>
-                                <TableCell>{shop.last_status}</TableCell>
+                                <TableCell>
+                                    <span
+                                        className={
+                                            shop.last_status === 'Open'
+                                                ? 'bg-success bg-opacity-10 text-success px-2 py-1 rounded'
+                                                : shop.last_status === 'Closed'
+                                                ? 'bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded'
+                                                : shop.last_status === 'Temporarily Closed'
+                                                ? 'bg-info bg-opacity-10 text-info px-2 py-1 rounded'
+                                                : 'bg-danger bg-opacity-10 text-danger px-2 py-1 rounded'
+                                        }
+                                    >
+                                        {shop.last_status}
+                                    </span>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

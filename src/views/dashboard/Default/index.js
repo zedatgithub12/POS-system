@@ -322,7 +322,7 @@ const Dashboard = () => {
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
                     <Box paddingX={4} paddingY={3}>
-                        <Typography className="fs-3 fw-semibold">Dashboard</Typography>
+                        <Typography className="fs-4 fw-semibold">Dashboard</Typography>
                     </Box>
                     <Grid container className="mx-2" justifyContent="space-between" alignItems="start">
                         <Grid
@@ -440,16 +440,6 @@ const Dashboard = () => {
                                     </Box>
                                 )}
                             </Box>
-                            {user.role === 'Admin' && (
-                                <>
-                                    <CustomerCard total={totalCustomer} addedToday={todaycustomers} />
-                                    <AddNew
-                                        stockbtn={() => navigate('/add-product')}
-                                        packagebtn={() => navigate('/create-package')}
-                                        targetbtn={() => handleTargetClick()}
-                                    />
-                                </>
-                            )}
                         </Grid>
                     </Grid>
                 </Grid>

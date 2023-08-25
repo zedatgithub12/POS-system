@@ -17,12 +17,21 @@ import {
     Paper,
     CircularProgress
 } from '@mui/material';
-import { IconChevronLeft, IconChevronRight, IconCircleCheck, IconList } from '@tabler/icons';
+import {
+    IconArrowBigDownLines,
+    IconArrowBigUpLines,
+    IconArrowDown,
+    IconArrowUp,
+    IconChevronLeft,
+    IconChevronRight,
+    IconCircleCheck,
+    IconList
+} from '@tabler/icons';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { useTheme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import { calculatePercentage, formatNumber, DateFormatter } from 'utils/functions';
+import { calculatePercentage, formatNumber, DateFormatter, Achievement } from 'utils/functions';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Pagination from '@mui/material/Pagination';
 import { Preferences } from 'preferences';
@@ -152,6 +161,9 @@ const TargetListing = (props) => {
         saveAs(blob, 'excel-report.xlsx');
     };
 
+    const sustract = (first, second) => {
+        return first - second;
+    };
     return (
         <Grid container sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 1 }}>
             {shopname && lists.target && (
@@ -227,9 +239,9 @@ const TargetListing = (props) => {
                             <TableRow>
                                 <TableCell>Date</TableCell>
                                 <TableCell>Target</TableCell>
-                                <TableCell>Collected</TableCell>
-                                <TableCell>Difference</TableCell>
                                 <TableCell>Achievement</TableCell>
+                                <TableCell>Difference</TableCell>
+                                <TableCell>Achievement(%)</TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -254,34 +266,37 @@ const TargetListing = (props) => {
                                                     fontWeight: theme.typography.fontWeightMedium
                                                 }}
                                             >
-                                                {item.totalRevenue}
+                                                {formatNumber(item.totalRevenue)}
                                             </Typography>
                                         </TableCell>
-                                        <TableCell>{parseInt(item.totalRevenue) - parseInt(lists.target.r_daily)}</TableCell>
                                         <TableCell>
-                                            {calculatePercentage(parseInt(item.totalRevenue), parseInt(lists.target.r_daily)) <= 99 ? (
+                                            {formatNumber(sustract(parseInt(item.totalRevenue), parseInt(lists.target.r_daily)))}
+                                        </TableCell>
+
+                                        <TableCell>
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center'
+                                                }}
+                                            >
+                                                <Typography
+                                                    sx={{
+                                                        paddingRight: 1
+                                                    }}
+                                                >
+                                                    {Achievement(parseInt(item.totalRevenue), parseInt(lists.target.r_daily)) ===
+                                                    'achieved' ? (
+                                                        <IconArrowUp size={16} color={theme.palette.success.dark} />
+                                                    ) : (
+                                                        <IconArrowDown size={16} color={theme.palette.error.main} />
+                                                    )}
+                                                </Typography>
+
                                                 <Typography sx={{ marginLeft: 2, fontWeight: theme.typography.fontWeightMedium }}>
                                                     {calculatePercentage(parseInt(item.totalRevenue), parseInt(lists.target.r_daily))}%
                                                 </Typography>
-                                            ) : (
-                                                <Box
-                                                    sx={{
-                                                        display: 'flex',
-                                                        alignItems: 'center'
-                                                    }}
-                                                >
-                                                    <IconCircleCheck color={theme.palette.success.dark} size={22} />
-                                                    <Typography
-                                                        sx={{
-                                                            marginLeft: 2,
-                                                            color: theme.palette.success.dark,
-                                                            fontWeight: theme.typography.fontWeightMedium
-                                                        }}
-                                                    >
-                                                        {calculatePercentage(parseInt(item.totalRevenue), parseInt(lists.target.r_daily))} %{' '}
-                                                    </Typography>
-                                                </Box>
-                                            )}
+                                            </Box>
                                         </TableCell>
                                     </TableRow>
                                 ))

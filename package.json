@@ -12,6 +12,7 @@
         "@mui/material": "^5.8.6",
         "@mui/system": "^5.8.6",
         "@mui/utils": "^5.8.6",
+        "@mui/x-charts": "^6.0.0-alpha.7",
         "@reduxjs/toolkit": "^1.9.5",
         "@tabler/icons": "^1.72.0",
         "apexcharts": "^3.35.3",

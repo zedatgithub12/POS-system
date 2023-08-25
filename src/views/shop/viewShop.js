@@ -27,9 +27,10 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import Connections from 'api';
 import SalesTargets from 'views/dashboard/Default/components/sales-against-target';
-import TargetListing from 'views/dashboard/Default/components/target-listing';
 import { useTheme } from '@mui/material/styles';
 import { ShopStatus } from 'data/shopStatus';
+import LineChartComponent from './components/linechart';
+import TargetListing from 'views/dashboard/Default/components/target-listing';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -73,6 +74,7 @@ const ViewShop = () => {
         severity: 'info',
         message: ''
     });
+
     const handleAddDialogOpen = () => {
         setAddDialogOpen(true);
     };
@@ -417,50 +419,6 @@ const ViewShop = () => {
                 <Grid item lg={6} md={12} sm={12} xs={12} spacing={2}></Grid>
 
                 <Grid container justifyContent="center">
-                    <Grid item lg={7} md={6} sm={6} xs={12}>
-                        <Grid
-                            item
-                            xs={12}
-                            style={{
-                                marginTop: 4,
-                                marginLeft: 4,
-                                borderRadius: 6,
-                                padding: 6,
-                                paddingRight: 18,
-                                paddingLeft: 10
-                            }}
-                        >
-                            {isLoading ? (
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        padding: 6
-                                    }}
-                                >
-                                    <CircularProgress size={24} />
-                                    <Typography
-                                        sx={{
-                                            marginLeft: 2,
-
-                                            justifyContent: 'center',
-                                            fontSize: theme.typography.h4,
-                                            fontWeight: theme.typography.fontWeightRegular
-                                        }}
-                                    >
-                                        Loading...
-                                    </Typography>
-                                </Box>
-                            ) : (
-                                <>
-                                    <SalesTargets targets={revenueTarget} />
-                                    <TargetListing lists={revenueTarget} />
-                                </>
-                            )}
-                        </Grid>
-                    </Grid>
-
                     <Grid
                         item
                         container
@@ -474,8 +432,7 @@ const ViewShop = () => {
                             marginLeft: 4,
                             borderRadius: 6,
                             padding: 6,
-                            paddingRight: 20,
-                            paddingLeft: 20
+                            paddingX: 8
                         }}
                     >
                         <Grid
@@ -735,6 +692,49 @@ const ViewShop = () => {
                                     Delete
                                 </Button>
                             </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <Grid item lg={7} md={6} sm={6} xs={12}>
+                        <Grid
+                            item
+                            xs={12}
+                            style={{
+                                marginTop: 4,
+                                marginLeft: 4,
+                                borderRadius: 6,
+                                padding: 6
+                            }}
+                        >
+                            {isLoading ? (
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        padding: 6
+                                    }}
+                                >
+                                    <CircularProgress size={24} />
+                                    <Typography
+                                        sx={{
+                                            marginLeft: 2,
+
+                                            justifyContent: 'center',
+                                            fontSize: theme.typography.h4,
+                                            fontWeight: theme.typography.fontWeightRegular
+                                        }}
+                                    >
+                                        Loading...
+                                    </Typography>
+                                </Box>
+                            ) : (
+                                <>
+                                    <SalesTargets targets={revenueTarget} />
+                                    <TargetListing lists={revenueTarget} />
+                                    {/* <LineChartComponent data={revenueTarget.thirtydays} /> */}
+                                </>
+                            )}
                         </Grid>
                     </Grid>
                 </Grid>

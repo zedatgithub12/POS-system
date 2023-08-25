@@ -33,3 +33,14 @@ export const DateFormatter = (soldat) => {
     const date = day + '-' + month + '-' + year;
     return date;
 };
+
+export const Achievement = (revenue, target) => {
+    let status;
+    if (revenue >= target) {
+        status = 'achieved';
+        return status;
+    } else {
+        status = 'in-progress';
+        return status;
+    }
+};
