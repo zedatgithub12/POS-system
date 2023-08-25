@@ -322,7 +322,9 @@ const Dashboard = () => {
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
                     <Box paddingX={4} paddingY={3}>
-                        <Typography className="fs-4 fw-semibold">Dashboard</Typography>
+                        <Typography variant="h3" className=" fw-semibold">
+                            Dashboard
+                        </Typography>
                     </Box>
                     <Grid container className="mx-2" justifyContent="space-between" alignItems="start">
                         <Grid
@@ -356,6 +358,7 @@ const Dashboard = () => {
                                                 sx={{ backgroundColor: theme.palette.background.default }}
                                             >
                                                 <MenuItem value="Select Shop">Select Shop</MenuItem>
+                                                <MenuItem value="All">All</MenuItem>
                                                 {Array.from(new Set(shops.map((item) => item.name))).map((shop) => (
                                                     <MenuItem
                                                         key={shop}
@@ -440,6 +443,22 @@ const Dashboard = () => {
                                     </Box>
                                 )}
                             </Box>
+                        </Grid>
+
+                        <Grid
+                            item
+                            xs={12}
+                            sm={12}
+                            md={12}
+                            lg={3.4}
+                            xl={3.4}
+                            sx={{ borderRadius: 2, padding: 1, paddingTop: 0, paddingLeft: 2 }}
+                        >
+                            <AddNew
+                                targetbtn={() => setOpenTargetDialog(true)}
+                                stockbtn={() => navigate('/add-stock')}
+                                packagebtn={() => navigate('/create-package')}
+                            />
                         </Grid>
                     </Grid>
                 </Grid>

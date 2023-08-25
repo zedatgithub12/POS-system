@@ -49,7 +49,7 @@ const LowStocks = ({ stocks }) => {
                                 color: theme.palette.primary.dark
                             }}
                         >
-                            {item.name}
+                            {item.item_name}
                         </Typography>
 
                         <Typography
@@ -59,7 +59,10 @@ const LowStocks = ({ stocks }) => {
                                 color: theme.palette.primary.dark
                             }}
                         >
-                            {item.quantity} {item.unit}
+                            <span className="bg-danger bg-opacity-10 text-danger px-3 py-1 mx-2 rounded text-capitalize">
+                                {item.stock_quantity}
+                            </span>
+                            {item.stock_unit}
                         </Typography>
                     </Box>
                 ))

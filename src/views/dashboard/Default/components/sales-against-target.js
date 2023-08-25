@@ -151,7 +151,7 @@ const SalesTargets = (targets) => {
                                     'achieved' ? (
                                         <IconArrowUp size={18} color={theme.palette.success.dark} />
                                     ) : (
-                                        <IconTimeline size={18} color={theme.palette.warning.main} />
+                                        <IconTimeline size={18} color={theme.palette.warning.dark} />
                                     )}
                                 </Typography>
                                 <Typography

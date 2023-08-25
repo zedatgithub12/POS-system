@@ -42,6 +42,22 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
             >
                 <Grid item xs={3}>
                     <Button
+                        onClick={targetbtn}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-evenly',
+                            borderRadius: 2,
+                            padding: 1
+                        }}
+                    >
+                        <Typography variant="h4" sx={{ color: theme.palette.primary.dark, fontWeight: theme.typography.fontWeightMedium }}>
+                            Target
+                        </Typography>
+                    </Button>
+                </Grid>
+                <Grid item xs={3}>
+                    <Button
                         onClick={stockbtn}
                         sx={{
                             borderRadius: 2,
@@ -64,22 +80,6 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
                     >
                         <Typography variant="h4" sx={{ color: theme.palette.primary.dark, fontWeight: theme.typography.fontWeightMedium }}>
                             Package
-                        </Typography>
-                    </Button>
-                </Grid>
-                <Grid item xs={3}>
-                    <Button
-                        onClick={targetbtn}
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-evenly',
-                            borderRadius: 2,
-                            padding: 1
-                        }}
-                    >
-                        <Typography variant="h4" sx={{ color: theme.palette.primary.dark, fontWeight: theme.typography.fontWeightMedium }}>
-                            Target
                         </Typography>
                     </Button>
                 </Grid>
