@@ -591,10 +591,9 @@ const CreateSale = () => {
                                                 <TableCell>{item.unit}</TableCell>
                                                 <TableCell>{item.unitPrice}</TableCell>
                                                 <TableCell>
-                                                    {' '}
                                                     <span className="bg-primary bg-opacity-10 text-primary px-4 py-1 rounded text-capitalize">
                                                         {parseInt(item.subtotal)}
-                                                    </span>{' '}
+                                                    </span>
                                                 </TableCell>
                                                 <TableCell>
                                                     <IconButton onClick={() => handleRemoveFromCart(item)}>
@@ -620,12 +619,7 @@ const CreateSale = () => {
                                         <TableBody>
                                             <TableRow>
                                                 <TableCell>Grand Total</TableCell>
-                                                <TableCell className="fw-semibold fs-4">
-                                                    {parseInt(grandTotal).toFixed(2)} ETB
-                                                    {/* <IconButton className="ms-3" onClick={() => setGrandTotal(grandTotal)}>
-                                                        <IconReload />
-                                                    </IconButton> */}
-                                                </TableCell>
+                                                <TableCell className="fw-semibold fs-4">{parseInt(grandTotal).toFixed(2)} ETB</TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>
@@ -686,20 +680,26 @@ const CreateSale = () => {
 
                         <Grid item xs={12}>
                             <Box mt={2} display="flex" justifyContent="flex-end">
-                                <Button variant="contained" color="primary" onClick={() => handleSave()}>
+                                <Box ml={1}>
+                                    <Button variant="text" color="secondary" sx={{ paddingX: 4, paddingY: 1, marginX: 2 }} onClick={GoBack}>
+                                        Cancel
+                                    </Button>
+                                </Box>
+
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{ paddingX: 8, paddingY: 1, marginLeft: 2 }}
+                                    onClick={() => handleSave()}
+                                >
                                     {spinner ? (
                                         <div className="spinner-border spinner-border-sm text-dark " role="status">
                                             <span className="visually-hidden">Loading...</span>
                                         </div>
                                     ) : (
-                                        'Save'
+                                        'Sell'
                                     )}
                                 </Button>
-                                <Box ml={1}>
-                                    <Button variant="contained" color="secondary" onClick={GoBack}>
-                                        Cancel
-                                    </Button>
-                                </Box>
                             </Box>
                         </Grid>
                     </Grid>
