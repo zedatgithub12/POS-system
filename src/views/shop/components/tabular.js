@@ -131,6 +131,7 @@ const ShopTable = ({ shops }) => {
                         {filteredShops.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((shop) => (
                             <TableRow
                                 key={shop.id}
+                                hover
                                 onClick={() =>
                                     navigate('/view-shop', {
                                         state: { ...shop }

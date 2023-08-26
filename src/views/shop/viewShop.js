@@ -32,6 +32,7 @@ import { ShopStatus } from 'data/shopStatus';
 import LineChartComponent from './components/linechart';
 import TargetListing from 'views/dashboard/Default/components/target-listing';
 import { SparkLineChart } from '@mui/x-charts';
+import MonthlyRevenueChart from './components/monthlyChart';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -732,8 +733,9 @@ const ViewShop = () => {
                             ) : (
                                 <>
                                     <SalesTargets targets={revenueTarget} />
-                                    <TargetListing lists={revenueTarget} />
-                                    {/* <LineChartComponent data={revenueTarget.thirtydays} /> */}
+                                    {/* <TargetListing lists={revenueTarget} />
+                                    <LineChartComponent data={revenueTarget.thirtydays} /> */}
+                                    {revenueTarget.monthlytotal && <MonthlyRevenueChart monthlyTotal={revenueTarget.monthlytotal} />}
                                 </>
                             )}
                         </Grid>

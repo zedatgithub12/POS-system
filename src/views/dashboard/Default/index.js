@@ -323,7 +323,7 @@ const Dashboard = () => {
                 <Grid container spacing={gridSpacing}>
                     <Box paddingX={4} paddingY={3}>
                         <Typography variant="h3" className=" fw-semibold">
-                            Dashboard
+                            Home
                         </Typography>
                     </Box>
                     <Grid container className="mx-2" justifyContent="space-between" alignItems="start">
@@ -445,21 +445,23 @@ const Dashboard = () => {
                             </Box>
                         </Grid>
 
-                        <Grid
-                            item
-                            xs={12}
-                            sm={12}
-                            md={12}
-                            lg={3.4}
-                            xl={3.4}
-                            sx={{ borderRadius: 2, padding: 1, paddingTop: 0, paddingLeft: 2 }}
-                        >
-                            <AddNew
-                                targetbtn={() => setOpenTargetDialog(true)}
-                                stockbtn={() => navigate('/add-stock')}
-                                packagebtn={() => navigate('/create-package')}
-                            />
-                        </Grid>
+                        {user.role === 'Admin' && (
+                            <Grid
+                                item
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={3.4}
+                                xl={3.4}
+                                sx={{ borderRadius: 2, padding: 1, paddingTop: 0, paddingLeft: 2 }}
+                            >
+                                <AddNew
+                                    targetbtn={() => setOpenTargetDialog(true)}
+                                    stockbtn={() => navigate('/add-stock')}
+                                    packagebtn={() => navigate('/create-package')}
+                                />
+                            </Grid>
+                        )}
                     </Grid>
                 </Grid>
             </Grid>
