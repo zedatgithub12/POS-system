@@ -217,6 +217,7 @@ const Dashboard = () => {
                 });
             });
     };
+
     const getTargets = (name) => {
         setTargetLoader(true);
         var Api = Connections.api + Connections.againsttarget + name;
@@ -236,7 +237,6 @@ const Dashboard = () => {
                     setRevenueTarget(response.data);
                     setTargetLoader(false);
                 } else {
-                    setRevenueTarget([]);
                     setTargetLoader(false);
                 }
             })

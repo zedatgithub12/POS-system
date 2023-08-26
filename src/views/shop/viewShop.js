@@ -31,6 +31,7 @@ import { useTheme } from '@mui/material/styles';
 import { ShopStatus } from 'data/shopStatus';
 import LineChartComponent from './components/linechart';
 import TargetListing from 'views/dashboard/Default/components/target-listing';
+import { SparkLineChart } from '@mui/x-charts';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;

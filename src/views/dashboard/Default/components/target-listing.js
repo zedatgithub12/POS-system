@@ -126,7 +126,6 @@ const TargetListing = (props) => {
                     setLoading(false);
                 } else {
                     setLoading(false);
-                    setThirtydays([]);
                 }
             })
             .catch((error) => {
@@ -143,6 +142,12 @@ const TargetListing = (props) => {
         getTargets();
         return () => {};
     }, [currentDate]);
+
+    useEffect(() => {
+        setThirtydays(lists.thirtydays);
+        return () => {};
+    }, [lists]);
+
     const handleDownloadExcel = () => {
         const sheetData = days.map((item) => [
             item.date,
@@ -269,9 +274,7 @@ const TargetListing = (props) => {
                                                 {formatNumber(item.totalRevenue)}
                                             </Typography>
                                         </TableCell>
-                                        <TableCell>
-                                            {formatNumber(sustract(parseInt(item.totalRevenue), parseInt(lists.target.r_daily)))}
-                                        </TableCell>
+                                        <TableCell>{formatNumber(parseInt(item.totalRevenue) - parseInt(lists.target.r_daily))}</TableCell>
 
                                         <TableCell>
                                             <Box
