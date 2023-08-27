@@ -29,14 +29,15 @@ import {
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
-import { IconTrash, IconEdit, IconSearch } from '@tabler/icons';
+import { IconTrash, IconEdit, IconSearch, IconEye } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 //import CustomersData from 'data/customers';
 import PropTypes from 'prop-types';
 import Connections from 'api';
+import { ActivityIndicators } from 'ui-component/activityIndicator';
 
 // ==============================|| CUSTOMERS PAGE ||============================== //
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -53,6 +54,7 @@ const Customers = () => {
     const [shopFilter, setShopFilter] = useState('Shop');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
+    const [loading, setLoading] = useState(true);
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -105,6 +107,7 @@ const Customers = () => {
 
     useEffect(() => {
         const getCustomers = () => {
+            setLoading(true);
             var AdminApi = Connections.api + Connections.viewcustomer;
             var SalesApi = Connections.api + Connections.viewstorecustomer + user.store_name;
             var Api = user.role === 'Admin' ? AdminApi : SalesApi;
@@ -123,8 +126,10 @@ const Customers = () => {
                 .then((response) => {
                     if (response.success) {
                         setCustomersData(response.data);
+                        setLoading(false);
                     } else {
                         setCustomersData(CustomersData);
+                        setLoading(false);
                     }
                 })
                 .catch(() => {
@@ -134,6 +139,7 @@ const Customers = () => {
                         severity: 'error',
                         message: 'There is error creatng shop!'
                     });
+                    setLoading(false);
                 });
         };
         getCustomers();
@@ -209,9 +215,19 @@ const Customers = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {paginatedData.map((customer, index) => (
-                                        <CustomerRow key={index} customer={customer} />
-                                    ))}
+                                    {loading ? (
+                                        <TableRow>
+                                            <TableCell colSpan={7} align="center">
+                                                <Box
+                                                    sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                                                >
+                                                    <ActivityIndicators />
+                                                </Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        paginatedData.map((customer, index) => <CustomerRow key={index} customer={customer} />)
+                                    )}
                                 </TableBody>
                             </Table>
                             <TablePagination
@@ -237,7 +253,7 @@ const Customers = () => {
 };
 
 const CustomerRow = ({ customer }) => {
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
 
     const [name, setName] = useState(customer.name);
     const [phone, setPhone] = useState(customer.phone);
@@ -391,6 +407,13 @@ const CustomerRow = ({ customer }) => {
                 <TableCell>{customer.shop}</TableCell>
                 <TableCell>{DateSlice(customer.created_at)}</TableCell>
                 <TableCell>
+                    <IconButton
+                        aria-label="view row"
+                        size="small"
+                        onClick={() => navigate('/customer-details', { state: { ...customer } })}
+                    >
+                        <IconEye />
+                    </IconButton>
                     <IconButton aria-label="Edit row" size="small" onClick={handleOpen}>
                         <IconEdit />
                     </IconButton>

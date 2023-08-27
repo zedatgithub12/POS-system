@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import { CardContent, Grid, Typography, Avatar, Divider } from '@mui/material';
-
+import Pagination from '@mui/material/Pagination';
 // project imports
 // import BajajAreaChartCard from './BajajAreaChartCard';
 import MainCard from 'ui-component/cards/MainCard';
@@ -18,6 +18,11 @@ import { KeyboardArrowDownOutlined } from '@mui/icons-material';
 
 const LowProducts = ({ isLoading, lowProducts = [] }) => {
     const theme = useTheme();
+    const [page, setPage] = useState(1);
+    const [numPages, setNumPages] = useState(Math.ceil(lowProducts.length / 10));
+    const handleChangePage = (event, value) => {
+        setPage(value);
+    };
     return (
         <>
             {isLoading ? (
@@ -74,6 +79,7 @@ const LowProducts = ({ isLoading, lowProducts = [] }) => {
                                         <Divider sx={{ my: 1.5 }} />
                                     </Grid>
                                 ))}
+                                <Pagination count={numPages} page={page} onChange={handleChangePage} />
                             </Grid>
                         </Grid>
                     </CardContent>

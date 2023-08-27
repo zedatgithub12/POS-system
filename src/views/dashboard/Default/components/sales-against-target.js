@@ -1,9 +1,8 @@
-import { useState } from 'react';
 // material-ui
-import { Grid, Typography, Box, Divider, Paper } from '@mui/material';
+import { Grid, Typography, Box, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { calculatePercentage, formatNumber } from 'utils/functions';
-import { IconBuildingStore, IconTarget } from '@tabler/icons';
+import { Achievement, calculatePercentage, formatNumber } from 'utils/functions';
+import { IconArrowUp, IconTarget, IconTimeline } from '@tabler/icons';
 
 // ==============================|| Sales target Component ||============================== //
 
@@ -22,7 +21,7 @@ const SalesTargets = (targets) => {
         >
             {targets.targets.target ? (
                 <>
-                    <Grid item xs={3.8}>
+                    <Grid item xs={12} sm={12} md={5.6} lg={3.8} xl={3.8}>
                         <Box
                             sx={{
                                 backgroundColor: theme.palette.primary.light,
@@ -44,17 +43,38 @@ const SalesTargets = (targets) => {
                                 >
                                     Daily
                                 </Typography>
-                                <Typography
+                                <Box
                                     sx={{
-                                        paddingRight: 1.8,
-                                        fontSize: 16,
-                                        fontSize: theme.typography.h4,
-                                        fontWeight: theme.typography.fontWeightRegular,
-                                        color: theme.palette.grey[800]
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-evenly'
                                     }}
                                 >
-                                    {calculatePercentage(parseInt(targets.targets.daily), parseInt(targets.targets.target.r_daily))}%
-                                </Typography>
+                                    <Typography
+                                        sx={{
+                                            paddingRight: 1
+                                        }}
+                                    >
+                                        {Achievement(parseInt(targets.targets.daily), parseInt(targets.targets.target.r_daily)) ===
+                                        'achieved' ? (
+                                            <IconArrowUp size={18} color={theme.palette.success.dark} />
+                                        ) : (
+                                            <IconTimeline size={18} color={theme.palette.error.main} />
+                                        )}
+                                    </Typography>
+                                    <Typography
+                                        sx={{
+                                            paddingRight: 1.8,
+                                            fontSize: 16,
+                                            fontSize: theme.typography.h4,
+                                            fontWeight: theme.typography.fontWeightRegular,
+                                            color: theme.palette.grey[800],
+                                            textAlign: 'center'
+                                        }}
+                                    >
+                                        {calculatePercentage(parseInt(targets.targets.daily), parseInt(targets.targets.target.r_daily))}%
+                                    </Typography>
+                                </Box>
                             </Box>
 
                             <Grid
@@ -91,14 +111,18 @@ const SalesTargets = (targets) => {
                                     >
                                         {formatNumber(parseInt(targets.targets.daily))}
                                     </Typography>
-                                    <Typography>Collected</Typography>
+                                    <Typography>Achieved</Typography>
                                 </Grid>
                             </Grid>
                         </Box>
                     </Grid>
                     <Grid
                         item
-                        xs={3.8}
+                        xs={12}
+                        sm={12}
+                        md={5.6}
+                        lg={3.8}
+                        xl={3.8}
                         sx={{
                             backgroundColor: theme.palette.primary.main,
                             marginY: 1,
@@ -109,17 +133,38 @@ const SalesTargets = (targets) => {
                             <Typography sx={{ paddingLeft: 1.8, paddingY: 1, fontSize: 16, color: theme.palette.background.default }}>
                                 Monthly
                             </Typography>
-                            <Typography
+
+                            <Box
                                 sx={{
-                                    paddingRight: 1.8,
-                                    paddingY: 1,
-                                    fontSize: 16,
-                                    fontWeight: theme.typography.fontWeightRegular,
-                                    color: theme.palette.background.default
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-evenly'
                                 }}
                             >
-                                {calculatePercentage(parseInt(targets.targets.monthly), parseInt(targets.targets.target.r_monthly))}%
-                            </Typography>
+                                <Typography
+                                    sx={{
+                                        paddingRight: 1
+                                    }}
+                                >
+                                    {Achievement(parseInt(targets.targets.monthly), parseInt(targets.targets.target.r_monthly)) ===
+                                    'achieved' ? (
+                                        <IconArrowUp size={18} color={theme.palette.success.dark} />
+                                    ) : (
+                                        <IconTimeline size={18} color={theme.palette.warning.dark} />
+                                    )}
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        paddingRight: 1.8,
+                                        paddingY: 1,
+                                        fontSize: 16,
+                                        fontWeight: theme.typography.fontWeightRegular,
+                                        color: theme.palette.background.default
+                                    }}
+                                >
+                                    {calculatePercentage(parseInt(targets.targets.monthly), parseInt(targets.targets.target.r_monthly))}%
+                                </Typography>
+                            </Box>
                         </Box>
 
                         <Grid
@@ -142,11 +187,11 @@ const SalesTargets = (targets) => {
                                 <Typography sx={{ fontSize: 24, color: theme.palette.background.default }}>
                                     {formatNumber(parseInt(targets.targets.monthly))}
                                 </Typography>
-                                <Typography sx={{ color: theme.palette.background.default }}>Collected</Typography>
+                                <Typography sx={{ color: theme.palette.background.default }}>Achieved</Typography>
                             </Grid>
                         </Grid>
                     </Grid>
-                    <Grid item xs={3.8}>
+                    <Grid item xs={12} sm={12} md={6} lg={3.8} xl={3.8}>
                         <Box
                             sx={{
                                 backgroundColor: theme.palette.primary.light,
@@ -167,16 +212,38 @@ const SalesTargets = (targets) => {
                                 >
                                     Annual
                                 </Typography>
-                                <Typography
+
+                                <Box
                                     sx={{
-                                        paddingRight: 1.8,
-                                        paddingY: 1,
-                                        fontSize: theme.typography.h4,
-                                        fontWeight: theme.typography.fontWeightRegular
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-evenly'
                                     }}
                                 >
-                                    {calculatePercentage(parseInt(targets.targets.annually), parseInt(targets.targets.target.r_yearly))}%
-                                </Typography>
+                                    <Typography
+                                        sx={{
+                                            paddingRight: 1
+                                        }}
+                                    >
+                                        {Achievement(parseInt(targets.targets.annually), parseInt(targets.targets.target.r_yearly)) ===
+                                        'achieved' ? (
+                                            <IconArrowUp size={18} color={theme.palette.success.dark} />
+                                        ) : (
+                                            <IconTimeline size={18} color={theme.palette.error.main} />
+                                        )}
+                                    </Typography>
+                                    <Typography
+                                        sx={{
+                                            paddingRight: 1.8,
+                                            paddingY: 1,
+                                            fontSize: theme.typography.h4,
+                                            fontWeight: theme.typography.fontWeightRegular
+                                        }}
+                                    >
+                                        {calculatePercentage(parseInt(targets.targets.annually), parseInt(targets.targets.target.r_yearly))}
+                                        %
+                                    </Typography>
+                                </Box>
                             </Box>
 
                             <Grid
@@ -207,13 +274,13 @@ const SalesTargets = (targets) => {
                                         sx={{
                                             paddingRight: 1.8,
                                             fontSize: 20,
-                                            fontWeight: theme.typography.fontWeightBold,
+                                            fontWeight: theme.typography.fontWeightMedium,
                                             color: theme.palette.grey[900]
                                         }}
                                     >
                                         {formatNumber(parseInt(targets.targets.annually))}
                                     </Typography>
-                                    <Typography>Collected</Typography>
+                                    <Typography>Achieved</Typography>
                                 </Grid>
                             </Grid>
                         </Box>

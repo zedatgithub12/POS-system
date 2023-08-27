@@ -71,11 +71,11 @@ const CreatePackage = () => {
     const handleShopSelection = (value) => {
         setShopId(value.id);
         setShopsName(value.name);
-        getProducts(value.name);
+        getShopStock(value.name);
     };
-    const getProducts = (shop) => {
+    const getShopStock = (shop) => {
         setLoading(true);
-        var Api = Connections.api + Connections.viewstoreproduct + shop;
+        var Api = Connections.api + Connections.getShopStocks + shop;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
@@ -113,13 +113,22 @@ const CreatePackage = () => {
             // If it does, update the quantity of the existing item
             const updatedItems = Items.map((item) => {
                 if (item.id === product.id) {
-                    return { ...item, quantity: item.quantity + 1 };
+                    return { ...item, item_quantity: item.item_quantity + 1 };
                 }
                 return item;
             });
             setItems(updatedItems);
         } else {
-            setItems([...Items, { id: product.id, name: product.name, code: product.code, unit: product.unit, quantity: 1 }]);
+            setItems([
+                ...Items,
+                {
+                    id: product.id,
+                    item_name: product.item_name,
+                    item_code: product.item_code,
+                    item_sku: product.stock_unit,
+                    item_quantity: 1
+                }
+            ]);
         }
     };
 
@@ -130,7 +139,7 @@ const CreatePackage = () => {
     const handleIncrement = (id) => {
         const updatedItems = Items.map((item) => {
             if (item.id === id) {
-                return { ...item, quantity: item.quantity + 1 };
+                return { ...item, item_quantity: parseInt(item.item_quantity) + 1 };
             }
             return item;
         });
@@ -139,8 +148,18 @@ const CreatePackage = () => {
 
     const handleDecrement = (id) => {
         const updatedItems = Items.map((item) => {
-            if (item.id === id && item.quantity > 0) {
-                return { ...item, quantity: item.quantity - 1 };
+            if (item.id === id && item.item_quantity > 0) {
+                return { ...item, item_quantity: parseInt(item.item_quantity) - 1 };
+            }
+            return item;
+        });
+        setItems(updatedItems);
+    };
+
+    const DirectInput = (event, id) => {
+        const updatedItems = Items.map((item) => {
+            if (item.id === id) {
+                return { ...item, item_quantity: event.target.value };
             }
             return item;
         });
@@ -155,7 +174,7 @@ const CreatePackage = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
         setSpinner(true);
-        if (!shopName) {
+        if (shopName && shopId != null) {
             setPopup({
                 ...popup,
                 status: true,
@@ -308,10 +327,9 @@ const CreatePackage = () => {
                             <Grid container>
                                 <Grid item xs={12} sm={6}>
                                     <Autocomplete
-                                        key={productData.id}
                                         disabled={shopId ? false : true}
                                         options={productData}
-                                        getOptionLabel={(option) => option.name}
+                                        getOptionLabel={(option) => option.item_name}
                                         onChange={(event, value) => {
                                             if (value) {
                                                 handleAddToCart(value);
@@ -341,8 +359,8 @@ const CreatePackage = () => {
                                                 <TableCell>Item Name</TableCell>
                                                 <TableCell>Item Code</TableCell>
 
-                                                <TableCell>Quantity</TableCell>
-                                                <TableCell>Unit</TableCell>
+                                                <TableCell align="center">Quantity</TableCell>
+                                                <TableCell>SKU</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -350,17 +368,23 @@ const CreatePackage = () => {
                                             <TableBody>
                                                 {Items.map((item, index) => (
                                                     <TableRow key={index}>
-                                                        <TableCell>{item.name}</TableCell>
-                                                        <TableCell>{item.code}</TableCell>
+                                                        <TableCell>{item.item_name}</TableCell>
+                                                        <TableCell>{item.item_code}</TableCell>
 
-                                                        <TableCell>
-                                                            <Box display="flex" alignItems="center">
-                                                                <Button onClick={() => handleDecrement(item.id)}>-</Button>
-                                                                <Typography>{item.quantity}</Typography>
-                                                                <Button onClick={() => handleIncrement(item.id)}>+</Button>
-                                                            </Box>
+                                                        <TableCell
+                                                            alignItems="center"
+                                                            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                                        >
+                                                            <Button onClick={() => handleDecrement(item.id)}>-</Button>
+
+                                                            <TextField
+                                                                type="number"
+                                                                value={item.item_quantity}
+                                                                onChange={(event) => DirectInput(event, item.id)}
+                                                            />
+                                                            <Button onClick={() => handleIncrement(item.id)}>+</Button>
                                                         </TableCell>
-                                                        <TableCell>{item.unit}</TableCell>
+                                                        <TableCell>{item.item_sku}</TableCell>
 
                                                         <TableCell>
                                                             <IconButton onClick={() => handleRemoveFromCart(item)}>
@@ -392,6 +416,9 @@ const CreatePackage = () => {
                                     item
                                     xs={12}
                                     sm={6}
+                                    md={5}
+                                    lg={4}
+                                    xl={4}
                                     sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginRight: 1 }}
                                 >
                                     <TextField
@@ -409,7 +436,10 @@ const CreatePackage = () => {
                                     item
                                     xs={12}
                                     sm={6}
-                                    sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginRight: 1 }}
+                                    md={5}
+                                    lg={4}
+                                    xl={4}
+                                    sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginLeft: 2 }}
                                 >
                                     <TextField
                                         fullWidth
@@ -428,8 +458,9 @@ const CreatePackage = () => {
                                         sx={{ marginTop: 2 }}
                                     />
                                 </Grid>
-
-                                <Grid item xs={12} sm={6}>
+                            </Grid>
+                            <Grid container>
+                                <Grid item xs={12} sm={6} md={5} lg={4} xl={4}>
                                     <TextField
                                         fullWidth
                                         required
@@ -445,11 +476,24 @@ const CreatePackage = () => {
                                     />
                                 </Grid>
                             </Grid>
-                            <Box paddingTop={5}>
-                                <Button onClick={GoBack} variant="text" color="error" sx={{ paddingX: 4, marginRight: 2 }}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit" variant="contained" color="primary" sx={{ paddingX: 4 }}>
+
+                            <Grid
+                                item
+                                xs={12}
+                                sm={6}
+                                md={5}
+                                lg={4}
+                                xl={4}
+                                sx={{
+                                    display: 'flex',
+                                    alignSelf: 'center',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: 0.5,
+                                    paddingTop: 4
+                                }}
+                            >
+                                <Button type="submit" variant="contained" color="primary" sx={{ paddingX: 6, paddingY: 1 }}>
                                     {spinner ? (
                                         <div className="spinner-border spinner-border-sm text-dark " role="status">
                                             <span className="visually-hidden">Loading...</span>
@@ -458,7 +502,10 @@ const CreatePackage = () => {
                                         'Create'
                                     )}
                                 </Button>
-                            </Box>
+                                <Button onClick={GoBack} variant="text" color="error" sx={{ paddingX: 4, marginRight: 2 }}>
+                                    Cancel
+                                </Button>
+                            </Grid>
                         </Grid>
                     </form>
                 </Grid>

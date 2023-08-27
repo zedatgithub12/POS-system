@@ -1,15 +1,22 @@
 import { useState } from 'react';
-
+import Pagination from '@mui/material/Pagination';
 // material-ui
 import { Typography, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { IconCircleCheck } from '@tabler/icons';
+import { Preferences } from 'preferences';
 // project imports
 
 // ==============================|| ADD NEW COMPONENTS ||============================== //
 
 const LowStocks = ({ stocks }) => {
     const theme = useTheme();
+    const [page, setPage] = useState(1);
+    const [numPages, setNumPages] = useState(Math.ceil(stocks.length / Preferences.numPerPage));
+    const handleChangePage = (event, value) => {
+        setPage(value);
+    };
+
     return (
         <Box
             sx={{
@@ -33,7 +40,7 @@ const LowStocks = ({ stocks }) => {
                     <Typography marginTop={1}>All stocks in this shop are above minimum</Typography>
                 </Box>
             ) : (
-                stocks.map((item) => (
+                stocks.slice((page - 1) * Preferences.numPerPage, page * Preferences.numPerPage).map((item) => (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 1 }}>
                         <Typography
                             sx={{
@@ -42,7 +49,7 @@ const LowStocks = ({ stocks }) => {
                                 color: theme.palette.primary.dark
                             }}
                         >
-                            {item.name}
+                            {item.item_name}
                         </Typography>
 
                         <Typography
@@ -52,10 +59,18 @@ const LowStocks = ({ stocks }) => {
                                 color: theme.palette.primary.dark
                             }}
                         >
-                            {item.quantity} {item.unit}
+                            <span className="bg-danger bg-opacity-10 text-danger px-3 py-1 mx-2 rounded text-capitalize">
+                                {item.stock_quantity}
+                            </span>
+                            {item.stock_unit}
                         </Typography>
                     </Box>
                 ))
+            )}
+            {stocks.length > Preferences.numPerPage && (
+                <Box marginTop={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Pagination count={numPages} page={page} onChange={handleChangePage} />
+                </Box>
             )}
         </Box>
     );

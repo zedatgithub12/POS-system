@@ -37,6 +37,7 @@ import { Link } from 'react-router-dom';
 // import ProductDummy from 'data/products';
 // import UsersData from 'data/users';
 import Connections from 'api';
+import { ActivityIndicators } from 'ui-component/activityIndicator';
 
 // ==============================|| USERS PAGE ||============================== //
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -50,6 +51,7 @@ const Users = () => {
     const [roleFilter, setRoleFilter] = useState('Role');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
+    const [loading, setLoading] = useState(true);
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -100,6 +102,7 @@ const Users = () => {
     const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
     useEffect(() => {
         const getUsers = () => {
+            setLoading(true);
             var Api = Connections.api + Connections.viewuser;
             var headers = {
                 accept: 'application/json',
@@ -115,8 +118,10 @@ const Users = () => {
                 .then((response) => {
                     if (response.success) {
                         setUserData(response.data);
+                        setLoading(false);
                     } else {
                         setUserData(userData);
+                        setLoading(false);
                     }
                 })
                 .catch(() => {
@@ -126,6 +131,7 @@ const Users = () => {
                         severity: 'error',
                         message: 'There is error featching  users!'
                     });
+                    setLoading(false);
                 });
         };
         getUsers();
@@ -203,9 +209,19 @@ const Users = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {paginatedData.map((user, index) => (
-                                        <UserRow key={index} user={user} />
-                                    ))}
+                                    {loading ? (
+                                        <TableRow>
+                                            <TableCell colSpan={6} align="center">
+                                                <Box
+                                                    sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                                                >
+                                                    <ActivityIndicators />
+                                                </Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        paginatedData.map((user, index) => <UserRow key={index} user={user} />)
+                                    )}
                                 </TableBody>
                             </Table>
                             <TablePagination

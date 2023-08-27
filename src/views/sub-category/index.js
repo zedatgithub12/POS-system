@@ -31,6 +31,8 @@ import MainCard from 'ui-component/cards/MainCard';
 // import CategoryData from 'data/category';
 import { gridSpacing } from 'store/constant';
 import Connections from 'api';
+import { ActivityIndicators } from 'ui-component/activityIndicator';
+
 // ==============================|| CATEGORY PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -54,6 +56,7 @@ const SubCategory = () => {
     };
 
     //category data
+    const [mainCategories, setMainCategories] = useState([]);
     const [CategoryData, setCategoryData] = useState([]);
     const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -66,6 +69,7 @@ const SubCategory = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(12);
     const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(true);
     const [spinner, setSpinner] = useState(false);
 
     const [categoryFilter, setCategoryFilter] = useState('Main Category');
@@ -87,8 +91,8 @@ const SubCategory = () => {
     const uniqueCategories = new Set();
 
     // Loop through the CategoryData array and add each main_category value to the Set
-    CategoryData.forEach((category) => {
-        uniqueCategories.add(category.main_category);
+    mainCategories.forEach((category) => {
+        uniqueCategories.add(category.name);
     });
 
     // Convert the Set back to an array
@@ -305,9 +309,37 @@ const SubCategory = () => {
     };
 
     //useffect which fetches list of categories when component get mounted
-
     useEffect(() => {
-        const getCatgeory = () => {
+        const getMainCatgeory = () => {
+            var Api = Connections.api + Connections.viewcategory;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers,
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setMainCategories(response.data);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error fetching categories!'
+                    });
+                });
+        };
+
+        const getSubCatgeory = () => {
+            setLoading(true);
             var Api = Connections.api + Connections.viewsubcategory;
             var headers = {
                 accept: 'application/json',
@@ -323,6 +355,7 @@ const SubCategory = () => {
                 .then((response) => {
                     if (response.success) {
                         setCategoryData(response.data);
+                        setLoading(false);
                     }
                 })
                 .catch(() => {
@@ -332,9 +365,11 @@ const SubCategory = () => {
                         severity: 'error',
                         message: 'There is error featching category!'
                     });
+                    setLoading(false);
                 });
         };
-        getCatgeory();
+        getMainCatgeory();
+        getSubCatgeory();
         return () => {};
     }, [popup]);
 
@@ -399,34 +434,40 @@ const SubCategory = () => {
                             </FormControl>
 
                             <List>
-                                {categoriesToShow.map((category) => (
-                                    <ListItem key={category.id} className="bg-light rounded m-2 py-3">
-                                        <ListItemText
-                                            primary={category.sub_category}
-                                            secondary={
-                                                <React.Fragment>
-                                                    <Typography
-                                                        sx={{ display: 'inline' }}
-                                                        component="span"
-                                                        variant="body2"
-                                                        color="text.primary"
-                                                    >
-                                                        {category.main_category}
-                                                    </Typography>
-                                                </React.Fragment>
-                                            }
-                                        />
+                                {loading ? (
+                                    <Box sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        <ActivityIndicators />
+                                    </Box>
+                                ) : (
+                                    categoriesToShow.map((category) => (
+                                        <ListItem key={category.id} className="bg-light rounded m-2 py-3">
+                                            <ListItemText
+                                                primary={category.sub_category}
+                                                secondary={
+                                                    <React.Fragment>
+                                                        <Typography
+                                                            sx={{ display: 'inline' }}
+                                                            component="span"
+                                                            variant="body2"
+                                                            color="text.primary"
+                                                        >
+                                                            {category.main_category}
+                                                        </Typography>
+                                                    </React.Fragment>
+                                                }
+                                            />
 
-                                        <ListItemSecondaryAction>
-                                            <IconButton onClick={() => handleEditDialogOpen(category)}>
-                                                <IconEdit />
-                                            </IconButton>
-                                            <IconButton onClick={() => handleDeleteDialogOpen(category)}>
-                                                <IconTrash />
-                                            </IconButton>
-                                        </ListItemSecondaryAction>
-                                    </ListItem>
-                                ))}
+                                            <ListItemSecondaryAction>
+                                                <IconButton onClick={() => handleEditDialogOpen(category)}>
+                                                    <IconEdit />
+                                                </IconButton>
+                                                <IconButton onClick={() => handleDeleteDialogOpen(category)}>
+                                                    <IconTrash />
+                                                </IconButton>
+                                            </ListItemSecondaryAction>
+                                        </ListItem>
+                                    ))
+                                )}
                             </List>
                             <TablePagination
                                 component="div"
@@ -442,7 +483,7 @@ const SubCategory = () => {
             </MainCard>
 
             <Dialog open={addDialogOpen} onClose={handleAddDialogClose}>
-                <DialogTitle>Add Category</DialogTitle>
+                <DialogTitle>Add Sub Category</DialogTitle>
 
                 <DialogContent>
                     <Autocomplete
@@ -484,7 +525,7 @@ const SubCategory = () => {
             </Dialog>
 
             <Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
-                <DialogTitle>Edit Category</DialogTitle>
+                <DialogTitle>Edit Sub Category</DialogTitle>
                 <DialogContent>
                     <Autocomplete
                         options={uniqueCategoryArray}
@@ -539,7 +580,7 @@ const SubCategory = () => {
                                 <span className="visually-hidden">Loading...</span>
                             </div>
                         ) : (
-                            'Delete'
+                            'Yes'
                         )}
                     </Button>
                 </DialogActions>

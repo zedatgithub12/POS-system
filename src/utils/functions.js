@@ -1,10 +1,21 @@
-export const formatNumber = (number) => {
-    if (number >= 1000000) {
-        return (number / 1000000).toFixed(1) + 'M';
-    } else if (number >= 1000) {
-        return (number / 1000).toFixed(1) + 'K';
+export const formatNumber = (passednum) => {
+    const number = Math.abs(passednum);
+    if (passednum < 0) {
+        if (number >= 1000000) {
+            return -(number / 1000000).toFixed(1) + 'M';
+        } else if (number >= 1000) {
+            return -(number / 1000).toFixed(1) + 'K';
+        } else {
+            return -number.toString();
+        }
     } else {
-        return number.toString();
+        if (number >= 1000000) {
+            return (number / 1000000).toFixed(1) + 'M';
+        } else if (number >= 1000) {
+            return (number / 1000).toFixed(1) + 'K';
+        } else {
+            return number.toString();
+        }
     }
 };
 
@@ -24,4 +35,23 @@ export const calculatePercentage = (numerator, denominator) => {
     }
     const percentage = (numerator / denominator) * 100;
     return percentage.toFixed(2); // Limiting the result to 2 decimal places
+};
+
+export const DateFormatter = (soldat) => {
+    var year = soldat.slice(0, 4);
+    var month = soldat.slice(5, 7);
+    var day = soldat.slice(8, 10);
+    const date = day + '-' + month + '-' + year;
+    return date;
+};
+
+export const Achievement = (revenue, target) => {
+    let status;
+    if (revenue >= target) {
+        status = 'achieved';
+        return status;
+    } else {
+        status = 'in-progress';
+        return status;
+    }
 };

@@ -11,6 +11,7 @@ const UpdateTransfer = Loadable(lazy(() => import('views/Transfer-stock/update-t
 //package routing
 const Packages = Loadable(lazy(() => import('views/Packages')));
 const CreatePackage = Loadable(lazy(() => import('views/Packages/createPackage')));
+const PackageDetail = Loadable(lazy(() => import('views/Packages/packageDetail')));
 const UpdatePackage = Loadable(lazy(() => import('views/Packages/updatePackage')));
 
 //package selling routing
@@ -32,6 +33,13 @@ const Products = Loadable(lazy(() => import('views/products')));
 const AddProduct = Loadable(lazy(() => import('views/products/addProduct')));
 const ViewProduct = Loadable(lazy(() => import('views/products/viewProduct')));
 const UpdateProduct = Loadable(lazy(() => import('views/products/updateProduct')));
+
+// Stock routing
+const Stock = Loadable(lazy(() => import('views/stocks')));
+const AddStock = Loadable(lazy(() => import('views/stocks/addStock')));
+const ViewStock = Loadable(lazy(() => import('views/stocks/viewStock')));
+const UpdateStock = Loadable(lazy(() => import('views/stocks/updateStock')));
+
 // Category routing
 const Category = Loadable(lazy(() => import('views/category')));
 
@@ -45,7 +53,7 @@ const ViewSale = Loadable(lazy(() => import('views/sales/viewSale')));
 //Customers Routing
 const Customers = Loadable(lazy(() => import('views/customers')));
 const AddCustomer = Loadable(lazy(() => import('views/customers/addCustomer')));
-const ViewCustomer = Loadable(lazy(() => import('views/customers/viewCustomer')));
+const CustomerDetails = Loadable(lazy(() => import('views/customers/viewCustomer')));
 const UpdateCustomer = Loadable(lazy(() => import('views/customers/updateCustomer')));
 //User Routing
 const Users = Loadable(lazy(() => import('views/users')));
@@ -170,6 +178,22 @@ const MainRoutes = {
             element: <UpdateProduct />
         },
         {
+            path: 'stocks',
+            element: <Stock />
+        },
+        {
+            path: 'add-stock',
+            element: <AddStock />
+        },
+        {
+            path: 'view-stock',
+            element: <ViewStock />
+        },
+        {
+            path: 'update-stock',
+            element: <UpdateStock />
+        },
+        {
             path: 'categories',
             element: <Category />
         },
@@ -202,8 +226,8 @@ const MainRoutes = {
             element: <AddCustomer />
         },
         {
-            path: 'view-customer',
-            element: <ViewCustomer />
+            path: 'customer-details',
+            element: <CustomerDetails />
         },
         {
             path: 'update-customer',
@@ -232,6 +256,10 @@ const MainRoutes = {
         {
             path: 'create-package',
             element: <CreatePackage />
+        },
+        {
+            path: 'view-package',
+            element: <PackageDetail />
         },
         {
             path: 'update-package',

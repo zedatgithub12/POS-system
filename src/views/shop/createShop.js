@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 // material-ui
-import { Grid, Typography, Button, Divider, Box, TextField } from '@mui/material';
+import { Grid, Typography, Button, Divider, Box, TextField, InputLabel, FormControl } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import { useTheme } from '@mui/material/styles';
 import shop from 'assets/images/placeholder-store.png';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate } from 'react-router-dom';
@@ -54,6 +55,7 @@ const CreateShop = () => {
         city: '',
         subcity: '',
         address: '',
+        tinnumber: '',
         latitude: '',
         longitude: '',
         description: '',
@@ -96,6 +98,7 @@ const CreateShop = () => {
         data.append('city', formData.city);
         data.append('subcity', formData.subcity);
         data.append('address', formData.address);
+        data.append('tin_number', formData.tinnumber);
         data.append('latitude', formData.latitude);
         data.append('longitude', formData.longitude);
         data.append('description', formData.description);
@@ -201,14 +204,22 @@ const CreateShop = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
-                                        <TextField
-                                            fullWidth
-                                            label="Category"
-                                            name="category"
-                                            onChange={handleInputChange}
-                                            value={formData.category}
-                                            required
-                                        />
+                                        <FormControl fullWidth required>
+                                            <InputLabel id="Category-label">Category</InputLabel>
+                                            <Select
+                                                required
+                                                label="Shop Category"
+                                                name="category"
+                                                value={formData.category}
+                                                onChange={handleInputChange}
+                                                displayEmpty
+                                                inputProps={{ 'aria-label': 'Category' }}
+                                            >
+                                                <MenuItem value="Suk">Suk</MenuItem>
+                                                <MenuItem value="Mini Market">Mini Market</MenuItem>
+                                                <MenuItem value="Supermarket">Supermarket</MenuItem>
+                                            </Select>
+                                        </FormControl>
                                     </Grid>
                                     <Grid item xs={12}>
                                         <TextField
@@ -272,6 +283,17 @@ const CreateShop = () => {
                                             value={formData.address}
                                         />
                                     </Grid>
+
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            fullWidth
+                                            label="TIN number"
+                                            name="tinnumber"
+                                            onChange={handleInputChange}
+                                            value={formData.tinnumber}
+                                        />
+                                    </Grid>
+
                                     <Grid item xs={12}>
                                         <Typography sx={{ paddingBottom: 1 }}>Select location on the map</Typography>
                                         <Box sx={{ height: 400, width: '100%' }}>

@@ -101,8 +101,31 @@ const NotificationSection = () => {
     };
 
     const handleOpenNotification = (notificationInfo) => {
-        navigate('/view-product', { state: { ...notificationInfo } });
-        setOpen(false);
+        if (notificationInfo.type === 'stock') {
+            navigate('/view-stock', { state: { ...notificationInfo } });
+            setOpen(false);
+        } else {
+            var statusChecked = true;
+            var status = notificationInfo.status ? notificationInfo.status : '';
+            var salesStatus = notificationInfo.salesstatus ? notificationInfo.salesstatus : '';
+            var notificationStatus = users.role === 'Admin' ? status : salesStatus;
+
+            if (statusChecked && notificationStatus === 'unseen') {
+                var AdminApi = Connections.api + Connections.updateStatus + notificationInfo.id;
+                var saleApi = Connections.api + Connections.updateSalesStatus + notificationInfo.id;
+                var Api = users.role === 'Admin' ? AdminApi : saleApi;
+                var headers = {
+                    accept: 'application/json',
+                    'Content-Type': 'application/json'
+                };
+                // Make the API call using fetch()
+                fetch(Api, {
+                    method: 'PUT',
+                    headers: headers
+                });
+                statusChecked = false;
+            }
+        }
     };
 
     useEffect(() => {

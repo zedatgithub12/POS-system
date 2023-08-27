@@ -3,7 +3,7 @@ import { useTheme, styled } from '@mui/material/styles';
 import { Avatar, Divider, Grid, List, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 
 // assets
-import { IconBuildingStore, IconChartInfographic } from '@tabler/icons';
+import { IconBuildingStore, IconChartInfographic, IconNotification } from '@tabler/icons';
 import PropTypes from 'prop-types';
 // styles
 const ListItemWrapper = styled('div')(({ theme }) => ({
@@ -50,15 +50,21 @@ const StockAlert = ({ type, title, date, message, status, onPress, salesstatus }
     //         return `${seconds.toString().padStart(1, '0')} s`;
     //     }
     // };
+
     const DateSlice = (date) => {
-        var month = date.slice(5, 7);
-        var day = date.slice(8, 10);
-        return day + '-' + month;
+        const formatteddate = new Date(date);
+
+        const formattedDate = formatteddate.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric'
+        });
+        return formattedDate;
     };
     return (
         <List
             sx={{
                 width: '100%',
+                minWidth: 300,
                 maxWidth: 400,
                 py: 0,
                 background: noticestatus === 'seen' ? theme.palette.background.default : theme.palette.primary.light,
@@ -85,7 +91,7 @@ const StockAlert = ({ type, title, date, message, status, onPress, salesstatus }
                                 color: theme.palette.primary.dark,
                                 backgroundColor: theme.palette.primary.light,
                                 border: 'none',
-                                borderColor: theme.palette.warning.main
+                                borderColor: theme.palette.warning.dark
                             }}
                         >
                             {type === 'stock' ? (
@@ -98,15 +104,7 @@ const StockAlert = ({ type, title, date, message, status, onPress, salesstatus }
                         </Avatar>
                     </ListItemAvatar>
                     <ListItemText primary={<Typography variant="subtitle1">{title}</Typography>} />
-                    <ListItemSecondaryAction>
-                        <Grid container justifyContent="flex-end">
-                            <Grid item xs={12}>
-                                <Typography variant="caption" display="block" gutterBottom>
-                                    {DateSlice(date)}
-                                </Typography>
-                            </Grid>
-                        </Grid>
-                    </ListItemSecondaryAction>
+                    <ListItemSecondaryAction></ListItemSecondaryAction>
                 </ListItem>
                 <Grid container direction="column" className="list-container">
                     <Grid item xs={12}>
@@ -123,6 +121,13 @@ const StockAlert = ({ type, title, date, message, status, onPress, salesstatus }
                         >
                             {message}
                         </Typography>
+                    </Grid>
+                    <Grid container justifyContent="flex-end">
+                        <Grid item xs={12}>
+                            <Typography variant="caption" display="block" gutterBottom>
+                                {DateSlice(date)}
+                            </Typography>
+                        </Grid>
                     </Grid>
                 </Grid>
             </ListItemWrapper>

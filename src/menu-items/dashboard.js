@@ -1,8 +1,17 @@
 // assets
-import { IconDashboard, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers, IconPackages } from '@tabler/icons';
+import {
+    IconDashboard,
+    IconBox,
+    IconCategory,
+    IconBuildingStore,
+    IconTimeline,
+    IconUsers,
+    IconPackages,
+    IconClipboardList
+} from '@tabler/icons';
 
 // constant
-const icons = { IconDashboard, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers, IconPackages };
+const icons = { IconDashboard, IconBox, IconCategory, IconBuildingStore, IconTimeline, IconUsers, IconPackages, IconClipboardList };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
@@ -16,7 +25,7 @@ const getDashboardItems = (role) => {
     const adminItems = [
         {
             id: 'default',
-            title: 'Dashboard',
+            title: 'Home',
             type: 'item',
             url: '/dashboard/default',
             icon: icons.IconDashboard,
@@ -24,42 +33,10 @@ const getDashboardItems = (role) => {
         },
         {
             id: 'shops',
-            title: 'Shops',
+            title: 'Manage Shops',
             type: 'item',
             url: '/shops',
             icon: icons.IconBuildingStore,
-            breadcrumbs: false
-        },
-        {
-            id: 'stocks',
-            title: 'Stocks',
-            type: 'collapse',
-            url: '/products',
-            icon: icons.IconBox,
-            breadcrumbs: false,
-            children: [
-                {
-                    id: 'stocks',
-                    title: 'Stocks',
-                    type: 'item',
-                    url: '/products',
-                    breadcrumbs: false
-                },
-                {
-                    id: 'tranfer-stock',
-                    title: 'Stock Transfers',
-                    type: 'item',
-                    url: '/transfer-stock',
-                    breadcrumbs: false
-                }
-            ]
-        },
-        {
-            id: 'packages',
-            title: 'Packages',
-            type: 'item',
-            url: '/packages',
-            icon: icons.IconPackages,
             breadcrumbs: false
         },
         {
@@ -87,6 +64,46 @@ const getDashboardItems = (role) => {
             ]
         },
         {
+            id: 'products',
+            title: 'Products',
+            type: 'item',
+            url: '/products',
+            icon: icons.IconBox,
+            breadcrumbs: false
+        },
+        {
+            id: 'stocks',
+            title: 'Manage Stocks',
+            type: 'collapse',
+            url: '/stocks',
+            icon: icons.IconClipboardList,
+            breadcrumbs: false,
+            children: [
+                {
+                    id: 'stocks',
+                    title: 'Stocks',
+                    type: 'item',
+                    url: '/stocks',
+                    breadcrumbs: false
+                },
+                {
+                    id: 'tranfer-stock',
+                    title: 'Stock Transfers',
+                    type: 'item',
+                    url: '/transfer-stock',
+                    breadcrumbs: false
+                },
+                {
+                    id: 'packages',
+                    title: 'Packages',
+                    type: 'item',
+                    url: '/packages',
+                    breadcrumbs: false
+                }
+            ]
+        },
+
+        {
             id: 'sales',
             title: 'Sales',
             type: 'item',
@@ -107,7 +124,7 @@ const getDashboardItems = (role) => {
     const salesItems = [
         {
             id: 'default',
-            title: 'Dashboard',
+            title: 'Home',
             type: 'item',
             url: '/dashboard/default',
             icon: icons.IconDashboard,
@@ -115,10 +132,10 @@ const getDashboardItems = (role) => {
         },
         {
             id: 'stocks',
-            title: 'Stocks',
+            title: 'Items',
             type: 'item',
-            url: '/products',
-            icon: icons.IconBox,
+            url: '/stocks',
+            icon: icons.IconClipboardList,
             breadcrumbs: false
         },
         {
@@ -144,7 +161,6 @@ const getDashboardItems = (role) => {
 
 const dashboard = {
     id: 'dashboard',
-    title: 'Dashboard',
     type: 'group',
     children: getDashboardItems(getUserRole())
 };

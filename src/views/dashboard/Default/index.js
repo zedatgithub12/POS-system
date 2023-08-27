@@ -24,11 +24,12 @@ import Connections from 'api';
 import { useTheme } from '@mui/material/styles';
 import AddNew from './components/add-new';
 import LowStocks from './components/low-stock';
-import CustomerCard from './components/customer-card';
 import SalesTargets from './components/sales-against-target';
 import { IconX, IconBuildingStore, IconChartInfographic } from '@tabler/icons';
 import TargetListing from './components/target-listing';
 import { useNavigate } from 'react-router-dom';
+import { Preferences } from 'preferences';
+import { ActivityIndicators } from 'ui-component/activityIndicator';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
@@ -41,17 +42,17 @@ const Dashboard = () => {
     const theme = useTheme();
 
     const navigate = useNavigate();
-
+    const defaultShop = Preferences.defaultshop;
     const [shopId, setShopId] = useState(null);
     const [shopName, setShopsName] = useState();
     const [shops, setShops] = useState([]);
     const [revenueTarget, setRevenueTarget] = useState([]);
     const [shopFilter, setShopFilter] = useState('Select Shop');
     const [targetShopFilter, setTargetShopFilter] = useState('Select Shop');
+    const [targetLoader, setTargetLoader] = useState(true);
+    const [loading, setLoading] = useState(true);
     const [spinner, setSpinner] = useState(false);
     const [lowstock, setLowStock] = useState([]);
-    const [totalCustomer, setTotalCustomer] = useState();
-    const [todaycustomers, setTodayCustomers] = useState();
     const [openTargetDialog, setOpenTargetDialog] = useState(false);
 
     const [target, setTarget] = useState({
@@ -90,10 +91,10 @@ const Dashboard = () => {
         });
     };
 
-    const handleTargetClick = () => {
-        setOpenTargetDialog(true);
-        getShops();
-    };
+    // const handleTargetClick = () => {
+    //     setOpenTargetDialog(true);
+    //     getShops();
+    // };
 
     const handleDialogClose = () => {
         setOpenTargetDialog(false);
@@ -196,6 +197,10 @@ const Dashboard = () => {
             .then((response) => {
                 if (response.success) {
                     setShops(response.data);
+                    setShopFilter(response.data[defaultShop].name);
+                    setTargetShopFilter(response.data[defaultShop].name);
+                    getLowStocks(response.data[defaultShop].name);
+                    getTargets(response.data[defaultShop].name);
                 } else {
                     setShops(shops);
                 }
@@ -209,7 +214,9 @@ const Dashboard = () => {
                 });
             });
     };
+
     const getTargets = (name) => {
+        setTargetLoader(true);
         var Api = Connections.api + Connections.againsttarget + name;
         var headers = {
             accept: 'application/json',
@@ -225,8 +232,9 @@ const Dashboard = () => {
             .then((response) => {
                 if (response.success) {
                     setRevenueTarget(response.data);
+                    setTargetLoader(false);
                 } else {
-                    setRevenueTarget([]);
+                    setTargetLoader(false);
                 }
             })
             .catch(() => {
@@ -236,10 +244,12 @@ const Dashboard = () => {
                     severity: 'error',
                     message: 'There is error fetching targets!'
                 });
+                setTargetLoader(false);
             });
     };
 
     const getLowStocks = (name) => {
+        setLoading(true);
         var Api = Connections.api + Connections.lowstock + name;
         var headers = {
             accept: 'application/json',
@@ -255,8 +265,10 @@ const Dashboard = () => {
             .then((response) => {
                 if (response.success) {
                     setLowStock(response.data);
+                    setLoading(false);
                 } else {
                     setLowStock(lowstock);
+                    setLoading(false);
                 }
             })
             .catch(() => {
@@ -266,39 +278,12 @@ const Dashboard = () => {
                     severity: 'error',
                     message: 'There is error fetching low stocks!'
                 });
+                setLoading(false);
             });
     };
 
-    const getCustomerCount = () => {
-        var Api = Connections.api + Connections.customercount;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'GET',
-            headers: headers,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setTotalCustomer(response.data.totalcustomers);
-                    setTodayCustomers(response.data.todaycustomers);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is an error fetching customers count'
-                });
-            });
-    };
     useEffect(() => {
-        user.role === 'Admin' ? (getShops(), getCustomerCount()) : (getTargets(user.store_name), getLowStocks(user.store_name));
+        user.role === 'Admin' ? getShops() : (getTargets(user.store_name), getLowStocks(user.store_name));
     }, [user.role, user.store_name]);
 
     return (
@@ -306,10 +291,20 @@ const Dashboard = () => {
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
                     <Box paddingX={4} paddingY={3}>
-                        <Typography className="fs-3 fw-semibold">Dashboard</Typography>
+                        <Typography variant="h3" className=" fw-semibold">
+                            Home
+                        </Typography>
                     </Box>
-                    <Grid container className="ms-4 me-3" justifyContent="space-between" alignItems="start">
-                        <Grid item xs={12} sm={12} md={12} lg={8.6} xl={8.6} sx={{ borderRadius: 2, padding: 3, paddingTop: 0 }}>
+                    <Grid container className="mx-2" justifyContent="space-between" alignItems="start">
+                        <Grid
+                            item
+                            xs={12}
+                            sm={12}
+                            md={12}
+                            lg={8.6}
+                            xl={8.6}
+                            sx={{ borderRadius: 2, padding: 1, paddingLeft: 2, paddingTop: 0 }}
+                        >
                             <Grid
                                 item
                                 xs={12}
@@ -332,6 +327,7 @@ const Dashboard = () => {
                                                 sx={{ backgroundColor: theme.palette.background.default }}
                                             >
                                                 <MenuItem value="Select Shop">Select Shop</MenuItem>
+                                                <MenuItem value="All">All</MenuItem>
                                                 {Array.from(new Set(shops.map((item) => item.name))).map((shop) => (
                                                     <MenuItem
                                                         key={shop}
@@ -347,29 +343,23 @@ const Dashboard = () => {
                                         <Typography sx={{ fontSize: theme.typography.h5, marginRight: 2 }}>{user.store_name}</Typography>
                                     )}
                                 </Box>
-
-                                <SalesTargets targets={revenueTarget} />
+                                {targetLoader ? (
+                                    <Box sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        <ActivityIndicators />
+                                    </Box>
+                                ) : (
+                                    <SalesTargets targets={revenueTarget} />
+                                )}
                             </Grid>
-                            <TargetListing lists={revenueTarget} />
+                            <TargetListing lists={revenueTarget ? revenueTarget : []} shopname={shopFilter} />
                         </Grid>
 
-                        <Grid item xs={3.4}>
-                            {user.role === 'Admin' && (
-                                <>
-                                    <AddNew
-                                        stockbtn={() => navigate('/add-product')}
-                                        packagebtn={() => navigate('/create-package')}
-                                        targetbtn={() => handleTargetClick()}
-                                    />
-                                    <CustomerCard total={totalCustomer} addedToday={todaycustomers} />
-                                </>
-                            )}
+                        <Grid item xs={12} sm={12} md={12} lg={3.4} xl={3.4} sx={{ borderRadius: 2, padding: 1, paddingTop: 0 }}>
                             <Box
                                 sx={{
                                     backgroundColor: theme.palette.background.default,
                                     borderRadius: 2,
-                                    paddingY: 1,
-                                    marginTop: user.role === 'Admin' ? 1 : 0
+                                    paddingY: 1
                                 }}
                             >
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: 1.5 }}>
@@ -401,7 +391,11 @@ const Dashboard = () => {
                                     )}
                                 </Box>
                                 <Divider />
-                                {shopFilter ? (
+                                {loading ? (
+                                    <Box sx={{ minHeight: 205, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        <ActivityIndicators />
+                                    </Box>
+                                ) : shopFilter ? (
                                     <LowStocks stocks={lowstock} />
                                 ) : (
                                     <Box
@@ -419,6 +413,24 @@ const Dashboard = () => {
                                 )}
                             </Box>
                         </Grid>
+
+                        {user.role === 'Admin' && (
+                            <Grid
+                                item
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                lg={3.4}
+                                xl={3.4}
+                                sx={{ borderRadius: 2, padding: 1, paddingTop: 0, paddingLeft: 2 }}
+                            >
+                                <AddNew
+                                    targetbtn={() => setOpenTargetDialog(true)}
+                                    stockbtn={() => navigate('/add-stock')}
+                                    packagebtn={() => navigate('/create-package')}
+                                />
+                            </Grid>
+                        )}
                     </Grid>
                 </Grid>
             </Grid>

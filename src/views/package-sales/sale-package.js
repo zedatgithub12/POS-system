@@ -50,8 +50,6 @@ const SalePackage = () => {
     const [packageBundle, setPackageBundle] = useState([]);
     const [Items, setItems] = useState(packageData.items ? packageData.items : []);
     const [grandTotal, setGrandTotal] = useState(0);
-    const [saleTax, setSaleTax] = useState(0);
-    const [discount, setDiscount] = useState(0);
     const [paymentStatus, setPaymentStatus] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('');
     const [shopName, setShopsName] = useState(user.role === 'Admin' ? '' : user.store_name);
@@ -82,7 +80,7 @@ const SalePackage = () => {
 
     const handleAddToCart = (packages) => {
         setPackageBundle(packages);
-        setGrandTotal(parseFloat(packageBundle.price));
+        setGrandTotal(packages.price);
 
         setItems(JSON.parse(packages.items));
     };
@@ -147,8 +145,6 @@ const SalePackage = () => {
                 customer: customerName,
                 pname: packageBundle.name,
                 products: Items,
-                tax: saleTax,
-                discount: discount,
                 grandTotal: packageBundle.price,
                 payment_status: paymentStatus,
                 payment_method: paymentMethod,
@@ -273,8 +269,9 @@ const SalePackage = () => {
             })
                 .then((response) => response.json())
                 .then((response) => {
+                    console.log(response.data);
                     if (response.success) {
-                        setPackagetData(response.data);
+                        setPackagetData(response.data.data);
                     } else {
                         setPackagetData(packageData);
                     }
@@ -333,6 +330,7 @@ const SalePackage = () => {
                                         }
                                     }}
                                     renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" />}
+                                    noOptionsText="Loading..."
                                 />
                             ) : (
                                 <TextField disabled label="Shop" variant="outlined" value={user.store_name} />
@@ -346,6 +344,7 @@ const SalePackage = () => {
                                     setCustomerName(value);
                                 }}
                                 renderInput={(params) => <TextField {...params} label="Customer" variant="outlined" />}
+                                noOptionsText="Loading..."
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -358,6 +357,7 @@ const SalePackage = () => {
                                     }
                                 }}
                                 renderInput={(params) => <TextField {...params} label="Select Package" variant="outlined" />}
+                                noOptionsText="Loading..."
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -374,12 +374,15 @@ const SalePackage = () => {
                                     <TableBody>
                                         {Items.map((item, index) => (
                                             <TableRow key={index}>
-                                                <TableCell>{item.name}</TableCell>
-                                                <TableCell>{item.code}</TableCell>
+                                                <TableCell>{item.item_name}</TableCell>
+                                                <TableCell>{item.item_code}</TableCell>
 
-                                                <TableCell>{item.quantity}</TableCell>
-
-                                                <TableCell>{item.unit}</TableCell>
+                                                <TableCell>
+                                                    <span className="bg-primary bg-opacity-10 text-primary px-3 py-1 rounded text-capitalize">
+                                                        {item.item_quantity}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell>{item.item_sku}</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -388,26 +391,13 @@ const SalePackage = () => {
                         </Grid>
 
                         <Grid item xs={12} md={6} className="m-auto">
-                            <Box mt={2} className="border rounded mx-5">
+                            <Box mt={2} className=" mx-5">
                                 <TableContainer component={Paper}>
                                     <Table>
                                         <TableBody>
                                             <TableRow>
-                                                <TableCell>Tax</TableCell>
-                                                <TableCell>{saleTax}%</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell>Discount</TableCell>
-                                                <TableCell>{discount} ETB</TableCell>
-                                            </TableRow>
-                                            <TableRow>
                                                 <TableCell>Grand Total</TableCell>
-                                                <TableCell className="fw-semibold fs-4">
-                                                    {parseFloat(grandTotal)} ETB
-                                                    {/* <IconButton className="ms-3" onClick={() => setGrandTotal(grandTotal)}>
-                                                        <IconReload />
-                                                    </IconButton> */}
-                                                </TableCell>
+                                                <TableCell className="fw-semibold fs-4">{grandTotal} ETB</TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>
@@ -418,13 +408,6 @@ const SalePackage = () => {
                         <Grid item xs={12} md={6}>
                             <Box mt={2}>
                                 <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField label="Sale Tax (%)" onChange={(event) => setSaleTax(event.target.value)} fullWidth />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField label="Discount (ETB)" onChange={(event) => setDiscount(event.target.value)} fullWidth />
-                                    </Grid>
-
                                     <Grid item xs={12} sm={6}>
                                         <FormControl fullWidth>
                                             <InputLabel id="payment-status-label">Payment Status</InputLabel>
@@ -475,20 +458,26 @@ const SalePackage = () => {
 
                         <Grid item xs={12}>
                             <Box mt={2} display="flex" justifyContent="flex-end">
-                                <Button variant="contained" color="primary" onClick={() => handleSave()}>
+                                <Box ml={1}>
+                                    <Button variant="text" color="secondary" sx={{ paddingX: 4, paddingY: 1, marginX: 2 }} onClick={GoBack}>
+                                        Cancel
+                                    </Button>
+                                </Box>
+
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{ paddingX: 8, paddingY: 1, marginLeft: 2 }}
+                                    onClick={() => handleSave()}
+                                >
                                     {spinner ? (
                                         <div className="spinner-border spinner-border-sm text-dark " role="status">
                                             <span className="visually-hidden">Loading...</span>
                                         </div>
                                     ) : (
-                                        'Save'
+                                        'Sell'
                                     )}
                                 </Button>
-                                <Box ml={1}>
-                                    <Button variant="contained" color="secondary" onClick={GoBack}>
-                                        Cancel
-                                    </Button>
-                                </Box>
                             </Box>
                         </Grid>
                     </Grid>

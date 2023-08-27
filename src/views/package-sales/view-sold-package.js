@@ -139,16 +139,16 @@ const ViewSoldPackage = () => {
                                                         <TableCell>Item Name</TableCell>
                                                         <TableCell>Code</TableCell>
                                                         <TableCell>Quantity</TableCell>
-                                                        <TableCell>Unit</TableCell>
+                                                        <TableCell>Item Unit</TableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
                                                     {JSON.parse(item.items).map((item, index) => (
                                                         <TableRow key={index}>
-                                                            <TableCell>{item.name}</TableCell>
-                                                            <TableCell>{item.code}</TableCell>
-                                                            <TableCell>{item.quantity}</TableCell>
-                                                            <TableCell>{item.unit}</TableCell>
+                                                            <TableCell>{item.item_name}</TableCell>
+                                                            <TableCell>{item.item_code}</TableCell>
+                                                            <TableCell>{item.item_quantity}</TableCell>
+                                                            <TableCell>{item.item_sku}</TableCell>
                                                         </TableRow>
                                                     ))}
                                                 </TableBody>
@@ -164,25 +164,12 @@ const ViewSoldPackage = () => {
                                         <Table size="small">
                                             <TableBody>
                                                 <TableRow>
-                                                    <TableCell>Total Tax</TableCell>
-                                                    <TableCell align="right" sx={{ color: theme.palette.primary.main }}>
-                                                        {parseInt(item.tax).toFixed(2)}%
-                                                    </TableCell>
-                                                </TableRow>
-                                                <TableRow>
-                                                    <TableCell>Total Discount</TableCell>
-                                                    <TableCell align="right" sx={{ color: theme.palette.primary.main }}>
-                                                        {parseInt(item.discount).toFixed(2)} ETB
-                                                    </TableCell>
-                                                </TableRow>
-                                                <TableRow>
                                                     <TableCell className="border-bottom-0 fw-semibold">Grand Total</TableCell>
                                                     <TableCell
-                                                        align="right"
                                                         className="border-bottom-0 fw-semibold fs-5"
                                                         sx={{ color: theme.palette.primary.main }}
                                                     >
-                                                        {parseInt(item.grandtotal).toFixed(2)} ETB
+                                                        {parseFloat(item.grandtotal).toFixed(2)} ETB
                                                     </TableCell>
                                                 </TableRow>
                                             </TableBody>

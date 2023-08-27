@@ -15,13 +15,15 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import Connections from 'api';
 import SalesTargets from 'views/dashboard/Default/components/sales-against-target';
-import TargetListing from 'views/dashboard/Default/components/target-listing';
 import { useTheme } from '@mui/material/styles';
+import { ShopStatus } from 'data/shopStatus';
+import MonthlyRevenueChart from './components/monthlyChart';
+
+// ==============================|| SHOP DETAIL PAGE ||============================== //
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
-// ==============================|| SHOP DETAIL PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -33,6 +35,8 @@ const ViewShop = () => {
     const GoBack = () => {
         navigate(-1);
     };
+    const userString = sessionStorage.getItem('user');
+    const user = JSON.parse(userString);
 
     const theme = useTheme();
     const [shops, setShops] = useState([]);
@@ -40,7 +44,6 @@ const ViewShop = () => {
     const [shopFilter, setShopFilter] = useState(shop.name);
     const [revenueTarget, setRevenueTarget] = useState([]);
     const [isLoading, setLoading] = useState(true);
-    const [stat, setStat] = useState([]);
     const [month] = useState('');
     const [year] = useState('');
     const [users, setUsers] = useState([]);
@@ -49,18 +52,31 @@ const ViewShop = () => {
     const [open, setOpen] = useState(false);
     const [alerttype, setAlertType] = useState('close');
     const [spinner, setSpinner] = useState(false);
+    const [shopStatus, setShopStatus] = useState('Pending');
+    const [statusDialog, setStatusDialog] = useState(false);
+    const [statusLoader, setStatusLoader] = useState(false);
 
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
         message: ''
     });
+
     const handleAddDialogOpen = () => {
         setAddDialogOpen(true);
     };
 
     const handleAddDialogClose = () => {
         setAddDialogOpen(false);
+    };
+
+    const handleStatusOpen = (event) => {
+        setShopStatus(event.target.value);
+        setStatusDialog(true);
+    };
+
+    const handleStatusClose = () => {
+        setStatusDialog(false);
     };
 
     const handleSnackClose = (event, reason) => {
@@ -228,8 +244,8 @@ const ViewShop = () => {
             });
             const data = await response.json();
             if (data.success) {
-                setStat(data.data);
                 setActiveShops(data.data.shopInfo);
+                setShopStatus(data.data.shopInfo.last_status ? data.data.shopInfo.last_status : 'Pending');
                 setLoading(false);
             }
         };
@@ -263,7 +279,7 @@ const ViewShop = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error creating shop!'
+                        message: 'There is error getting shop!'
                     });
                 });
         };
@@ -303,6 +319,58 @@ const ViewShop = () => {
 
         return () => {};
     }, []);
+
+    const handleStatusUpdate = () => {
+        setStatusLoader(true);
+        var ApiUrl = Connections.api + Connections.changeStatus;
+        const headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        const data = {
+            shop_id: activeShops.id,
+            user_id: user.id,
+            status: shopStatus
+        };
+
+        fetch(ApiUrl, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(data)
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setStatusLoader(false);
+                    setStatusDialog(false);
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: 'Successfully done!'
+                    });
+                } else {
+                    setStatusLoader(false);
+                    setStatusDialog(false);
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'Unable to change status'
+                    });
+                }
+            })
+            .catch(() => {
+                setStatusLoader(false);
+                setStatusDialog(false);
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error changing shop status!'
+                });
+            });
+    };
     return (
         <>
             <MainCard>
@@ -337,50 +405,6 @@ const ViewShop = () => {
                 <Grid item lg={6} md={12} sm={12} xs={12} spacing={2}></Grid>
 
                 <Grid container justifyContent="center">
-                    <Grid item lg={7} md={6} sm={6} xs={12}>
-                        <Grid
-                            item
-                            xs={12}
-                            style={{
-                                marginTop: 4,
-                                marginLeft: 4,
-                                borderRadius: 6,
-                                padding: 6,
-                                paddingRight: 18,
-                                paddingLeft: 10
-                            }}
-                        >
-                            {isLoading ? (
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        padding: 6
-                                    }}
-                                >
-                                    <CircularProgress size={24} />
-                                    <Typography
-                                        sx={{
-                                            marginLeft: 2,
-
-                                            justifyContent: 'center',
-                                            fontSize: theme.typography.h4,
-                                            fontWeight: theme.typography.fontWeightRegular
-                                        }}
-                                    >
-                                        Loading...
-                                    </Typography>
-                                </Box>
-                            ) : (
-                                <>
-                                    <SalesTargets targets={revenueTarget} />
-                                    <TargetListing lists={revenueTarget} />
-                                </>
-                            )}
-                        </Grid>
-                    </Grid>
-
                     <Grid
                         item
                         container
@@ -394,10 +418,31 @@ const ViewShop = () => {
                             marginLeft: 4,
                             borderRadius: 6,
                             padding: 6,
-                            paddingRight: 20,
-                            paddingLeft: 20
+                            paddingX: 8
                         }}
                     >
+                        <Grid
+                            container
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            spacing={1}
+                            className="bg-light"
+                            style={{ marginTop: 10, borderRadius: 6, padding: 6, paddingRight: 20, paddingLeft: 20 }}
+                        >
+                            <Grid item>
+                                <Typography variant="body2">Status</Typography>
+                            </Grid>
+                            <Grid item>
+                                <Select value={shopStatus} onChange={handleStatusOpen}>
+                                    {ShopStatus.map((status, index) => (
+                                        <MenuItem key={index} value={status.label}>
+                                            {status.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </Grid>
+                        </Grid>
                         <Grid
                             container
                             direction="row"
@@ -425,7 +470,22 @@ const ViewShop = () => {
                                 />
                             </Grid>
                         </Grid>
-
+                        <Grid
+                            container
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            spacing={1}
+                            className="bg-light"
+                            style={{ marginTop: 10, borderRadius: 6, padding: 6, paddingRight: 20, paddingLeft: 20 }}
+                        >
+                            <Grid item>
+                                <Typography variant="body2">Shop ID</Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="h4">{activeShops.id}</Typography>
+                            </Grid>
+                        </Grid>
                         <Grid
                             container
                             direction="row"
@@ -442,6 +502,25 @@ const ViewShop = () => {
                                 <Typography variant="h5">{activeShops.address}</Typography>
                             </Grid>
                         </Grid>
+                        {activeShops.tin_number != 0 && (
+                            <Grid
+                                container
+                                direction="row"
+                                alignItems="center"
+                                justifyContent="space-between"
+                                spacing={1}
+                                className="bg-light"
+                                style={{ marginTop: 10, borderRadius: 6, padding: 6, paddingRight: 20, paddingLeft: 20 }}
+                            >
+                                <Grid item>
+                                    <Typography variant="body2">TIN Number</Typography>
+                                </Grid>
+                                <Grid item>
+                                    <Typography variant="h5">{activeShops.tin_number}</Typography>
+                                </Grid>
+                            </Grid>
+                        )}
+
                         <Grid
                             container
                             direction="row"
@@ -576,7 +655,7 @@ const ViewShop = () => {
                         >
                             <Grid item>
                                 <Button
-                                    variant="outlined"
+                                    variant="text"
                                     color="primary"
                                     className="me-3 w-25"
                                     onClick={() =>
@@ -599,6 +678,50 @@ const ViewShop = () => {
                                     Delete
                                 </Button>
                             </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <Grid item lg={7} md={6} sm={6} xs={12}>
+                        <Grid
+                            item
+                            xs={12}
+                            style={{
+                                marginTop: 4,
+                                marginLeft: 4,
+                                borderRadius: 6,
+                                padding: 6
+                            }}
+                        >
+                            {isLoading ? (
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        padding: 6
+                                    }}
+                                >
+                                    <CircularProgress size={24} />
+                                    <Typography
+                                        sx={{
+                                            marginLeft: 2,
+
+                                            justifyContent: 'center',
+                                            fontSize: theme.typography.h4,
+                                            fontWeight: theme.typography.fontWeightRegular
+                                        }}
+                                    >
+                                        Loading...
+                                    </Typography>
+                                </Box>
+                            ) : (
+                                <>
+                                    <SalesTargets targets={revenueTarget} />
+                                    {/* <TargetListing lists={revenueTarget} />
+                                    <LineChartComponent data={revenueTarget.thirtydays} /> */}
+                                    {revenueTarget.monthlytotal && <MonthlyRevenueChart monthlyTotal={revenueTarget.monthlytotal} />}
+                                </>
+                            )}
                         </Grid>
                     </Grid>
                 </Grid>
@@ -667,6 +790,27 @@ const ViewShop = () => {
                     )}
                 </DialogActions>
             </Dialog>
+
+            <Dialog open={statusDialog} onClose={handleStatusClose}>
+                <DialogContent>
+                    Does {shop.name ? shop.name : ''} is <strong>{shopStatus} </strong> ?
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="text" sx={{ color: theme.palette.primary.main }} onClick={handleStatusClose}>
+                        No
+                    </Button>
+                    <Button variant="contained" color="primary" onClick={() => handleStatusUpdate()}>
+                        {statusLoader ? (
+                            <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        ) : (
+                            'Yes'
+                        )}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleSnackClose}>
                 <Alert onClose={handleSnackClose} severity={popup.severity} sx={{ width: '100%' }}>
                     {popup.message}

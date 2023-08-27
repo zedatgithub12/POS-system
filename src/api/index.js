@@ -11,16 +11,19 @@ const Connections = {
     adminstat: '/adminstat',
     shopstat: '/shopstat',
     againsttarget: '/againsttarget/',
-
+    monthlytarget: '/monthlytarget/',
     // admin dashboard sidebar
     lowstock: '/lowstock/',
     customercount: '/customercount',
+
     //stores api
     createstore: '/createstore',
     viewstore: '/viewstore',
     updatestore: '/updatestore/',
     deletestore: '/deletestore/',
     addmanager: '/addmanager/',
+    changeStatus: '/changeStatus',
+    updateStatus: '/updateStatus',
 
     //product api's
     addproduct: '/addproduct',
@@ -30,6 +33,24 @@ const Connections = {
     updateproduct: '/updateproduct/',
     deleteproduct: '/deleteproduct/',
 
+    //item api's
+    items: '/items',
+    allItems: '/getallitems',
+    addItems: '/add-items',
+    getItems: '/get-items/',
+    updateItems: '/update-items/',
+    deleteItems: '/delete-items/',
+
+    //Stock api's
+    stocks: '/stocks',
+    shopStocks: '/shopStocks/',
+    getShopStocks: '/getShopStocks/',
+    createStocks: '/create-stocks',
+    getStock: '/get-stocks/',
+    updateStock: '/update-stocks/',
+    updateStockStatus: '/update-stock-status/',
+    deleteStocks: '/delete-stocks/',
+
     //package api's
     addpackage: '/addpackage',
     viewpackages: '/viewpackages',
@@ -37,6 +58,12 @@ const Connections = {
     viewstorepackage: '/viewstorepackage/',
     updatepackage: '/updatepackage/',
     deletepackage: '/deletepackage/',
+
+    //packaged items api
+    packagedItems: '/packaged-items/',
+    addPackagedItem: '/add-packaged-items/',
+    deletePackagedItem: '/packaged-items/',
+    quantityUpdate: '/single-package-item/',
 
     //sold package Api's
     createpackagesale: '/createpackagesale',
@@ -65,12 +92,18 @@ const Connections = {
     updatesale: '/updatesale/',
     deletesale: '/deletesale/',
 
+    //sales api
+    getSoldItem: '/sold_items/',
+    updateSoldItem: '/sold_items/',
+    deleteSoldItem: '/sold_items/',
+
     //customer api
     addcustomer: '/addcustomer',
     viewcustomer: '/viewcustomer',
     viewstorecustomer: '/viewstorecustomer/', //an api to fetch customer sales role customer
     updatecustomer: '/updatecustomer/',
     deletecustomer: '/deletecustomer/',
+    customerdetails: '/customer-details/',
 
     //users api
     adduser: '/adduser',

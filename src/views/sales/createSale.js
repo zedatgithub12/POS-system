@@ -163,6 +163,7 @@ const CreateSale = () => {
     const [customerName, setCustomerName] = useState('');
     const [note, setNote] = useState('');
     const [spinner, setSpinner] = useState(false);
+    const [loading, setLoading] = useState();
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -419,10 +420,23 @@ const CreateSale = () => {
                 });
         };
 
-        const getProducts = () => {
-            var AdminApi = Connections.api + Connections.viewproduct;
-            var saleApi = Connections.api + Connections.viewstoreproduct + user.store_name;
-            var Api = user.role === 'Admin' ? AdminApi : saleApi;
+        getCustomers();
+
+        if (user.role === 'Admin') {
+            getShops();
+        }
+
+        return () => {};
+    }, []);
+
+    const handleShopSelection = (value) => {
+        setShopsName(value);
+    };
+
+    useEffect(() => {
+        const getShopStock = () => {
+            setLoading(true);
+            var Api = Connections.api + Connections.getShopStocks + shopName;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -436,9 +450,12 @@ const CreateSale = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
+                        console.log(response);
                         setProductData(response.data);
+                        setLoading(false);
                     } else {
-                        setProductData(productData);
+                        setProductData([]);
+                        setLoading(false);
                     }
                 })
                 .catch(() => {
@@ -448,17 +465,13 @@ const CreateSale = () => {
                         severity: 'error',
                         message: 'There is error fetching product!'
                     });
+                    setLoading(false);
                 });
         };
-        getCustomers();
-        getProducts();
 
-        if (user.role === 'Admin') {
-            getShops();
-        }
-
+        getShopStock();
         return () => {};
-    }, []);
+    }, [shopName]);
     return (
         <MainCard>
             <Grid container spacing={gridSpacing} gutterBottom>
@@ -491,10 +504,11 @@ const CreateSale = () => {
                                     getOptionLabel={(option) => option.name}
                                     onInputChange={(event, value) => {
                                         if (value) {
-                                            setShopsName(value);
+                                            handleShopSelection(value);
                                         }
                                     }}
                                     renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" />}
+                                    noOptionsText="Loading..."
                                 />
                             ) : (
                                 <TextField disabled label="Shop" variant="outlined" value={user.store_name} />
@@ -508,25 +522,42 @@ const CreateSale = () => {
                                     setCustomerName(value);
                                 }}
                                 renderInput={(params) => <TextField {...params} label="Customer" variant="outlined" />}
+                                noOptionsText="Loading..."
                             />
                         </Grid>
-                        <Grid item xs={12}>
-                            <Autocomplete
-                                options={productData}
-                                getOptionLabel={(option) => option.name}
-                                onChange={(event, value) => {
-                                    if (value) {
-                                        handleAddToCart(value);
-                                    }
-                                }}
-                                renderInput={(params) => <TextField {...params} label="Search Product" variant="outlined" />}
-                            />
-                            <Box style={{ display: 'flex', alignItems: 'center' }}>
-                                <Button className="mt-2" onClick={() => startScanner()} disabled={isScanning}>
-                                    Scan Barcode
-                                </Button>
-                                <Typography sx={{ color: theme.palette.error.main }}>{isScanning ? 'Scanning...' : ''}</Typography>
-                            </Box>
+                        <Grid item container spacing={2} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Grid item xs={4}>
+                                <Autocomplete
+                                    options={productData}
+                                    getOptionLabel={(option) => option.item_code}
+                                    onChange={(event, value) => {
+                                        if (value) {
+                                            handleAddToCart(value);
+                                        }
+                                    }}
+                                    renderInput={(params) => <TextField {...params} label="Search by code" variant="outlined" />}
+                                    noOptionsText="No item found"
+                                />
+                                <Box style={{ display: 'flex', alignItems: 'center' }}>
+                                    <Button className="mt-2" onClick={() => startScanner()} disabled={isScanning}>
+                                        Scan Barcode
+                                    </Button>
+                                    <Typography sx={{ color: theme.palette.error.main }}>{isScanning ? 'Scanning...' : ''}</Typography>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={8}>
+                                <Autocomplete
+                                    options={productData}
+                                    getOptionLabel={(option) => option.item_name}
+                                    onChange={(event, value) => {
+                                        if (value) {
+                                            handleAddToCart(value);
+                                        }
+                                    }}
+                                    renderInput={(params) => <TextField {...params} label="Search by name" variant="outlined" />}
+                                    noOptionsText="No item found"
+                                />
+                            </Grid>
                         </Grid>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
@@ -559,7 +590,11 @@ const CreateSale = () => {
                                                 </TableCell>
                                                 <TableCell>{item.unit}</TableCell>
                                                 <TableCell>{item.unitPrice}</TableCell>
-                                                <TableCell>{parseInt(item.subtotal)}</TableCell>
+                                                <TableCell>
+                                                    <span className="bg-primary bg-opacity-10 text-primary px-4 py-1 rounded text-capitalize">
+                                                        {parseInt(item.subtotal)}
+                                                    </span>
+                                                </TableCell>
                                                 <TableCell>
                                                     <IconButton onClick={() => handleRemoveFromCart(item)}>
                                                         <Delete />
@@ -584,12 +619,7 @@ const CreateSale = () => {
                                         <TableBody>
                                             <TableRow>
                                                 <TableCell>Grand Total</TableCell>
-                                                <TableCell className="fw-semibold fs-4">
-                                                    {parseInt(grandTotal).toFixed(2)} ETB
-                                                    {/* <IconButton className="ms-3" onClick={() => setGrandTotal(grandTotal)}>
-                                                        <IconReload />
-                                                    </IconButton> */}
-                                                </TableCell>
+                                                <TableCell className="fw-semibold fs-4">{parseInt(grandTotal).toFixed(2)} ETB</TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>
@@ -650,20 +680,26 @@ const CreateSale = () => {
 
                         <Grid item xs={12}>
                             <Box mt={2} display="flex" justifyContent="flex-end">
-                                <Button variant="contained" color="primary" onClick={() => handleSave()}>
+                                <Box ml={1}>
+                                    <Button variant="text" color="secondary" sx={{ paddingX: 4, paddingY: 1, marginX: 2 }} onClick={GoBack}>
+                                        Cancel
+                                    </Button>
+                                </Box>
+
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{ paddingX: 8, paddingY: 1, marginLeft: 2 }}
+                                    onClick={() => handleSave()}
+                                >
                                     {spinner ? (
                                         <div className="spinner-border spinner-border-sm text-dark " role="status">
                                             <span className="visually-hidden">Loading...</span>
                                         </div>
                                     ) : (
-                                        'Save'
+                                        'Sell'
                                     )}
                                 </Button>
-                                <Box ml={1}>
-                                    <Button variant="contained" color="secondary" onClick={GoBack}>
-                                        Cancel
-                                    </Button>
-                                </Box>
                             </Box>
                         </Grid>
                     </Grid>

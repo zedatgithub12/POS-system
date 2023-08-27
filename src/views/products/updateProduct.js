@@ -1,5 +1,5 @@
 // material-ui
-import { Grid, Typography, Button, Divider, TextField, Container, MenuItem, Autocomplete, FormControl, Select } from '@mui/material';
+import { Grid, Box, Typography, Button, Divider, TextField, Container, MenuItem, Autocomplete, FormControl, Select } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -8,7 +8,9 @@ import { gridSpacing } from 'store/constant';
 import { useNavigate, useLocation } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Connections from 'api';
-
+import { IconBox } from '@tabler/icons';
+import { Item_Sku } from 'data/sku';
+import { useTheme } from '@mui/material/styles';
 // ==============================|| UPDATE PRODUCT PAGE ||============================== //
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -19,6 +21,7 @@ const UpdateProduct = () => {
     const GoBack = () => {
         navigate(-1);
     };
+    const theme = useTheme();
     const { state } = useLocation();
 
     //category data
@@ -28,19 +31,14 @@ const UpdateProduct = () => {
     //
 
     const [productPicture, setProductPicture] = useState(null);
-    const [picturePreview, setPicturePreview] = useState(state.picture ? state.picture : null);
-    const [productName, setProductName] = useState(state.name ? state.name : '');
-    const [productCategory, setProductCategory] = useState(state.category ? state.category : '');
-    const [productSubCategory, setProductSubCategory] = useState(state.sub_category ? state.sub_category : '');
-    const [brand, setBrand] = useState(state.brand ? state.brand : '');
-    const [productCode, setProductCode] = useState(state.code ? state.code : '');
-    const [productCost, setProductCost] = useState(state.cost ? state.cost : '');
-    const [productUnit, setProductUnit] = useState(state.unit ? state.unit : '');
-    const [productPrice, setProductPrice] = useState(state.price ? state.price : '');
-    const [productQuantity, setProductQuantity] = useState(state.quantity ? state.quantity : '');
-    const [productMinQuantity, setProductMinQuantity] = useState(state.min_quantity ? state.min_quantity : '');
-    const [productDescription, setProductDescription] = useState(state.description ? state.description : '');
-    const [warehouses, setWarehouses] = useState(state.shop ? state.shop : '');
+    const [picturePreview, setPicturePreview] = useState(state.item_image ? state.item_image : null);
+    const [productName, setProductName] = useState(state.item_name ? state.item_name : '');
+    const [productCategory, setProductCategory] = useState(state.item_category ? state.item_category : 'Main Category');
+    const [productSubCategory, setProductSubCategory] = useState(state.item_sub_category ? state.item_sub_category : 'Sub Category');
+    const [brand, setBrand] = useState(state.item_brand ? state.item_brand : '');
+    const [productUnit, setProductUnit] = useState(state.item_unit ? state.item_unit : '');
+    const [productPrice, setProductPrice] = useState(state.item_price ? state.item_price : '');
+    const [productDescription, setProductDescription] = useState(state.item_description ? state.item_description : '');
     const [spinner, setSpinner] = useState(false);
     const [popup, setPopup] = useState({
         status: false,
@@ -56,10 +54,6 @@ const UpdateProduct = () => {
         setProductSubCategory(event.target.value);
     };
 
-    const handleShopChange = (event) => {
-        setWarehouses(event.target.value);
-    };
-
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -71,32 +65,34 @@ const UpdateProduct = () => {
         });
     };
 
+    const handleUnitChange = (value) => {
+        setProductUnit(value.name);
+    };
+
+    const handleUnitInput = (unit) => {
+        setProductUnit(unit);
+    };
+
     const handleSubmit = (event) => {
         event.preventDefault();
         setSpinner(true);
         // Handle form submission here
         // Declare the data to be sent to the API
-        var Api = Connections.api + Connections.updateproduct + state.id;
+        var Api = Connections.api + Connections.updateItems + state.id;
         // var headers = {
         //     accept: 'application/json',
         //     'Content-Type': 'application/json'
         // };
 
         const data = new FormData();
-        data.append('picture', productPicture);
-        data.append('name', productName);
-        data.append('category', productCategory);
-        data.append('sub_category', productSubCategory);
-        data.append('brand', brand);
-        data.append('code', productCode);
-        data.append('cost', productCost);
-        data.append('unit', productUnit);
-        data.append('price', productPrice);
-        data.append('quantity', productQuantity);
-        data.append('min_quantity', productMinQuantity);
-        data.append('description', productDescription);
-        data.append('shop', warehouses);
-        data.append('status', 'In-stock');
+        data.append('item_image', productPicture);
+        data.append('item_name', productName);
+        data.append('item_category', productCategory);
+        data.append('item_sub_category', productSubCategory);
+        data.append('item_brand', brand);
+        data.append('item_unit', productUnit);
+        data.append('item_price', productPrice);
+        data.append('item_description', productDescription);
 
         // Make the API call using fetch()
         fetch(Api, {
@@ -234,6 +230,12 @@ const UpdateProduct = () => {
             </Grid>
             <Container maxWidth="sm">
                 <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleSubmit}>
+                    <Box marginBottom={2}>
+                        <Typography>
+                            Item Code{' '}
+                            <strong style={{ color: theme.palette.primary.dark, fontSize: theme.typography.h4 }}>{state.item_code} </strong>{' '}
+                        </Typography>
+                    </Box>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                             <input
@@ -244,25 +246,43 @@ const UpdateProduct = () => {
                                 id="product-picture"
                             />
                             <label htmlFor="product-picture">
-                                <Button variant="contained" color="primary" component="span" fullWidth style={{ height: '100%' }}>
+                                <Box fullWidth>
                                     {picturePreview ? (
                                         <img
-                                            src={Connections.images + picturePreview}
+                                            src={productPicture ? picturePreview : Connections.images + picturePreview}
                                             alt="Product"
                                             style={{ width: '100%' }}
                                             className="img-fluid rounded m-auto"
                                         />
                                     ) : (
-                                        'Upload Picture'
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                justifyContent: 'center',
+                                                alignItems: 'center'
+                                            }}
+                                        >
+                                            <IconBox size={24} />
+                                            <Typography
+                                                variant="contained"
+                                                color="primary"
+                                                component="span"
+                                                fullWidth
+                                                style={{ height: '100%' }}
+                                            >
+                                                Upload Picture
+                                            </Typography>
+                                        </Box>
                                     )}
-                                </Button>
+                                </Box>
                             </label>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 color="primary"
                                 fullWidth
-                                label="Product Name"
+                                label="Item Name"
                                 value={productName}
                                 onChange={(event) => setProductName(event.target.value)}
                                 required
@@ -303,83 +323,43 @@ const UpdateProduct = () => {
                                 required
                             />
                         </Grid>
+
                         <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Product Code"
-                                value={productCode}
-                                color="primary"
-                                onChange={(event) => setProductCode(event.target.value)}
+                            <Autocomplete
+                                freeSolo
+                                options={Item_Sku}
+                                getOptionLabel={(option) => option.name}
+                                defaultValue={{ name: productUnit }}
+                                onChange={(event, value) => {
+                                    if (value !== null) {
+                                        handleUnitChange(value);
+                                    }
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Item Unit"
+                                        value={productUnit}
+                                        onChange={(event) => handleUnitInput(event.target.value)}
+                                    />
+                                )}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Product Cost"
-                                color="primary"
-                                value={productCost}
-                                onChange={(event) => setProductCost(event.target.value)}
-                                required
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Product Unit"
-                                color="primary"
-                                value={productUnit}
-                                onChange={(event) => setProductUnit(event.target.value)}
-                                required
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Product Price"
+                                label="Item Price"
                                 color="primary"
                                 value={productPrice}
                                 onChange={(event) => setProductPrice(event.target.value)}
                                 required
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Product Quantity"
-                                color="primary"
-                                value={productQuantity}
-                                onChange={(event) => setProductQuantity(event.target.value)}
-                                required
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Min Quantity"
-                                color="primary"
-                                value={productMinQuantity}
-                                onChange={(event) => setProductMinQuantity(event.target.value)}
-                                required
-                            />
-                        </Grid>
 
-                        <Grid item xs={12} sm={6}>
-                            <Autocomplete
-                                options={shops}
-                                getOptionLabel={(option) => option.name}
-                                onChange={(event, value) => {
-                                    if (value) {
-                                        setWarehouses(value.name);
-                                    }
-                                }}
-                                defaultValue={{ name: warehouses }}
-                                renderInput={(params) => <TextField {...params} label="Select Shop" variant="outlined" />}
-                            />
-                        </Grid>
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
-                                label="Product Description"
+                                label="Item Description"
                                 color="primary"
                                 value={productDescription}
                                 onChange={(event) => setProductDescription(event.target.value)}

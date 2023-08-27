@@ -71,9 +71,16 @@ const TransferStock = () => {
     };
 
     const handleShopSelection = (value) => {
-        setShopId(value.id);
-        setShopsName(value.name);
-        getProducts(value.name);
+        if (shopId != null && value.id != shopId) {
+            setShopId(value.id);
+            setShopsName(value.name);
+            setItems([]);
+            getShopStock(value.name);
+        } else {
+            setShopId(value.id);
+            setShopsName(value.name);
+            getShopStock(value.name);
+        }
     };
 
     const handleReceivingShopSelection = (value) => {
@@ -81,9 +88,9 @@ const TransferStock = () => {
         setReceivingShopsName(value.name);
     };
 
-    const getProducts = (shop) => {
+    const getShopStock = (shop) => {
         setLoading(true);
-        var Api = Connections.api + Connections.viewstoreproduct + shop;
+        var Api = Connections.api + Connections.getShopStocks + shop;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
@@ -100,7 +107,6 @@ const TransferStock = () => {
                     setProductData(response.data);
                     setLoading(false);
                 } else {
-                    setProductData([]);
                     setLoading(false);
                 }
             })
@@ -121,7 +127,7 @@ const TransferStock = () => {
             // If it does, update the quantity of the existing item
             const updatedItems = Items.map((item) => {
                 if (item.id === product.id) {
-                    return { ...item, quantity: item.quantity + 1 };
+                    return { ...item, stock_quantity: item.stock_quantity + 1 };
                 }
                 return item;
             });
@@ -129,7 +135,15 @@ const TransferStock = () => {
         } else {
             setItems([
                 ...Items,
-                { id: product.id, name: product.name, code: product.code, unit: product.unit, existing: product.quantity, quantity: 1 }
+                {
+                    id: product.id,
+                    item_name: product.item_name,
+                    item_code: product.item_code,
+                    stock_unit: product.stock_unit,
+                    stock_price: product.stock_price,
+                    existing: product.stock_quantity,
+                    stock_quantity: 1
+                }
             ]);
         }
     };
@@ -141,7 +155,7 @@ const TransferStock = () => {
     const handleIncrement = (id) => {
         const updatedItems = Items.map((item) => {
             if (item.id === id) {
-                return { ...item, quantity: item.quantity + 1 };
+                return { ...item, stock_quantity: parseInt(item.stock_quantity) + 1 };
             }
             return item;
         });
@@ -150,39 +164,59 @@ const TransferStock = () => {
 
     const handleDecrement = (id) => {
         const updatedItems = Items.map((item) => {
-            if (item.id === id && item.quantity > 0) {
-                return { ...item, quantity: item.quantity - 1 };
+            if (item.id === id && item.stock_quantity > 0) {
+                return { ...item, stock_quantity: parseInt(item.stock_quantity) - 1 };
             }
             return item;
         });
         setItems(updatedItems);
     };
-
+    const DirectInput = (event, id) => {
+        const updatedItems = Items.map((item) => {
+            if (item.id === id) {
+                return { ...item, stock_quantity: event.target.value };
+            }
+            return item;
+        });
+        setItems(updatedItems);
+    };
     //submit data to api
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        setSpinner(true);
+
         if (!shopName) {
             setPopup({
                 ...popup,
                 status: true,
                 severity: 'error',
-                message: 'Please select shop!'
+                message: 'Please sending shop'
             });
-            setSpinner(false);
-        }
-        if (Items.length == 0) {
+        } else if (!receivingShopId) {
             setPopup({
                 ...popup,
                 status: true,
                 severity: 'error',
-                message: 'Please add items to list first!'
+                message: 'Please select receiving shop'
             });
-            setSpinner(false);
+        } else if (shopId == receivingShopId) {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'You cannot make transfer to same shop'
+            });
+        } else if (Items.length == 0) {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please add items to the list first!'
+            });
         } else {
             // Handle form submission here
             // Declare the data to be sent to the API
+            setSpinner(true);
             var Api = Connections.api + Connections.transfer;
             var headers = {
                 accept: 'application/json',
@@ -282,7 +316,7 @@ const TransferStock = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Transfer Stock</Typography>
+                                    <Typography variant="h3">Make Transfer</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -336,10 +370,9 @@ const TransferStock = () => {
                             <Grid container>
                                 <Grid item xs={12} sm={6}>
                                     <Autocomplete
-                                        key={productData.id}
                                         disabled={shopId ? false : true}
                                         options={productData}
-                                        getOptionLabel={(option) => option.name}
+                                        getOptionLabel={(option) => option.item_name}
                                         onChange={(event, value) => {
                                             if (value) {
                                                 handleAddToCart(value);
@@ -366,11 +399,14 @@ const TransferStock = () => {
                                     <Table>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell>Item Name</TableCell>
-                                                <TableCell>Item Code</TableCell>
+                                                <TableCell>Item name</TableCell>
+                                                <TableCell>Item code</TableCell>
 
-                                                <TableCell>Quantity</TableCell>
-                                                <TableCell>Unit</TableCell>
+                                                <TableCell width={260} align="center">
+                                                    Transfered amount
+                                                </TableCell>
+                                                <TableCell>SKU</TableCell>
+                                                <TableCell>Item price</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -378,18 +414,23 @@ const TransferStock = () => {
                                             <TableBody>
                                                 {Items.map((item, index) => (
                                                     <TableRow key={index}>
-                                                        <TableCell>{item.name}</TableCell>
-                                                        <TableCell>{item.code}</TableCell>
+                                                        <TableCell>{item.item_name}</TableCell>
+                                                        <TableCell>{item.item_code}</TableCell>
 
                                                         <TableCell>
                                                             <Box display="flex" alignItems="center">
                                                                 <Button onClick={() => handleDecrement(item.id)}>-</Button>
-                                                                <Typography>{item.quantity}</Typography>
+
+                                                                <TextField
+                                                                    type="number"
+                                                                    value={item.stock_quantity}
+                                                                    onChange={(event) => DirectInput(event, item.id)}
+                                                                />
                                                                 <Button onClick={() => handleIncrement(item.id)}>+</Button>
                                                             </Box>
                                                         </TableCell>
-                                                        <TableCell>{item.unit}</TableCell>
-
+                                                        <TableCell>{item.stock_unit}</TableCell>
+                                                        <TableCell>{item.stock_price} ETB</TableCell>
                                                         <TableCell>
                                                             <IconButton onClick={() => handleRemoveFromCart(item)}>
                                                                 <Delete />
@@ -405,7 +446,7 @@ const TransferStock = () => {
                                                         <Box padding={3}>
                                                             <img src={Transfering} alt="Add Item" width="30%" height="30%" />
                                                             <Typography variant="h4" color="textSecondary" sx={{ marginY: 4 }}>
-                                                                Add item to list
+                                                                Add item to transfer list
                                                             </Typography>
                                                         </Box>
                                                     </TableCell>
