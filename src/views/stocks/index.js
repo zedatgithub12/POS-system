@@ -34,6 +34,7 @@ import {
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IconEdit, IconSearch, IconEye, IconPlus, IconTestPipe, IconArrowsTransferDown, IconX, IconCoins } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -47,11 +48,17 @@ import { ActivityIndicators } from 'ui-component/activityIndicator';
 import { DateFormatter } from 'utils/functions';
 import { MoreVert } from '@mui/icons-material';
 import { stock_status } from 'data/stock_statuses';
+
+import { saveAs } from 'file-saver';
+import * as XLSX from 'xlsx';
+import { CSVLink } from 'react-csv';
 // ==============================|| PRODUCT PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
+
+const ITEM_HEIGHT = 20;
 const Stock = () => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
@@ -86,6 +93,10 @@ const Stock = () => {
     const [stockLoader, setStockLoader] = useState(false);
     const [checked, setChecked] = useState(false);
 
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [exportExcel, setexportExcel] = useState(null);
+
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -100,6 +111,7 @@ const Stock = () => {
             ...popup,
             status: false
         });
+        setexportExcel(null);
     };
 
     const handleSubCategoryFilterChange = (event) => {
@@ -480,6 +492,90 @@ const Stock = () => {
                 });
         }
     };
+
+    const expand = Boolean(exportExcel);
+    const handleClick = (event) => {
+        setexportExcel(event.currentTarget);
+    };
+
+    const handleMenuClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleSelectAllClick = (event) => {
+        if (event.target.checked) {
+            setSelectedRows(filteredData.map((sale) => sale.id));
+        } else {
+            setSelectedRows([]);
+        }
+    };
+
+    const handleRowClick = (event, id) => {
+        const selectedIndex = selectedRows.indexOf(id);
+        let newSelectedRows = [];
+
+        if (selectedIndex === -1) {
+            newSelectedRows = newSelectedRows.concat(selectedRows, id);
+        } else if (selectedIndex === 0) {
+            newSelectedRows = newSelectedRows.concat(selectedRows.slice(1));
+        } else if (selectedIndex === selectedRows.length - 1) {
+            newSelectedRows = newSelectedRows.concat(selectedRows.slice(0, -1));
+        } else if (selectedIndex > 0) {
+            newSelectedRows = newSelectedRows.concat(selectedRows.slice(0, selectedIndex), selectedRows.slice(selectedIndex + 1));
+        }
+
+        setSelectedRows(newSelectedRows);
+    };
+
+    const csvData =
+        selectedRows.length > 0
+            ? selectedRows.map((id) => {
+                  const item = filteredData.find((item) => item.id === id);
+                  return {
+                      shop: item.stock_shop,
+                      item_name: item.item_name,
+                      item_code: item.item_code,
+                      category: item.item_category,
+                      sub_category: item.item_sub_category,
+                      brand: item.item_brand,
+                      SKU: item.stock_unit,
+                      item_min_quantity: item.stock_min_quantity,
+                      item_quantity: item.stock_quantity,
+                      item_cost: item.stock_cost,
+                      item_price: item.stock_price,
+                      item_expire_date: item.stock_expire_date,
+                      item_status: item.stock_status
+                  };
+              })
+            : filteredData.map((item) => ({
+                  shop: item.stock_shop,
+                  item_name: item.item_name,
+                  item_code: item.item_code,
+                  category: item.item_category,
+                  sub_category: item.item_sub_category,
+                  brand: item.item_brand,
+                  SKU: item.stock_unit,
+                  item_min_quantity: item.stock_min_quantity,
+                  item_quantity: item.stock_quantity,
+                  item_cost: item.stock_cost,
+                  item_price: item.stock_price,
+                  item_expire_date: item.stock_expire_date,
+                  item_status: item.stock_status
+              }));
+
+    const handleDownloadExcel = () => {
+        const worksheet = XLSX.utils.json_to_sheet(csvData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'stocks');
+        const excelBuffer = XLSX.write(workbook, {
+            bookType: 'xlsx',
+            type: 'array'
+        });
+        const fileData = new Blob([excelBuffer], {
+            type: 'application/octet-stream'
+        });
+        saveAs(fileData, 'stocks.xlsx');
+    };
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -580,83 +676,130 @@ const Stock = () => {
                 )}
 
                 <Grid item xs={12}>
-                    <Box paddingX="2" className="shadow-1 p-3 rounded ">
-                        <TextField
-                            label="Search"
-                            variant="outlined"
-                            color="primary"
-                            value={searchText}
-                            onChange={handleSearchTextChange}
-                            className="mb-2 mt-2"
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton>
-                                            <IconSearch />
-                                        </IconButton>
-                                    </InputAdornment>
-                                )
-                            }}
-                        />
-                        {users.role === 'Admin' && (
-                            <FormControl className="ms-2 my-2 ">
-                                <Select value={shopFilter} onChange={handleShopFilterChange}>
-                                    <MenuItem value="Shop">Shop</MenuItem>
-                                    {Array.from(new Set(productData.map((stock) => stock.stock_shop))).map((shop) => (
-                                        <MenuItem key={shop} value={shop}>
-                                            {shop}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        )}
-                        <FormControl className="ms-2 mt-2 ">
-                            <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
-                                <MenuItem value="Category">Category</MenuItem>
-                                {Array.from(new Set(productData.map((stock) => stock.item_category))).map((category) => (
-                                    <MenuItem key={category} value={category}>
-                                        {category}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <FormControl className="ms-2 mt-2 ">
-                            <Select value={subCategoryFilter} onChange={handleSubCategoryFilterChange}>
-                                <MenuItem value="Sub Category">Sub Category</MenuItem>
-                                {Array.from(new Set(productData.map((stock) => stock.item_sub_category))).map((category) => (
-                                    <MenuItem key={category} value={category}>
-                                        {category}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                    <Box paddingX="2" className="shadow-1  rounded ">
+                        <Grid
+                            item
+                            xs={12}
+                            sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+                        >
+                            <Box>
+                                <TextField
+                                    label="Search"
+                                    variant="outlined"
+                                    color="primary"
+                                    value={searchText}
+                                    onChange={handleSearchTextChange}
+                                    className="mb-2 mt-2"
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton>
+                                                    <IconSearch />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
+                                {users.role === 'Admin' && (
+                                    <FormControl className="ms-2 my-2 ">
+                                        <Select value={shopFilter} onChange={handleShopFilterChange}>
+                                            <MenuItem value="Shop">Shop</MenuItem>
+                                            {Array.from(new Set(productData.map((stock) => stock.stock_shop))).map((shop) => (
+                                                <MenuItem key={shop} value={shop}>
+                                                    {shop}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                )}
+                                <FormControl className="ms-2 mt-2 ">
+                                    <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
+                                        <MenuItem value="Category">Category</MenuItem>
+                                        {Array.from(new Set(productData.map((stock) => stock.item_category))).map((category) => (
+                                            <MenuItem key={category} value={category}>
+                                                {category}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                <FormControl className="ms-2 mt-2 ">
+                                    <Select value={subCategoryFilter} onChange={handleSubCategoryFilterChange}>
+                                        <MenuItem value="Sub Category">Sub Category</MenuItem>
+                                        {Array.from(new Set(productData.map((stock) => stock.item_sub_category))).map((category) => (
+                                            <MenuItem key={category} value={category}>
+                                                {category}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
 
-                        <FormControl className="ms-2 mt-2 ">
-                            <Select value={brandFilter} onChange={handleBrandFilterChange}>
-                                <MenuItem value="Brand">Brand</MenuItem>
-                                {Array.from(new Set(productData.map((stock) => stock.item_brand))).map((brand) => (
-                                    <MenuItem key={brand} value={brand}>
-                                        {brand}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                                <FormControl className="ms-2 mt-2 ">
+                                    <Select value={brandFilter} onChange={handleBrandFilterChange}>
+                                        <MenuItem value="Brand">Brand</MenuItem>
+                                        {Array.from(new Set(productData.map((stock) => stock.item_brand))).map((brand) => (
+                                            <MenuItem key={brand} value={brand}>
+                                                {brand}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
 
-                        <FormControl className="ms-2 my-2 ">
-                            <Select value={statusFilter} onChange={handleStatusFilterChange}>
-                                <MenuItem value="Status">Status</MenuItem>
-                                {Array.from(new Set(productData.map((stock) => stock.stock_status))).map((status) => (
-                                    <MenuItem key={status} value={status}>
-                                        {status}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                                <FormControl className="ms-2 my-2 ">
+                                    <Select value={statusFilter} onChange={handleStatusFilterChange}>
+                                        <MenuItem value="Status">Status</MenuItem>
+                                        {Array.from(new Set(productData.map((stock) => stock.stock_status))).map((status) => (
+                                            <MenuItem key={status} value={status}>
+                                                {status}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Box>
+                            <IconButton
+                                aria-label="more"
+                                id="long-button"
+                                aria-controls={expand ? 'long-menu' : undefined}
+                                aria-expanded={expand ? 'true' : undefined}
+                                aria-haspopup="true"
+                                onClick={handleClick}
+                            >
+                                <MoreVertIcon />
+                            </IconButton>
+                            <Menu
+                                id="long-menu"
+                                MenuListProps={{
+                                    'aria-labelledby': 'long-button'
+                                }}
+                                anchorEl={exportExcel}
+                                open={expand}
+                                onClose={handleClose}
+                                PaperProps={{
+                                    style: {
+                                        maxHeight: ITEM_HEIGHT * 4.5,
+                                        width: '20ch'
+                                    }
+                                }}
+                            >
+                                <MenuItem onClick={handleDownloadExcel}>Export Excel </MenuItem>
+                                <MenuItem>
+                                    <CSVLink data={csvData} filename={'stocks.csv'} className="text-decoration-none text-dark">
+                                        Export CSV
+                                    </CSVLink>
+                                </MenuItem>
+                            </Menu>
+                        </Grid>
+
                         <TableContainer component={Paper} className="shadow-sm">
                             <Table aria-label="product table">
                                 <TableHead className="bg-light">
                                     <TableRow>
-                                        <TableCell></TableCell>
+                                        <TableCell>
+                                            <Checkbox
+                                                indeterminate={selectedRows.length > 0 && selectedRows.length < filteredData.length}
+                                                checked={selectedRows.length === filteredData.length}
+                                                onChange={handleSelectAllClick}
+                                            />
+                                        </TableCell>
                                         <TableCell>Item name</TableCell>
                                         <TableCell>Item code</TableCell>
                                         <TableCell>Shop</TableCell>
@@ -682,7 +825,11 @@ const Stock = () => {
                                             </TableCell>
                                         </TableRow>
                                     ) : (
-                                        filteredData.map((stock, index) => <ProductRow key={index} product={stock} />)
+                                        filteredData.map((stock, index) => (
+                                            <ProductRow key={index} product={stock} onPress={(event) => handleRowClick(event, stock.id)}>
+                                                <Checkbox checked={selectedRows.indexOf(stock.id) !== -1} />
+                                            </ProductRow>
+                                        ))
                                     )}
                                 </TableBody>
                             </Table>
@@ -1001,13 +1148,13 @@ const Stock = () => {
     );
 };
 
-const ProductRow = ({ product }) => {
+const ProductRow = ({ product, onPress, children }) => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
     const navigate = useNavigate();
-    const [spinner, setSpinner] = useState(false);
+    const [setSpinner] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState([]);
-    const [dialogOpen, setDialogOpen] = useState(false);
+    const [setDialogOpen] = useState(false);
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(!open);
@@ -1151,8 +1298,10 @@ const ProductRow = ({ product }) => {
             <TableRow
                 hover
                 className={open ? 'border border-5 border-top-0 border-bottom-0 border-end-0 border-secondary rounded' : 'border-0 rounded'}
+                onClick={onPress}
             >
                 <TableCell>
+                    {children}
                     <IconButton aria-label="expand row" size="small" onClick={handleOpen}>
                         {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                     </IconButton>

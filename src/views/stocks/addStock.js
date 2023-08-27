@@ -49,6 +49,7 @@ const AddStock = () => {
     const handleItemChange = (event) => {
         setItemName(event.target.value.item_name);
         setItemCode(event.target.value.item_code);
+        setProductUnit(event.target.value.item_unit);
     };
 
     const handleShopChange = (event) => {
@@ -248,17 +249,6 @@ const AddStock = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Item Unit"
-                                color="primary"
-                                value={productUnit}
-                                onChange={(event) => setProductUnit(event.target.value)}
-                                required
-                            />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
                                 label="Item Cost"
                                 color="primary"
                                 value={productCost}
@@ -299,13 +289,13 @@ const AddStock = () => {
                             <TextField fullWidth color="primary" type="date" value={expireDate} onChange={handleExpireDateChange} />
                         </Grid>
                     </Grid>
-                    <Button type="submit" fullWidth variant="contained" color="primary" style={{ margin: '1rem 0' }}>
+                    <Button type="submit" variant="contained" color="primary" style={{ margin: '1rem 0' }}>
                         {spinner ? (
                             <div className="spinner-border spinner-border-sm text-dark " role="status">
                                 <span className="visually-hidden">Loading...</span>
                             </div>
                         ) : (
-                            'Save'
+                            'Add to shop'
                         )}
                     </Button>
                 </form>
