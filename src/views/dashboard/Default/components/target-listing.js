@@ -14,19 +14,9 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Paper,
-    CircularProgress
+    Paper
 } from '@mui/material';
-import {
-    IconArrowBigDownLines,
-    IconArrowBigUpLines,
-    IconArrowDown,
-    IconArrowUp,
-    IconChevronLeft,
-    IconChevronRight,
-    IconCircleCheck,
-    IconList
-} from '@tabler/icons';
+import { IconArrowDown, IconArrowUp, IconChevronLeft, IconChevronRight, IconList } from '@tabler/icons';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { useTheme } from '@mui/material/styles';
@@ -98,9 +88,9 @@ const TargetListing = (props) => {
         setAnchorEl(null);
     };
 
-    const csvExport = () => {
-        handleClose();
-    };
+    // const csvExport = () => {
+    //     handleClose();
+    // };
 
     const handleChangePage = (event, value) => {
         setPage(value);
@@ -128,7 +118,7 @@ const TargetListing = (props) => {
                     setLoading(false);
                 }
             })
-            .catch((error) => {
+            .catch(() => {
                 setPopup({
                     ...popup,
                     status: true,
@@ -166,9 +156,6 @@ const TargetListing = (props) => {
         saveAs(blob, 'excel-report.xlsx');
     };
 
-    const sustract = (first, second) => {
-        return first - second;
-    };
     return (
         <Grid container sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 1 }}>
             {shopname && lists.target && (

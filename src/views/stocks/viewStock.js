@@ -3,8 +3,6 @@ import { Grid, Box, Button, Typography } from '@mui/material';
 import Connections from 'api';
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';

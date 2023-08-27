@@ -1,5 +1,5 @@
-import { Grid, Typography, Box, Table, TableBody, TableRow, TableCell, TableHead } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Grid, Typography, Table, TableBody, TableRow, TableCell, TableHead } from '@mui/material';
+import PropTypes from 'prop-types';
 
 const ItemAvailablity = ({ Items }) => {
     return (
@@ -35,4 +35,7 @@ const ItemAvailablity = ({ Items }) => {
     );
 };
 
+ItemAvailablity.propTypes = {
+    Items: PropTypes.arrayOf(PropTypes.string).isRequired
+};
 export default ItemAvailablity;

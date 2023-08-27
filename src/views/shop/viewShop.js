@@ -1,18 +1,6 @@
 import React, { useState, forwardRef, useEffect } from 'react';
 // material-ui
-import {
-    Grid,
-    Box,
-    Typography,
-    Button,
-    Divider,
-    TextField,
-    MenuItem,
-    FormControl,
-    Select,
-    CircularProgress,
-    InputLabel
-} from '@mui/material';
+import { Grid, Box, Typography, Button, Divider, TextField, MenuItem, FormControl, Select, CircularProgress } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -29,15 +17,13 @@ import Connections from 'api';
 import SalesTargets from 'views/dashboard/Default/components/sales-against-target';
 import { useTheme } from '@mui/material/styles';
 import { ShopStatus } from 'data/shopStatus';
-import LineChartComponent from './components/linechart';
-import TargetListing from 'views/dashboard/Default/components/target-listing';
-import { SparkLineChart } from '@mui/x-charts';
 import MonthlyRevenueChart from './components/monthlyChart';
+
+// ==============================|| SHOP DETAIL PAGE ||============================== //
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
-// ==============================|| SHOP DETAIL PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -58,7 +44,6 @@ const ViewShop = () => {
     const [shopFilter, setShopFilter] = useState(shop.name);
     const [revenueTarget, setRevenueTarget] = useState([]);
     const [isLoading, setLoading] = useState(true);
-    const [stat, setStat] = useState([]);
     const [month] = useState('');
     const [year] = useState('');
     const [users, setUsers] = useState([]);
@@ -259,7 +244,6 @@ const ViewShop = () => {
             });
             const data = await response.json();
             if (data.success) {
-                setStat(data.data);
                 setActiveShops(data.data.shopInfo);
                 setShopStatus(data.data.shopInfo.last_status ? data.data.shopInfo.last_status : 'Pending');
                 setLoading(false);

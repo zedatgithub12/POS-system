@@ -3,6 +3,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import Connections from 'api';
+import PropTypes from 'prop-types';
 
 const ItemDetail = ({ stock }) => {
     const theme = useTheme();
@@ -115,4 +116,7 @@ const ItemDetail = ({ stock }) => {
     );
 };
 
+ItemDetail.propTypes = {
+    stock: PropTypes.arrayOf(PropTypes.string).isRequired
+};
 export default ItemDetail;

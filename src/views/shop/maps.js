@@ -1,13 +1,13 @@
 // material-ui
-import React, { useState } from 'react';
+import { useState } from 'react';
 import GoogleMapReact from 'google-map-react';
 // project imports
-
 import { Typography, Box, Divider, Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import Marker from 'assets/images/icons/marker.svg';
 import { IconBuildingStore, IconCategory, IconPhone, IconPin, IconUser } from '@tabler/icons';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
+
 // ==============================|| SHOP MAP PAGE ||============================== //
 
 // ShopMarker component to display markers on the map
@@ -59,7 +59,7 @@ const ShopMarker = ({ name, info, category, manager, phone, onPress }) => {
     );
 };
 
-const ShopMap = ({ shopData, onPress }) => {
+const ShopMap = ({ shopData }) => {
     const navigate = useNavigate();
     return (
         <Box style={{ height: '450px', width: '100%', borderRadius: 4 }}>
@@ -88,6 +88,26 @@ const ShopMap = ({ shopData, onPress }) => {
             </GoogleMapReact>
         </Box>
     );
+};
+
+ShopMarker.propTypes = {
+    name: PropTypes.string.isRequired,
+    info: PropTypes.string.isRequired,
+    category: PropTypes.string.isRequired,
+    manager: PropTypes.string.isRequired,
+    phone: PropTypes.string.isRequired,
+    onPress: PropTypes.func.isRequired
+};
+
+ShopMap.propTypes = {
+    lat: PropTypes.number.isRequired,
+    lng: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    info: PropTypes.string.isRequired,
+    category: PropTypes.string.isRequired,
+    manager: PropTypes.string.isRequired,
+    phone: PropTypes.string.isRequired,
+    onPress: PropTypes.func.isRequired
 };
 
 export default ShopMap;

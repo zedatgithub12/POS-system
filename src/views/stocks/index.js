@@ -20,7 +20,6 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions,
     Button,
     Box,
     Collapse,
@@ -36,10 +35,9 @@ import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IconEdit, IconSearch, IconEye, IconPlus, IconTestPipe, IconArrowsTransferDown, IconX, IconCoins } from '@tabler/icons';
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Connections from 'api';
 import { useTheme } from '@mui/material/styles';
@@ -52,6 +50,7 @@ import { stock_status } from 'data/stock_statuses';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import { CSVLink } from 'react-csv';
+
 // ==============================|| PRODUCT PAGE ||============================== //
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -94,7 +93,6 @@ const Stock = () => {
     const [checked, setChecked] = useState(false);
 
     const [selectedRows, setSelectedRows] = useState([]);
-    const [anchorEl, setAnchorEl] = useState(null);
     const [exportExcel, setexportExcel] = useState(null);
 
     const [popup, setPopup] = useState({
@@ -496,10 +494,6 @@ const Stock = () => {
     const expand = Boolean(exportExcel);
     const handleClick = (event) => {
         setexportExcel(event.currentTarget);
-    };
-
-    const handleMenuClick = (event) => {
-        setAnchorEl(event.currentTarget);
     };
 
     const handleSelectAllClick = (event) => {
@@ -1152,9 +1146,7 @@ const ProductRow = ({ product, onPress, children }) => {
     const userString = sessionStorage.getItem('user');
     const users = JSON.parse(userString);
     const navigate = useNavigate();
-    const [setSpinner] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState([]);
-    const [setDialogOpen] = useState(false);
+
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(!open);
@@ -1176,65 +1168,64 @@ const ProductRow = ({ product, onPress, children }) => {
         });
     };
 
-    const handleTrashClick = (product) => {
-        setSelectedProduct(product);
-        setDialogOpen(true);
-    };
-    const handleDialogClose = () => {
-        setSelectedProduct(null);
-        setDialogOpen(false);
-    };
+    // const handleTrashClick = (product) => {
+    //     setSelectedProduct(product);
+    //     setDialogOpen(true);
+    // };
+    // const handleDialogClose = () => {
+    //     setSelectedProduct(null);
+    //     setDialogOpen(false);
+    // };
 
-    const Delete = () => {
-        // Do something with the deleted category
-        setSpinner(true);
-        var Api = Connections.api + Connections.deleteStocks + selectedProduct.id;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
+    // const Delete = () => {
+    //     // Do something with the deleted category
+    //     setSpinner(true);
+    //     var Api = Connections.api + Connections.deleteStocks + selectedProduct.id;
+    //     var headers = {
+    //         accept: 'application/json',
+    //         'Content-Type': 'application/json'
+    //     };
 
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'DELETE',
-            headers: headers,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'success',
-                        message: response.message
-                    });
+    //     // Make the API call using fetch()
+    //     fetch(Api, {
+    //         method: 'DELETE',
+    //         headers: headers,
+    //         cache: 'no-cache'
+    //     })
+    //         .then((response) => response.json())
+    //         .then((response) => {
+    //             if (response.success) {
+    //                 setPopup({
+    //                     ...popup,
+    //                     status: true,
+    //                     severity: 'success',
+    //                     message: response.message
+    //                 });
 
-                    setSpinner(false);
-                    handleDialogClose();
-                } else {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'error',
-                        message: response.message
-                    });
-                    setSpinner(false);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error deleting product!'
-                });
-                setSpinner(false);
-            });
-    };
+    //                 setSpinner(false);
+    //                 handleDialogClose();
+    //             } else {
+    //                 setPopup({
+    //                     ...popup,
+    //                     status: true,
+    //                     severity: 'error',
+    //                     message: response.message
+    //                 });
+    //                 setSpinner(false);
+    //             }
+    //         })
+    //         .catch(() => {
+    //             setPopup({
+    //                 ...popup,
+    //                 status: true,
+    //                 severity: 'error',
+    //                 message: 'There is error deleting product!'
+    //             });
+    //             setSpinner(false);
+    //         });
+    // };
 
     const [anchorEl, setAnchorEl] = useState(null);
-    const [selectedItem, setSelectedItems] = useState();
 
     const handleMenuClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -1244,9 +1235,8 @@ const ProductRow = ({ product, onPress, children }) => {
         setAnchorEl(null);
     };
 
-    const handleSelectItem = (event, item) => {
+    const handleSelectItem = (event) => {
         handleMenuClick(event);
-        setSelectedItems({ ...item });
     };
 
     const handleStatusChange = (status, id) => {
@@ -1438,21 +1428,8 @@ const ProductRow = ({ product, onPress, children }) => {
 };
 
 ProductRow.propTypes = {
-    product: PropTypes.shape({
-        id: PropTypes.number,
-        item_image: PropTypes.string,
-        item_name: PropTypes.string.isRequired,
-        item_category: PropTypes.string.isRequired,
-        item_sub_category: PropTypes.string.isRequired,
-        item_brand: PropTypes.string.isRequired,
-        stock_price: PropTypes.number.isRequired,
-        stock_quantity: PropTypes.number.isRequired,
-        stock_min_quantity: PropTypes.number.isRequired,
-        stock_status: PropTypes.string.isRequired,
-        item_code: PropTypes.string.isRequired,
-        stock_cost: PropTypes.number,
-        stock_unit: PropTypes.string.isRequired,
-        stock_shop: PropTypes.string.isRequired
-    }).isRequired
+    product: PropTypes.object.isRequired,
+    onPress: PropTypes.func.isRequired,
+    children: PropTypes.node
 };
 export default Stock;

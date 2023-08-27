@@ -1,12 +1,13 @@
+import React, { useState, useEffect } from 'react';
 // material-ui
-import { Grid, Typography, Button, Divider, TextField, Container, FormControl, MenuItem, Select, Autocomplete } from '@mui/material';
+import { Grid, Typography, Button, Divider, TextField, Container, FormControl, MenuItem, Select } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+
 import Connections from 'api';
 // ==============================|| Add Product PAGE ||============================== //
 const Alert = React.forwardRef(function Alert(props, ref) {

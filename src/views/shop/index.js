@@ -1,34 +1,22 @@
+import React, { useState, useEffect } from 'react';
 // material-ui
-import {
-    Grid,
-    Box,
-    Typography,
-    Button,
-    Card,
-    CardContent,
-    CardMedia,
-    CardActionArea,
-    MenuItem,
-    FormControl,
-    Select,
-    CircularProgress
-} from '@mui/material';
+import { Grid, Box, Typography, Button, Card, CardContent, CardMedia, CardActionArea, MenuItem, FormControl, Select } from '@mui/material';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { Link, useNavigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
 import Connections from 'api';
 import ShopMap from './maps';
 import { ActivityIndicators } from 'ui-component/activityIndicator';
 import ShopTable from './components/tabular';
+
 // ==============================|| SHOP LISTING PAGE ||============================== //
+
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });

@@ -1,5 +1,6 @@
 import { Grid, Typography, Table, TableBody, TableRow, TableCell, TableHead } from '@mui/material';
 import { DateFormatter } from 'utils/functions';
+import PropTypes from 'prop-types';
 
 const ReplanishmentHistory = ({ History }) => {
     return (
@@ -32,4 +33,7 @@ const ReplanishmentHistory = ({ History }) => {
     );
 };
 
+ReplanishmentHistory.propTypes = {
+    History: PropTypes.arrayOf(PropTypes.string).isRequired
+};
 export default ReplanishmentHistory;

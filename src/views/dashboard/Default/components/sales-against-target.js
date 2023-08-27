@@ -1,6 +1,5 @@
-import { useState } from 'react';
 // material-ui
-import { Grid, Typography, Box, Divider, Paper } from '@mui/material';
+import { Grid, Typography, Box, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Achievement, calculatePercentage, formatNumber } from 'utils/functions';
 import { IconArrowUp, IconTarget, IconTimeline } from '@tabler/icons';

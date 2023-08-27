@@ -1,6 +1,7 @@
-import { Grid, Box, Table, TableBody, TableRow, TableCell, TableHead, Typography } from '@mui/material';
+import { Grid, Table, TableBody, TableRow, TableCell, TableHead, Typography } from '@mui/material';
 import { DateFormatter } from 'utils/functions';
 import { IconChevronsDown, IconChevronsUp } from '@tabler/icons';
+import PropTypes from 'prop-types';
 
 const PriceUpdate = ({ prices }) => {
     return (
@@ -43,6 +44,10 @@ const PriceUpdate = ({ prices }) => {
             )}
         </Grid>
     );
+};
+
+PriceUpdate.propTypes = {
+    prices: PropTypes.arrayOf(PropTypes.string).isRequired
 };
 
 export default PriceUpdate;

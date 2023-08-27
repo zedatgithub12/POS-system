@@ -1,5 +1,5 @@
 // material-ui
-import { Typography, Box, Divider, Button } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { formatNumber } from 'utils/functions';
 // project imports

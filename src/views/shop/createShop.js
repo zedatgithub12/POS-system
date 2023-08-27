@@ -7,7 +7,6 @@ import { useTheme } from '@mui/material/styles';
 import shop from 'assets/images/placeholder-store.png';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { useNavigate } from 'react-router-dom';

@@ -24,7 +24,6 @@ import Connections from 'api';
 import { useTheme } from '@mui/material/styles';
 import AddNew from './components/add-new';
 import LowStocks from './components/low-stock';
-import CustomerCard from './components/customer-card';
 import SalesTargets from './components/sales-against-target';
 import { IconX, IconBuildingStore, IconChartInfographic } from '@tabler/icons';
 import TargetListing from './components/target-listing';
@@ -54,8 +53,6 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [spinner, setSpinner] = useState(false);
     const [lowstock, setLowStock] = useState([]);
-    const [totalCustomer, setTotalCustomer] = useState();
-    const [todaycustomers, setTodayCustomers] = useState();
     const [openTargetDialog, setOpenTargetDialog] = useState(false);
 
     const [target, setTarget] = useState({
@@ -94,10 +91,10 @@ const Dashboard = () => {
         });
     };
 
-    const handleTargetClick = () => {
-        setOpenTargetDialog(true);
-        getShops();
-    };
+    // const handleTargetClick = () => {
+    //     setOpenTargetDialog(true);
+    //     getShops();
+    // };
 
     const handleDialogClose = () => {
         setOpenTargetDialog(false);
@@ -285,36 +282,8 @@ const Dashboard = () => {
             });
     };
 
-    const getCustomerCount = () => {
-        var Api = Connections.api + Connections.customercount;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'GET',
-            headers: headers,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setTotalCustomer(response.data.totalcustomers);
-                    setTodayCustomers(response.data.todaycustomers);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is an error fetching customers count'
-                });
-            });
-    };
     useEffect(() => {
-        user.role === 'Admin' ? (getShops(), getCustomerCount()) : (getTargets(user.store_name), getLowStocks(user.store_name));
+        user.role === 'Admin' ? getShops() : (getTargets(user.store_name), getLowStocks(user.store_name));
     }, [user.role, user.store_name]);
 
     return (
