@@ -37,7 +37,7 @@ const UpdateProduct = () => {
     const [productSubCategory, setProductSubCategory] = useState(state.item_sub_category ? state.item_sub_category : 'Sub Category');
     const [brand, setBrand] = useState(state.item_brand ? state.item_brand : '');
     const [productUnit, setProductUnit] = useState(state.item_unit ? state.item_unit : '');
-    const [productPrice, setProductPrice] = useState(state.item_price ? state.item_price : '');
+    const [productSKU, setProductSKU] = useState(state.item_sku ? state.item_sku : '');
     const [productDescription, setProductDescription] = useState(state.item_description ? state.item_description : '');
     const [spinner, setSpinner] = useState(false);
     const [popup, setPopup] = useState({
@@ -79,19 +79,16 @@ const UpdateProduct = () => {
         // Handle form submission here
         // Declare the data to be sent to the API
         var Api = Connections.api + Connections.updateItems + state.id;
-        // var headers = {
-        //     accept: 'application/json',
-        //     'Content-Type': 'application/json'
-        // };
 
         const data = new FormData();
         data.append('item_image', productPicture);
-        data.append('item_name', productName);
+        data.append('item_name', brand);
         data.append('item_category', productCategory);
         data.append('item_sub_category', productSubCategory);
         data.append('item_brand', brand);
         data.append('item_unit', productUnit);
-        data.append('item_price', productPrice);
+        data.append('item_sku', productSKU);
+        data.append('item_price', 1);
         data.append('item_description', productDescription);
 
         // Make the API call using fetch()
@@ -211,7 +208,12 @@ const UpdateProduct = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Update Product</Typography>
+                                    <Typography variant="h3">
+                                        Update Product |{' '}
+                                        <strong style={{ color: theme.palette.primary.dark, fontSize: theme.typography.h4 }}>
+                                            {state.item_code}{' '}
+                                        </strong>{' '}
+                                    </Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -230,12 +232,6 @@ const UpdateProduct = () => {
             </Grid>
             <Container maxWidth="sm">
                 <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleSubmit}>
-                    <Box marginBottom={2}>
-                        <Typography>
-                            Item Code{' '}
-                            <strong style={{ color: theme.palette.primary.dark, fontSize: theme.typography.h4 }}>{state.item_code} </strong>{' '}
-                        </Typography>
-                    </Box>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                             <input
@@ -278,20 +274,11 @@ const UpdateProduct = () => {
                                 </Box>
                             </label>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                color="primary"
-                                fullWidth
-                                label="Item Name"
-                                value={productName}
-                                onChange={(event) => setProductName(event.target.value)}
-                                required
-                            />
-                        </Grid>
+
                         <Grid item xs={12} sm={6}>
                             <FormControl fullWidth required>
                                 <Select value={productCategory} onChange={handleCategoryChange}>
-                                    <MenuItem value="Main Category">Main Category</MenuItem>
+                                    <MenuItem value={productCategory}>{productCategory}</MenuItem>
                                     {Array.from(new Set(CategoryData.map((product) => product.main_category))).map((category) => (
                                         <MenuItem key={category} value={category}>
                                             {category}
@@ -304,7 +291,7 @@ const UpdateProduct = () => {
                         <Grid item xs={12} sm={6}>
                             <FormControl fullWidth>
                                 <Select value={productSubCategory} onChange={handleSubCategoryChange}>
-                                    <MenuItem value="Sub Category">Sub Category</MenuItem>
+                                    <MenuItem value={productSubCategory}>{productSubCategory}</MenuItem>
                                     {Array.from(new Set(CategoryData.map((product) => product.sub_category))).map((category) => (
                                         <MenuItem key={category} value={category}>
                                             {category}
@@ -348,10 +335,10 @@ const UpdateProduct = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Item Price"
+                                label="Item SKU"
                                 color="primary"
-                                value={productPrice}
-                                onChange={(event) => setProductPrice(event.target.value)}
+                                value={productSKU}
+                                onChange={(event) => setProductSKU(event.target.value)}
                                 required
                             />
                         </Grid>
@@ -359,6 +346,8 @@ const UpdateProduct = () => {
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
+                                multiline
+                                rows={4}
                                 label="Item Description"
                                 color="primary"
                                 value={productDescription}

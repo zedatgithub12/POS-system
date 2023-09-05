@@ -50,7 +50,7 @@ const AddStock = () => {
     const handleItemChange = (event) => {
         setItemName(event.target.value.item_name);
         setItemCode(event.target.value.item_code);
-        setProductUnit(event.target.value.item_unit);
+        setProductUnit(event.target.value.item_sku);
     };
 
     const handleShopChange = (event) => {
@@ -110,7 +110,7 @@ const AddStock = () => {
                     ...popup,
                     status: true,
                     severity: 'error',
-                    message: 'There is error adding  product!'
+                    message: 'There is error creating  stock!'
                 });
                 setSpinner(false);
             });
@@ -197,7 +197,7 @@ const AddStock = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Create Item</Typography>
+                                    <Typography variant="h3">Create Stock</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -240,7 +240,7 @@ const AddStock = () => {
                                             sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                                         >
                                             <span>{item.item_name} </span>
-                                            <span>{item.item_code} </span>
+                                            <span>{item.item_sku} </span>
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -250,7 +250,7 @@ const AddStock = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Item Cost"
+                                label="Puchase Price"
                                 color="primary"
                                 value={productCost}
                                 onChange={(event) => setProductCost(event.target.value)}
@@ -259,7 +259,7 @@ const AddStock = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Item Price"
+                                label="Selling Price"
                                 color="primary"
                                 value={productPrice}
                                 onChange={(event) => setProductPrice(event.target.value)}
@@ -269,7 +269,7 @@ const AddStock = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Item Quantity"
+                                label="Stock Quantity"
                                 color="primary"
                                 value={productQuantity}
                                 onChange={(event) => setProductQuantity(event.target.value)}
@@ -279,7 +279,7 @@ const AddStock = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Min Quantity"
+                                label="Stock Min Quantity"
                                 color="primary"
                                 value={productMinQuantity}
                                 onChange={(event) => setProductMinQuantity(event.target.value)}
@@ -287,18 +287,28 @@ const AddStock = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <TextField fullWidth color="primary" type="date" value={expireDate} onChange={handleExpireDateChange} />
+                            <TextField
+                                fullWidth
+                                required
+                                label="Stock Expire date"
+                                color="primary"
+                                type="date"
+                                value={expireDate}
+                                onChange={handleExpireDateChange}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Button type="submit" variant="contained" color="primary" sx={{ paddingX: 15, paddingY: 1.4 }}>
+                                {spinner ? (
+                                    <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                ) : (
+                                    'Save'
+                                )}
+                            </Button>
                         </Grid>
                     </Grid>
-                    <Button type="submit" variant="contained" color="primary" style={{ margin: '1rem 0' }}>
-                        {spinner ? (
-                            <div className="spinner-border spinner-border-sm text-dark " role="status">
-                                <span className="visually-hidden">Loading...</span>
-                            </div>
-                        ) : (
-                            'Add to shop'
-                        )}
-                    </Button>
                 </form>
             </Container>
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>

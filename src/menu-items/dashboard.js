@@ -41,7 +41,7 @@ const getDashboardItems = (role) => {
         },
         {
             id: 'category',
-            title: 'Categories',
+            title: 'Manage Categories',
             type: 'collapse',
             url: '/categories',
             icon: icons.IconCategory,
@@ -65,7 +65,7 @@ const getDashboardItems = (role) => {
         },
         {
             id: 'products',
-            title: 'Products',
+            title: 'Manage Products',
             type: 'item',
             url: '/products',
             icon: icons.IconBox,
@@ -105,7 +105,7 @@ const getDashboardItems = (role) => {
 
         {
             id: 'sales',
-            title: 'Sales',
+            title: 'Manage Sales',
             type: 'item',
             url: '/sales',
             icon: icons.IconTimeline,
@@ -113,7 +113,7 @@ const getDashboardItems = (role) => {
         },
         {
             id: 'customers',
-            title: 'Customers',
+            title: 'Manage Customers',
             type: 'item',
             url: '/customers',
             icon: icons.IconUsers,

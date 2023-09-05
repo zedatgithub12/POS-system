@@ -201,8 +201,6 @@ const Products = () => {
         return () => {};
     }, [page, rowsPerPage]);
 
-    // const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -301,13 +299,12 @@ const Products = () => {
                                 <TableHead className="bg-light">
                                     <TableRow>
                                         <TableCell></TableCell>
-                                        <TableCell>Name</TableCell>
+                                        <TableCell>Brand</TableCell>
                                         <TableCell>Code</TableCell>
                                         <TableCell>Category</TableCell>
                                         <TableCell>Sub Category</TableCell>
-                                        <TableCell>Brand</TableCell>
+                                        <TableCell>Unit</TableCell>
                                         <TableCell>SKU</TableCell>
-                                        <TableCell>Price</TableCell>
                                         <TableCell>Status</TableCell>
                                         <TableCell>Actions</TableCell>
                                     </TableRow>
@@ -461,15 +458,15 @@ const ProductRow = ({ product }) => {
                         {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                     </IconButton>
                 </TableCell>
-                <TableCell>{product.item_name}</TableCell>
+                <TableCell>{product.item_brand}</TableCell>
                 <TableCell>{product.item_code}</TableCell>
                 <TableCell>{product.item_category}</TableCell>
                 <TableCell>{product.item_sub_category}</TableCell>
-                <TableCell>{product.item_brand}</TableCell>
+                <TableCell>{product.item_unit}</TableCell>
                 <TableCell>
-                    <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded"> {product.item_unit}</span>
+                    <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded"> {product.item_sku}</span>
                 </TableCell>
-                <TableCell>{product.item_price} ETB</TableCell>
+
                 <TableCell sx={{ textTransform: 'capitalize' }}>
                     <span
                         className={

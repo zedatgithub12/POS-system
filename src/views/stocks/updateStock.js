@@ -27,7 +27,7 @@ const UpdateStock = () => {
     const [itemName, setItemName] = useState(state.item_name ? state.item_name : 'Select Item');
     const [ItemCode, setItemCode] = useState(state.item_code ? state.item_code : '');
     const [productCost, setProductCost] = useState(state.stock_cost ? state.stock_cost : '');
-    const [productUnit, setProductUnit] = useState(state.stock_unit ? state.stock_unit : '');
+    const [productsku, setProductsku] = useState(state.stock_unit ? state.stock_unit : '');
     const [productPrice, setProductPrice] = useState(state.stock_price ? state.stock_price : '');
     const [productQuantity, setProductQuantity] = useState(state.stock_quantity ? state.stock_quantity : '');
     const [productMinQuantity, setProductMinQuantity] = useState(state.stock_min_quantity ? state.stock_min_quantity : '');
@@ -54,6 +54,7 @@ const UpdateStock = () => {
     const handleItemChange = (event) => {
         setItemName(event.target.value.item_name);
         setItemCode(event.target.value.item_code);
+        setProductUnit(event.target.value.item_sku);
     };
 
     const handleShopChange = (event) => {
@@ -75,7 +76,7 @@ const UpdateStock = () => {
         data.append('item_name', itemName);
         data.append('item_code', ItemCode);
         data.append('stock_cost', productCost);
-        data.append('stock_unit', productUnit);
+        data.append('stock_unit', productsku);
         data.append('stock_price', productPrice);
         data.append('stock_quantity', productQuantity);
         data.append('stock_min_quantity', productMinQuantity);
@@ -243,7 +244,7 @@ const UpdateStock = () => {
                                             sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                                         >
                                             <span>{item.item_name} </span>
-                                            <span>{item.item_code} </span>
+                                            <span>{item.item_sku} </span>
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -253,18 +254,7 @@ const UpdateStock = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Item Unit"
-                                color="primary"
-                                value={productUnit}
-                                onChange={(event) => setProductUnit(event.target.value)}
-                                required
-                            />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Item Cost"
+                                label="Stock Purchase Price"
                                 color="primary"
                                 value={productCost}
                                 onChange={(event) => setProductCost(event.target.value)}
@@ -273,7 +263,7 @@ const UpdateStock = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Item Price"
+                                label="Stock Selling Price"
                                 color="primary"
                                 value={productPrice}
                                 onChange={(event) => setProductPrice(event.target.value)}
@@ -283,7 +273,7 @@ const UpdateStock = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Item Quantity"
+                                label="Stock Quantity"
                                 color="primary"
                                 value={productQuantity}
                                 onChange={(event) => setProductQuantity(event.target.value)}
@@ -293,7 +283,7 @@ const UpdateStock = () => {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="Min Quantity"
+                                label="Stock Min Quantity"
                                 color="primary"
                                 value={productMinQuantity}
                                 onChange={(event) => setProductMinQuantity(event.target.value)}
@@ -301,18 +291,28 @@ const UpdateStock = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <TextField fullWidth color="primary" type="date" value={expireDate} onChange={handleExpireDateChange} />
+                            <TextField
+                                fullWidth
+                                required
+                                label="Expire Date"
+                                color="primary"
+                                type="date"
+                                value={expireDate}
+                                onChange={handleExpireDateChange}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Button type="submit" fullWidth variant="contained" color="primary" sx={{ paddingY: 1.4 }}>
+                                {spinner ? (
+                                    <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                ) : (
+                                    'Submit'
+                                )}
+                            </Button>
                         </Grid>
                     </Grid>
-                    <Button type="submit" fullWidth variant="contained" color="primary" style={{ margin: '1rem 0' }}>
-                        {spinner ? (
-                            <div className="spinner-border spinner-border-sm text-dark " role="status">
-                                <span className="visually-hidden">Loading...</span>
-                            </div>
-                        ) : (
-                            'Submit'
-                        )}
-                    </Button>
                 </form>
             </Container>
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
