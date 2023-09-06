@@ -32,7 +32,7 @@ const UpdateProduct = () => {
 
     const [productPicture, setProductPicture] = useState(null);
     const [picturePreview, setPicturePreview] = useState(state.item_image ? state.item_image : null);
-    const [productName, setProductName] = useState(state.item_name ? state.item_name : '');
+    const [productpackaging, setProductPackaging] = useState(state.item_packaging ? state.item_packaging : '');
     const [productCategory, setProductCategory] = useState(state.item_category ? state.item_category : 'Main Category');
     const [productSubCategory, setProductSubCategory] = useState(state.item_sub_category ? state.item_sub_category : 'Sub Category');
     const [brand, setBrand] = useState(state.item_brand ? state.item_brand : '');
@@ -50,8 +50,12 @@ const UpdateProduct = () => {
         setProductCategory(event.target.value);
     };
 
-    const handleSubCategoryChange = (event) => {
-        setProductSubCategory(event.target.value);
+    const handleSubCategoryChange = (value) => {
+        setProductSubCategory(value);
+    };
+
+    const handleSubCategoryInput = (sub_category) => {
+        setProductSubCategory(sub_category);
     };
 
     const handleClose = (event, reason) => {
@@ -82,12 +86,13 @@ const UpdateProduct = () => {
 
         const data = new FormData();
         data.append('item_image', productPicture);
-        data.append('item_name', brand);
+        data.append('item_name', productSubCategory);
         data.append('item_category', productCategory);
         data.append('item_sub_category', productSubCategory);
         data.append('item_brand', brand);
         data.append('item_unit', productUnit);
         data.append('item_sku', productSKU);
+        data.append('item_packaging', productpackaging);
         data.append('item_price', 1);
         data.append('item_description', productDescription);
 
@@ -288,18 +293,30 @@ const UpdateProduct = () => {
                             </FormControl>
                         </Grid>
 
-                        <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth>
-                                <Select value={productSubCategory} onChange={handleSubCategoryChange}>
-                                    <MenuItem value={productSubCategory}>{productSubCategory}</MenuItem>
-                                    {Array.from(new Set(CategoryData.map((product) => product.sub_category))).map((category) => (
-                                        <MenuItem key={category} value={category}>
-                                            {category}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                        <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>
+                            <Autocomplete
+                                freeSolo
+                                options={CategoryData}
+                                getOptionLabel={(option) => option.sub_category}
+                                onChange={(event, value) => {
+                                    if (value) {
+                                        handleSubCategoryChange(value);
+                                    }
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        required
+                                        fullWidth
+                                        label="Sub Category"
+                                        variant="outlined"
+                                        value={productSubCategory}
+                                        onChange={(event) => handleSubCategoryInput(event.target.value)}
+                                    />
+                                )}
+                            />
                         </Grid>
+
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
@@ -342,7 +359,15 @@ const UpdateProduct = () => {
                                 required
                             />
                         </Grid>
-
+                        <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>
+                            <TextField
+                                fullWidth
+                                label="Item Packaging"
+                                color="primary"
+                                value={productpackaging}
+                                onChange={(event) => setProductPackaging(event.target.value)}
+                            />
+                        </Grid>
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth

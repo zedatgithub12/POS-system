@@ -6,9 +6,6 @@ import {
     Box,
     Divider,
     List,
-    ListItem,
-    ListItemText,
-    ListItemSecondaryAction,
     IconButton,
     Dialog,
     DialogTitle,
@@ -16,7 +13,13 @@ import {
     TextField,
     Button,
     DialogActions,
-    TablePagination
+    TablePagination,
+    TableContainer,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody
 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -296,7 +299,9 @@ const Category = () => {
         return () => {};
     }, [popup]);
 
-    const filteredCategories = CategoryData.filter((category) => category.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    const filteredCategories = CategoryData.filter(
+        (category) => category.name.toLowerCase().includes(searchTerm.toLowerCase()) || category.id == searchTerm
+    );
 
     const categoriesToShow = filteredCategories.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
@@ -334,7 +339,6 @@ const Category = () => {
                             <TextField
                                 label="Search Categories"
                                 color="primary"
-                                className="ms-2"
                                 value={searchTerm}
                                 onChange={handleSearchTermChange}
                                 InputProps={{
@@ -345,42 +349,47 @@ const Category = () => {
                                     )
                                 }}
                             />
-                            <List>
-                                {loading ? (
-                                    <Box sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                        <ActivityIndicators />
-                                    </Box>
-                                ) : (
-                                    categoriesToShow.map((category) => (
-                                        <ListItem key={category.id} className="bg-light rounded m-2 py-3">
-                                            <ListItemText
-                                                primary={category.name}
-                                                secondary={
-                                                    <React.Fragment>
-                                                        <Typography
-                                                            sx={{ display: 'inline' }}
-                                                            component="span"
-                                                            variant="body2"
-                                                            color="text.primary"
-                                                        >
-                                                            {category.description}
-                                                        </Typography>
-                                                    </React.Fragment>
-                                                }
-                                            />
+                            <TableContainer sx={{ marginTop: 2 }}>
+                                <Table>
+                                    <TableHead className="bg-light">
+                                        <TableRow>
+                                            <TableCell>ID</TableCell>
+                                            <TableCell>Name</TableCell>
+                                            <TableCell>Description</TableCell>
+                                            <TableCell>Action</TableCell>
+                                        </TableRow>
+                                    </TableHead>
 
-                                            <ListItemSecondaryAction>
-                                                <IconButton onClick={() => handleEditDialogOpen(category)}>
-                                                    <IconEdit />
-                                                </IconButton>
-                                                <IconButton onClick={() => handleDeleteDialogOpen(category)}>
-                                                    <IconTrash />
-                                                </IconButton>
-                                            </ListItemSecondaryAction>
-                                        </ListItem>
-                                    ))
-                                )}
-                            </List>
+                                    {loading ? (
+                                        <TableBody>
+                                            <TableRow>
+                                                <TableCell colSpan={4} align="center" sx={{ paddingY: 6 }}>
+                                                    <ActivityIndicators />
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    ) : (
+                                        <TableBody>
+                                            {categoriesToShow.map((category) => (
+                                                <TableRow>
+                                                    <TableCell>{category.id}</TableCell>
+                                                    <TableCell>{category.name}</TableCell>
+                                                    <TableCell>{category.description}</TableCell>
+                                                    <TableCell>
+                                                        {' '}
+                                                        <IconButton onClick={() => handleEditDialogOpen(category)}>
+                                                            <IconEdit />
+                                                        </IconButton>
+                                                        <IconButton onClick={() => handleDeleteDialogOpen(category)}>
+                                                            <IconTrash />
+                                                        </IconButton>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    )}
+                                </Table>
+                            </TableContainer>
                             <TablePagination
                                 component="div"
                                 count={filteredCategories.length}
@@ -414,7 +423,6 @@ const Category = () => {
                         value={addCategoryDesc}
                         onChange={(e) => setAddCategoryDesc(e.target.value)}
                         fullWidth
-                        required
                     />
                 </DialogContent>
                 <DialogActions>

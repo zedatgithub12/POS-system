@@ -106,10 +106,26 @@ const getDashboardItems = (role) => {
         {
             id: 'sales',
             title: 'Manage Sales',
-            type: 'item',
+            type: 'collapse',
             url: '/sales',
             icon: icons.IconTimeline,
-            breadcrumbs: false
+            breadcrumbs: false,
+            children: [
+                {
+                    id: 'sales',
+                    title: 'Sales',
+                    type: 'item',
+                    url: '/sales',
+                    breadcrumbs: false
+                },
+                {
+                    id: 'solditems',
+                    title: 'Sold Items',
+                    type: 'item',
+                    url: '/sold-items',
+                    breadcrumbs: false
+                }
+            ]
         },
         {
             id: 'customers',

@@ -87,9 +87,6 @@ const App = () => {
 
                     setLogin(false);
                 }
-                {
-                    setLogin(false);
-                }
             },
 
             getToken: async () => {

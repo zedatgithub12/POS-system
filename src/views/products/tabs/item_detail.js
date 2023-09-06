@@ -18,10 +18,6 @@ const ItemDetail = ({ product }) => {
                                 <TableCell>Item code</TableCell>
                                 <TableCell>{product.item_code}</TableCell>
                             </TableRow>
-                            <TableRow>
-                                <TableCell>Brand</TableCell>
-                                <TableCell>{product.item_name}</TableCell>
-                            </TableRow>
 
                             <TableRow>
                                 <TableCell>Category</TableCell>
@@ -31,14 +27,24 @@ const ItemDetail = ({ product }) => {
                                 <TableCell>Sub category</TableCell>
                                 <TableCell>{product.item_sub_category}</TableCell>
                             </TableRow>
-
+                            <TableRow>
+                                <TableCell>Brand</TableCell>
+                                <TableCell>{product.item_name}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell>Unit</TableCell>
+                                <TableCell>{product.item_unit}</TableCell>
+                            </TableRow>
                             <TableRow>
                                 <TableCell> SKU</TableCell>
                                 <TableCell>
                                     <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded"> {product.item_sku}</span>
                                 </TableCell>
                             </TableRow>
-
+                            <TableRow>
+                                <TableCell>Packaging</TableCell>
+                                <TableCell>{product.item_packaging}</TableCell>
+                            </TableRow>
                             <TableRow>
                                 <TableCell>Status</TableCell>
                                 <TableCell sx={{ textTransform: 'capitalize' }}>
