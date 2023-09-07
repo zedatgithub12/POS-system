@@ -218,9 +218,9 @@ const Packages = () => {
                             <Table aria-label="product table">
                                 <TableHead className="bg-light">
                                     <TableRow>
-                                        <TableCell>Name</TableCell>
                                         <TableCell>Shop</TableCell>
-                                        <TableCell>Price</TableCell>
+                                        <TableCell>Package name</TableCell>
+                                        <TableCell>Package price</TableCell>
                                         <TableCell>Expire Date</TableCell>
                                         <TableCell>Status</TableCell>
                                         <TableCell>Actions</TableCell>
@@ -382,9 +382,8 @@ const ProductRow = ({ product }) => {
                 }
                 onClick={handleOpen}
             >
-                <TableCell>{product.name}</TableCell>
                 <TableCell>{product.shopname}</TableCell>
-
+                <TableCell>{product.name}</TableCell>
                 <TableCell>{product.price} Birr</TableCell>
                 <TableCell>{DateFormatter(product.expiredate)}</TableCell>
 

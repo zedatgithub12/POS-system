@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // material-ui
-import { Grid, Typography, Button, Divider, TextField, Container, FormControl, MenuItem, Select } from '@mui/material';
+import { Grid, Typography, Button, Divider, TextField, Container, FormControl, MenuItem, Select, Autocomplete, Box } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -36,25 +36,25 @@ const AddStock = () => {
 
     const [items, setItems] = useState([]);
     const [shops, setShops] = useState([]);
-    const [itemName, setItemName] = useState('Select Item');
+    const [itemName, setItemName] = useState();
     const [ItemCode, setItemCode] = useState();
     const [productCost, setProductCost] = useState('');
-    const [productUnit, setProductUnit] = useState('');
+    const [itemSKU, setItemSKU] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [productQuantity, setProductQuantity] = useState('');
     const [productMinQuantity, setProductMinQuantity] = useState('');
-    const [warehouses, setWarehouses] = useState('Shops');
+    const [shop, setShop] = useState('Shop');
     const [spinner, setSpinner] = useState(false);
     const [expireDate, setExpireDate] = useState(null);
 
-    const handleItemChange = (event) => {
-        setItemName(event.target.value.item_name);
-        setItemCode(event.target.value.item_code);
-        setProductUnit(event.target.value.item_sku);
+    const handleItemChange = (value) => {
+        setItemName(value.item_name);
+        setItemCode(value.item_code);
+        setItemSKU(value.item_sku);
     };
 
     const handleShopChange = (event) => {
-        setWarehouses(event.target.value);
+        setShop(event.target.value);
     };
 
     const handleExpireDateChange = (event) => {
@@ -63,57 +63,75 @@ const AddStock = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        setSpinner(true);
+
         // Handle form submission here
         // Declare the data to be sent to the API
-        var Api = Connections.api + Connections.createStocks;
 
-        const data = new FormData();
-        data.append('item_name', itemName);
-        data.append('item_code', ItemCode);
-        data.append('stock_cost', productCost);
-        data.append('stock_unit', productUnit);
-        data.append('stock_price', productPrice);
-        data.append('stock_quantity', productQuantity);
-        data.append('stock_min_quantity', productMinQuantity);
-        data.append('stock_expire_date', expireDate);
-        data.append('stock_shop', warehouses);
+        if (itemName === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please select product to add'
+            });
+        } else if (itemName === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please select product to add'
+            });
+        } else {
+            setSpinner(true);
+            var Api = Connections.api + Connections.createStocks;
 
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'POST',
-            body: data,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'success',
-                        message: response.message
-                    });
-                    setSpinner(false);
-                } else {
+            const data = new FormData();
+            data.append('item_name', itemName);
+            data.append('item_code', ItemCode);
+            data.append('stock_cost', productCost);
+            data.append('stock_unit', itemSKU);
+            data.append('stock_price', productPrice);
+            data.append('stock_quantity', productQuantity);
+            data.append('stock_min_quantity', productMinQuantity);
+            data.append('stock_expire_date', expireDate);
+            data.append('stock_shop', shop);
+
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'POST',
+                body: data,
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    }
+                })
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: response.message
+                        message: 'There is error creating  stock!'
                     });
                     setSpinner(false);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error creating  stock!'
                 });
-                setSpinner(false);
-            });
+        }
     };
 
     useEffect(() => {
@@ -219,8 +237,8 @@ const AddStock = () => {
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                             <FormControl fullWidth>
-                                <Select value={warehouses} onChange={handleShopChange}>
-                                    <MenuItem value="Shops"> Select Shop</MenuItem>
+                                <Select value={shop} onChange={handleShopChange}>
+                                    <MenuItem value="Shop"> Select Shop</MenuItem>
                                     {Array.from(new Set(shops.map((stores) => stores.name))).map((shop) => (
                                         <MenuItem key={shop} value={shop}>
                                             {shop}
@@ -230,21 +248,17 @@ const AddStock = () => {
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth required>
-                                <Select value={itemName} onChange={(event) => handleItemChange(event)}>
-                                    <MenuItem value={itemName}>{itemName}</MenuItem>
-                                    {items.map((item, index) => (
-                                        <MenuItem
-                                            key={index}
-                                            value={item}
-                                            sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                                        >
-                                            <span>{item.item_name} </span>
-                                            <span>{item.item_sku} </span>
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            <Autocomplete
+                                options={items}
+                                getOptionLabel={(option) => `${option.item_name} - ${option.item_brand} - ${option.item_sku}`}
+                                onChange={(event, value) => {
+                                    if (value) {
+                                        handleItemChange(value);
+                                    }
+                                }}
+                                renderInput={(params) => <TextField {...params} label="Select Item" variant="outlined" />}
+                                noOptionsText="Loading..."
+                            />
                         </Grid>
 
                         <Grid item xs={12} sm={6}>

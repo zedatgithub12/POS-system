@@ -132,7 +132,7 @@ const ViewStock = () => {
                                 <Tab label="Availability" value="2" />
 
                                 <Tab label="Price Updates" value="3" />
-                                <Tab label="Replanishments" value="4" />
+                                <Tab label="Replenishments" value="4" />
                             </TabList>
                         </Box>
                         <TabPanel value="1">

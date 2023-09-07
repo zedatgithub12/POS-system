@@ -117,7 +117,7 @@ const ViewProduct = () => {
                             <Grid item>
                                 <Grid container direction="column" spacing={1}>
                                     <Grid item>
-                                        <Typography variant="h3">{state.name}</Typography>
+                                        <Typography variant="h3">{state.item_name}</Typography>
                                     </Grid>
                                 </Grid>
                             </Grid>

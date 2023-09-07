@@ -9,7 +9,7 @@ export const columns = [
     },
     {
         field: 'updated_at',
-        headerName: 'Month',
+        headerName: 'Date',
         width: 100,
         valueFormatter: (params) => {
             const formattedDate = DateFormatter(params.value);
@@ -18,7 +18,7 @@ export const columns = [
     },
     {
         field: 'created_at',
-        headerName: 'Date',
+        headerName: 'Month',
         type: 'month',
         width: 110,
         valueFormatter: (params) => {
@@ -28,8 +28,14 @@ export const columns = [
         }
     },
     {
-        field: 'item_name',
-        headerName: 'Item',
+        field: 'item_category',
+        headerName: 'Category',
+        sortable: true,
+        width: 128
+    },
+    {
+        field: 'item_sub_category',
+        headerName: 'Sub Category',
         sortable: true,
         width: 128
     },
@@ -57,12 +63,7 @@ export const columns = [
         sortable: true,
         width: 128
     },
-    {
-        field: 'item_category',
-        headerName: 'Category',
-        sortable: true,
-        width: 128
-    },
+
     {
         field: 'price',
         headerName: 'Sub Total(ETB)',

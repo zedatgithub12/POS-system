@@ -590,17 +590,19 @@ const UpdatePackage = () => {
                             <Table>
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Item Name</TableCell>
                                         <TableCell>Item Code</TableCell>
-
-                                        <TableCell>Quantity</TableCell>
+                                        <TableCell>Category</TableCell>
+                                        <TableCell>Sub Category</TableCell>
+                                        <TableCell>Brand</TableCell>
                                         <TableCell>Item SKU</TableCell>
+                                        <TableCell>Quantity</TableCell>
+
                                         <TableCell align="center">Action</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 {loading ? (
                                     <TableRow>
-                                        <TableCell colSpan={4} align="center">
+                                        <TableCell colSpan={7} align="center">
                                             <Box
                                                 sx={{
                                                     minHeight: 80,
@@ -617,8 +619,15 @@ const UpdatePackage = () => {
                                     <TableBody>
                                         {Items.map((item, index) => (
                                             <TableRow key={index}>
-                                                <TableCell>{item.item_name}</TableCell>
                                                 <TableCell>{item.item_code}</TableCell>
+                                                <TableCell>{item.item_category}</TableCell>
+                                                <TableCell>{item.item_sub_category}</TableCell>
+                                                <TableCell>{item.item_brand}</TableCell>
+                                                <TableCell>
+                                                    <span className="bg-primary bg-opacity-10 text-primary px-4 py-1 rounded">
+                                                        {item.item_sku}
+                                                    </span>
+                                                </TableCell>
 
                                                 <TableCell sx={{ position: 'relative' }}>
                                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -687,11 +696,6 @@ const UpdatePackage = () => {
                                                         </Box>
                                                     </Menu>
                                                 </TableCell>
-                                                <TableCell>
-                                                    <span className="bg-primary bg-opacity-10 text-primary px-4 py-1 rounded">
-                                                        {item.item_sku}
-                                                    </span>
-                                                </TableCell>
 
                                                 <TableCell sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                                     <IconButton onClick={() => handleTrashClick(item)}>
@@ -740,7 +744,7 @@ const UpdatePackage = () => {
                                 <Autocomplete
                                     disabled={shopId ? false : true}
                                     options={stockData}
-                                    getOptionLabel={(option) => option.item_name}
+                                    getOptionLabel={(option) => `${option.item_name} - ${option.item_brand} - ${option.stock_unit}`}
                                     onChange={(event, value) => {
                                         if (value) {
                                             setSelectedStock(value);
@@ -749,7 +753,7 @@ const UpdatePackage = () => {
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}
-                                            label="Select Item"
+                                            label="Select Stock"
                                             variant="outlined"
                                             sx={{ backgroundColor: theme.palette.background.default }}
                                         />
@@ -781,14 +785,14 @@ const UpdatePackage = () => {
                                 <Typography sx={{ fontSize: theme.typography.h5 }}>
                                     Item Code {selectedStock.item_code && selectedStock.item_code}
                                 </Typography>
-                                <Typography sx={{ fontSize: theme.typography.h5, marginTop: 2 }}>
+                                {/* <Typography sx={{ fontSize: theme.typography.h5, marginTop: 2 }}>
                                     Item SKU{' '}
                                     {selectedStock.stock_unit && (
                                         <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 ms-2 rounded">
                                             {selectedStock.stock_unit}
                                         </span>
                                     )}
-                                </Typography>
+                                </Typography> */}
                             </Grid>
                         </Grid>
 

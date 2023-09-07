@@ -19,10 +19,6 @@ const ItemDetail = ({ stock }) => {
                                 <TableCell>Item code</TableCell>
                                 <TableCell>{stock.item_code}</TableCell>
                             </TableRow>
-                            <TableRow>
-                                <TableCell>Item name</TableCell>
-                                <TableCell>{stock.item_name}</TableCell>
-                            </TableRow>
 
                             <TableRow>
                                 <TableCell>Shop</TableCell>
@@ -37,6 +33,18 @@ const ItemDetail = ({ stock }) => {
                                 <TableCell>{stock.item_sub_category}</TableCell>
                             </TableRow>
                             <TableRow>
+                                <TableCell> Brand</TableCell>
+                                <TableCell>{stock.item_brand}</TableCell>
+                            </TableRow>
+
+                            <TableRow>
+                                <TableCell>SKU</TableCell>
+                                <TableCell>
+                                    {' '}
+                                    <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded">{stock.stock_unit}</span>
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
                                 <TableCell>Quantity</TableCell>
                                 <TableCell>{stock.stock_quantity}</TableCell>
                             </TableRow>
@@ -46,26 +54,16 @@ const ItemDetail = ({ stock }) => {
                             </TableRow>
 
                             <TableRow>
-                                <TableCell> Brand</TableCell>
-                                <TableCell>{stock.item_brand}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>Cost</TableCell>
+                                <TableCell>Purchase price</TableCell>
                                 <TableCell>{stock.stock_cost} ETB</TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell>Price </TableCell>
+                                <TableCell>Selling Price </TableCell>
                                 <TableCell>
                                     {stock.stock_price} {''}ETB
                                 </TableCell>
                             </TableRow>
-                            <TableRow>
-                                <TableCell>SKU</TableCell>
-                                <TableCell>
-                                    {' '}
-                                    <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded">{stock.stock_unit}</span>
-                                </TableCell>
-                            </TableRow>
+
                             <TableRow>
                                 <TableCell>Status</TableCell>
                                 <TableCell>

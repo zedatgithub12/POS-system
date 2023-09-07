@@ -162,8 +162,10 @@ const PackageDetail = () => {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Item Name</TableCell>
                                     <TableCell>Item Code</TableCell>
+                                    <TableCell>Category</TableCell>
+                                    <TableCell>Sub Category</TableCell>
+                                    <TableCell>Brand</TableCell>
                                     <TableCell>SKU</TableCell>
                                     <TableCell>Quantity</TableCell>
                                 </TableRow>
@@ -180,9 +182,10 @@ const PackageDetail = () => {
                                 <TableBody>
                                     {Items.map((item, index) => (
                                         <TableRow key={index}>
-                                            <TableCell>{item.item_name}</TableCell>
                                             <TableCell>{item.item_code}</TableCell>
-
+                                            <TableCell>{item.item_category}</TableCell>
+                                            <TableCell>{item.item_sub_category}</TableCell>
+                                            <TableCell>{item.item_brand}</TableCell>
                                             <TableCell>
                                                 <span className="bg-primary bg-opacity-10 text-primary px-4 py-1 rounded">
                                                     {item.item_sku}

@@ -1,5 +1,5 @@
 // material-ui
-import { Grid, Typography, Button, Divider, TextField, Container, MenuItem, FormControl, Select } from '@mui/material';
+import { Grid, Typography, Button, Divider, TextField, Container, MenuItem, FormControl, Select, Autocomplete } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -27,11 +27,11 @@ const UpdateStock = () => {
     const [itemName, setItemName] = useState(state.item_name ? state.item_name : 'Select Item');
     const [ItemCode, setItemCode] = useState(state.item_code ? state.item_code : '');
     const [productCost, setProductCost] = useState(state.stock_cost ? state.stock_cost : '');
-    const [productsku, setProductsku] = useState(state.stock_unit ? state.stock_unit : '');
+    const [ItemSKU, setItemSKU] = useState(state.stock_unit ? state.stock_unit : '');
     const [productPrice, setProductPrice] = useState(state.stock_price ? state.stock_price : '');
     const [productQuantity, setProductQuantity] = useState(state.stock_quantity ? state.stock_quantity : '');
     const [productMinQuantity, setProductMinQuantity] = useState(state.stock_min_quantity ? state.stock_min_quantity : '');
-    const [warehouses, setWarehouses] = useState(state.stock_shop ? state.stock_shop : '');
+    const [shop, setShop] = useState(state.stock_shop ? state.stock_shop : 'Shop');
     const [spinner, setSpinner] = useState(false);
     const [expireDate, setExpireDate] = useState(state.stock_expire_date ? state.stock_expire_date : null);
     const [popup, setPopup] = useState({
@@ -51,14 +51,14 @@ const UpdateStock = () => {
         });
     };
 
-    const handleItemChange = (event) => {
-        setItemName(event.target.value.item_name);
-        setItemCode(event.target.value.item_code);
-        setProductUnit(event.target.value.item_sku);
+    const handleItemChange = (value) => {
+        setItemName(value.item_name);
+        setItemCode(value.item_code);
+        setItemSKU(value.item_sku);
     };
 
     const handleShopChange = (event) => {
-        setWarehouses(event.target.value);
+        setShop(event.target.value);
     };
 
     const handleExpireDateChange = (event) => {
@@ -76,12 +76,12 @@ const UpdateStock = () => {
         data.append('item_name', itemName);
         data.append('item_code', ItemCode);
         data.append('stock_cost', productCost);
-        data.append('stock_unit', productsku);
+        data.append('stock_unit', ItemSKU);
         data.append('stock_price', productPrice);
         data.append('stock_quantity', productQuantity);
         data.append('stock_min_quantity', productMinQuantity);
         data.append('stock_expire_date', expireDate);
-        data.append('stock_shop', warehouses);
+        data.append('stock_shop', shop);
 
         // Make the API call using fetch()
         fetch(Api, {
@@ -223,8 +223,8 @@ const UpdateStock = () => {
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                             <FormControl fullWidth>
-                                <Select value={warehouses} onChange={handleShopChange}>
-                                    <MenuItem value="Shops"> Select Shop</MenuItem>
+                                <Select value={shop} onChange={handleShopChange}>
+                                    <MenuItem value="Shop"> Select Shop</MenuItem>
                                     {Array.from(new Set(shops.map((stores) => stores.name))).map((shop) => (
                                         <MenuItem key={shop} value={shop}>
                                             {shop}
@@ -234,21 +234,18 @@ const UpdateStock = () => {
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth required>
-                                <Select value={itemName} onChange={(event) => handleItemChange(event)}>
-                                    <MenuItem value={itemName}>{itemName}</MenuItem>
-                                    {items.map((item, index) => (
-                                        <MenuItem
-                                            key={index}
-                                            value={item}
-                                            sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                                        >
-                                            <span>{item.item_name} </span>
-                                            <span>{item.item_sku} </span>
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            <Autocomplete
+                                options={items}
+                                getOptionLabel={(option) => `${option.item_name} - ${option.item_brand} - ${option.item_sku}`}
+                                onChange={(event, value) => {
+                                    if (value) {
+                                        handleItemChange(value);
+                                    }
+                                }}
+                                defaultValue={{ item_name: state.item_name, item_brand: state.item_brand, item_sku: state.stock_unit }}
+                                renderInput={(params) => <TextField {...params} label="Select Item" variant="outlined" />}
+                                noOptionsText="Loading..."
+                            />
                         </Grid>
 
                         <Grid item xs={12} sm={6}>

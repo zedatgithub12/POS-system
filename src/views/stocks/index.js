@@ -484,7 +484,7 @@ const Stock = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error replanishing stock item!'
+                        message: 'There is error replenishing stock item!'
                     });
                     setSpinner(false);
                 });
@@ -606,7 +606,7 @@ const Stock = () => {
                                 }}
                             >
                                 <IconPlus />
-                                <Typography variant="h4">Create Item</Typography>
+                                <Typography variant="h4">Create Stock</Typography>
                             </Button>
                         </Grid>
 
@@ -794,10 +794,10 @@ const Stock = () => {
                                                 onChange={handleSelectAllClick}
                                             />
                                         </TableCell>
-                                        <TableCell>Item name</TableCell>
-                                        <TableCell>Item code</TableCell>
                                         <TableCell>Shop</TableCell>
+                                        <TableCell>Item code</TableCell>
                                         <TableCell>Category</TableCell>
+                                        <TableCell>Sub Category</TableCell>
                                         <TableCell>Brand</TableCell>
                                         <TableCell>SKU</TableCell>
                                         <TableCell>Price</TableCell>
@@ -908,7 +908,7 @@ const Stock = () => {
                                             required
                                             key={stockData.id}
                                             options={stockData}
-                                            getOptionLabel={(option) => option.item_name}
+                                            getOptionLabel={(option) => `${option.item_name} - ${option.item_brand} - ${option.stock_unit}`}
                                             onChange={(event, value) => {
                                                 if (value) {
                                                     setSelectedStock(value);
@@ -1046,7 +1046,7 @@ const Stock = () => {
                                         key={stockData.id}
                                         disabled={shopId ? false : true}
                                         options={stockData}
-                                        getOptionLabel={(option) => option.item_name}
+                                        getOptionLabel={(option) => `${option.item_name} - ${option.item_brand} - ${option.stock_unit}`}
                                         onChange={(event, value) => {
                                             if (value) {
                                                 setSelectedStock(value);
@@ -1296,12 +1296,10 @@ const ProductRow = ({ product, onPress, children }) => {
                         {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                     </IconButton>
                 </TableCell>
-                <TableCell component="th" scope="row">
-                    {product.item_name}
-                </TableCell>
-                <TableCell>{product.item_code}</TableCell>
                 <TableCell>{product.stock_shop}</TableCell>
+                <TableCell>{product.item_code}</TableCell>
                 <TableCell>{product.item_category}</TableCell>
+                <TableCell>{product.item_sub_category}</TableCell>
                 <TableCell>{product.item_brand}</TableCell>
                 <TableCell>
                     <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded">{product.stock_unit}</span>
