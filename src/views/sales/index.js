@@ -12,6 +12,9 @@ import PackageScreen from './screens/package-screen';
 // ==============================|| SALES PAGE ||============================== //
 
 const Sales = () => {
+    const userString = sessionStorage.getItem('user');
+    const user = JSON.parse(userString);
+
     const [active, setActive] = useState(true);
     return (
         <MainCard>
@@ -32,32 +35,32 @@ const Sales = () => {
                                 </Grid>
                             </Grid>
                         </Grid>
-
-                        {active ? (
-                            <Grid item sx={{ display: 'flex' }}>
-                                <Button
-                                    component={Link}
-                                    to="/create-sale"
-                                    variant="outlined"
-                                    color="primary"
-                                    sx={{ textDecoration: 'none' }}
-                                >
-                                    Create Sell
-                                </Button>
-                            </Grid>
-                        ) : (
-                            <Grid item sx={{ display: 'flex' }}>
-                                <Button
-                                    component={Link}
-                                    to="/sale-package"
-                                    variant="outlined"
-                                    color="primary"
-                                    sx={{ textDecoration: 'none' }}
-                                >
-                                    Create Sell
-                                </Button>
-                            </Grid>
-                        )}
+                        {user.role === 'Sales' &&
+                            (active ? (
+                                <Grid item sx={{ display: 'flex' }}>
+                                    <Button
+                                        component={Link}
+                                        to="/create-sale"
+                                        variant="outlined"
+                                        color="primary"
+                                        sx={{ textDecoration: 'none' }}
+                                    >
+                                        Create Sell
+                                    </Button>
+                                </Grid>
+                            ) : (
+                                <Grid item sx={{ display: 'flex' }}>
+                                    <Button
+                                        component={Link}
+                                        to="/sale-package"
+                                        variant="outlined"
+                                        color="primary"
+                                        sx={{ textDecoration: 'none' }}
+                                    >
+                                        Create Sell
+                                    </Button>
+                                </Grid>
+                            ))}
                     </Grid>
                 </Grid>
 

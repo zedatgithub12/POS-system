@@ -136,19 +136,22 @@ const ViewSoldPackage = () => {
                                             <Table>
                                                 <TableHead>
                                                     <TableRow>
+                                                        <TableCell>Item Code</TableCell>
                                                         <TableCell>Item Name</TableCell>
-                                                        <TableCell>Code</TableCell>
+
+                                                        <TableCell>Brand</TableCell>
+                                                        <TableCell>SKU</TableCell>
                                                         <TableCell>Quantity</TableCell>
-                                                        <TableCell>Item Unit</TableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
                                                     {JSON.parse(item.items).map((item, index) => (
                                                         <TableRow key={index}>
-                                                            <TableCell>{item.item_name}</TableCell>
                                                             <TableCell>{item.item_code}</TableCell>
-                                                            <TableCell>{item.item_quantity}</TableCell>
+                                                            <TableCell>{item.item_name}</TableCell>
+                                                            <TableCell>{item.item_brand}</TableCell>
                                                             <TableCell>{item.item_sku}</TableCell>
+                                                            <TableCell>{item.item_quantity}</TableCell>
                                                         </TableRow>
                                                     ))}
                                                 </TableBody>

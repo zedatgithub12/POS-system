@@ -14,7 +14,8 @@ import {
     TextField,
     FormControl,
     Select,
-    MenuItem
+    MenuItem,
+    ButtonGroup
 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -22,7 +23,6 @@ import MuiAlert from '@mui/material/Alert';
 import { gridSpacing } from 'store/constant';
 import Connections from 'api';
 import { useTheme } from '@mui/material/styles';
-import AddNew from './components/add-new';
 import LowStocks from './components/low-stock';
 import SalesTargets from './components/sales-against-target';
 import { IconX, IconBuildingStore, IconChartInfographic } from '@tabler/icons';
@@ -30,6 +30,7 @@ import TargetListing from './components/target-listing';
 import { useNavigate } from 'react-router-dom';
 import { Preferences } from 'preferences';
 import { ActivityIndicators } from 'ui-component/activityIndicator';
+import EachShops from './components/eachShops';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
@@ -50,6 +51,9 @@ const Dashboard = () => {
     const [shopFilter, setShopFilter] = useState('Select Shop');
     const [targetShopFilter, setTargetShopFilter] = useState('Select Shop');
     const [targetLoader, setTargetLoader] = useState(true);
+    const [eachShopsAchievement, setEachShopsAchievement] = useState([]);
+    const [eachLoader, setEachLoader] = useState(false);
+    const [selectedButton, setSelectedButton] = useState('daily');
     const [loading, setLoading] = useState(true);
     const [spinner, setSpinner] = useState(false);
     const [lowstock, setLowStock] = useState([]);
@@ -90,11 +94,6 @@ const Dashboard = () => {
             status: false
         });
     };
-
-    // const handleTargetClick = () => {
-    //     setOpenTargetDialog(true);
-    //     getShops();
-    // };
 
     const handleDialogClose = () => {
         setOpenTargetDialog(false);
@@ -248,6 +247,50 @@ const Dashboard = () => {
             });
     };
 
+    const periods = [
+        { id: 1, name: 'daily' },
+        { id: 2, name: 'monthly' },
+        { id: 3, name: 'annual' }
+    ];
+
+    const handlePeriodFilter = (option) => {
+        setSelectedButton(option);
+        getEachAchievement(option);
+    };
+
+    const getEachAchievement = (period) => {
+        setEachLoader(true);
+        var Api = Connections.api + Connections.eachShops + `?period=${period}`;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'GET',
+            headers: headers,
+            cache: 'no-cache'
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setEachShopsAchievement(response.data);
+                    setEachLoader(false);
+                } else {
+                    setEachLoader(false);
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error getting each shop achievement!'
+                });
+                setEachLoader(false);
+            });
+    };
+
     const getLowStocks = (name) => {
         setLoading(true);
         var Api = Connections.api + Connections.lowstock + name;
@@ -286,6 +329,11 @@ const Dashboard = () => {
         user.role === 'Admin' ? getShops() : (getTargets(user.store_name), getLowStocks(user.store_name));
     }, [user.role, user.store_name]);
 
+    useEffect(() => {
+        getEachAchievement(selectedButton);
+
+        return () => {};
+    }, []);
     return (
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
@@ -351,7 +399,37 @@ const Dashboard = () => {
                                     <SalesTargets targets={revenueTarget} />
                                 )}
                             </Grid>
-                            <TargetListing lists={revenueTarget ? revenueTarget : []} shopname={shopFilter} />
+                            {user.role === 'Sales' && revenueTarget.target && (
+                                <TargetListing lists={revenueTarget} shopname={user.store_name} />
+                            )}
+
+                            {user.role === 'Admin' && (
+                                <EachShops lists={eachShopsAchievement} loading={eachLoader} period={selectedButton}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: 1 }}>
+                                        <ButtonGroup variant="outlined" aria-label="outlined primary button group">
+                                            {periods.map((button) => (
+                                                <Button
+                                                    key={button.id}
+                                                    sx={{
+                                                        backgroundColor: selectedButton === button.name ? theme.palette.primary.main : null,
+                                                        color:
+                                                            selectedButton === button.name
+                                                                ? theme.palette.background.default
+                                                                : theme.palette.primary.main,
+                                                        '&:hover': {
+                                                            backgroundColor: theme.palette.primary.main,
+                                                            color: theme.palette.background.default
+                                                        }
+                                                    }}
+                                                    onClick={() => handlePeriodFilter(button.name)}
+                                                >
+                                                    {button.name}
+                                                </Button>
+                                            ))}
+                                        </ButtonGroup>
+                                    </Box>{' '}
+                                </EachShops>
+                            )}
                         </Grid>
 
                         <Grid item xs={12} sm={12} md={12} lg={3.4} xl={3.4} sx={{ borderRadius: 2, padding: 1, paddingTop: 0 }}>
@@ -413,24 +491,6 @@ const Dashboard = () => {
                                 )}
                             </Box>
                         </Grid>
-
-                        {user.role === 'Admin' && (
-                            <Grid
-                                item
-                                xs={12}
-                                sm={12}
-                                md={12}
-                                lg={3.4}
-                                xl={3.4}
-                                sx={{ borderRadius: 2, padding: 1, paddingTop: 0, paddingLeft: 2 }}
-                            >
-                                <AddNew
-                                    targetbtn={() => setOpenTargetDialog(true)}
-                                    stockbtn={() => navigate('/add-stock')}
-                                    packagebtn={() => navigate('/create-package')}
-                                />
-                            </Grid>
-                        )}
                     </Grid>
                 </Grid>
             </Grid>

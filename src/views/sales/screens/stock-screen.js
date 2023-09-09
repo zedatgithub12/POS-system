@@ -506,9 +506,9 @@ const StockScreen = () => {
                                                                 >
                                                                     Edit Sale
                                                                 </MenuItem>
-                                                                <MenuItem onClick={() => handleTrashClick(selectedItem)}>
+                                                                {/* <MenuItem onClick={() => handleTrashClick(selectedItem)}>
                                                                     Delete Sale
-                                                                </MenuItem>
+                                                                </MenuItem> */}
                                                             </>
                                                         )}
                                                     </Menu>

@@ -223,7 +223,7 @@ const UpdateSale = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        setItems(response.data);
+                        setItems(response.data.data);
                         setLoading(false);
                     } else {
                         setPopup({
@@ -317,11 +317,12 @@ const UpdateSale = () => {
                                 <Table size="small">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell>Item Name</TableCell>
                                             <TableCell>Item Code</TableCell>
+                                            <TableCell>Category</TableCell>
+                                            <TableCell>Sub Category</TableCell>
+                                            <TableCell>Brand</TableCell>
                                             <TableCell align="right">SKU</TableCell>
                                             <TableCell align="right">Quantity</TableCell>
-                                            <TableCell align="right">Unit Price</TableCell>
                                             <TableCell align="right">SubTotal</TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -345,8 +346,10 @@ const UpdateSale = () => {
                                         <TableBody>
                                             {Items.map((soldItem, index) => (
                                                 <TableRow key={index}>
-                                                    <TableCell>{soldItem.item_name}</TableCell>
                                                     <TableCell>{soldItem.item_code}</TableCell>
+                                                    <TableCell>{soldItem.item_category}</TableCell>
+                                                    <TableCell>{soldItem.item_sub_category}</TableCell>
+                                                    <TableCell>{soldItem.item_brand}</TableCell>
                                                     <TableCell align="right">
                                                         {' '}
                                                         <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded">
@@ -354,7 +357,7 @@ const UpdateSale = () => {
                                                         </span>
                                                     </TableCell>
                                                     <TableCell align="right">{soldItem.quantity}</TableCell>
-                                                    <TableCell align="right">{parseInt(soldItem.price).toFixed(2)}</TableCell>
+
                                                     <TableCell align="right">{parseInt(soldItem.price).toFixed(2)}</TableCell>
                                                 </TableRow>
                                             ))}
