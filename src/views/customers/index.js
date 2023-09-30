@@ -92,7 +92,7 @@ const Customers = () => {
 
         if (searchText) {
             const searchRegex = new RegExp(searchText, 'i');
-            isMatch = isMatch && (searchRegex.test(customers.name) || searchRegex.test(customers.name));
+            isMatch = isMatch && searchRegex.test(customers.phone);
         }
 
         if (shopFilter !== 'Shop') {

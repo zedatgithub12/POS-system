@@ -304,7 +304,7 @@ const AddProduct = () => {
                         <Grid item>
                             <Grid container direction="column" spacing={1}>
                                 <Grid item>
-                                    <Typography variant="h3">Add Product</Typography>
+                                    <Typography variant="h3">Create New Product</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>

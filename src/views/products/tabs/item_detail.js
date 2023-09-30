@@ -55,7 +55,7 @@ const ItemDetail = ({ product }) => {
                                                 : 'bg-danger bg-opacity-10 text-danger px-2 py-1 rounded'
                                         }
                                     >
-                                        {product.item_status}
+                                        {product.item_status === 'deactivate' ? product.item_status + 'd' : product.item_status}
                                     </span>
                                 </TableCell>
                             </TableRow>

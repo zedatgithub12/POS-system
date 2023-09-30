@@ -22,20 +22,13 @@ import {
     DialogActions,
     Button,
     Box,
-    Collapse,
     FormControl,
-    FormControlLabel,
-    Checkbox,
     Select,
-    List,
-    ListItem,
-    ListItemText,
-    Autocomplete,
-    CircularProgress
+    Menu
 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import { KeyboardArrowDown, KeyboardArrowUp, MoreVert } from '@mui/icons-material';
 import { IconEdit, IconSearch, IconEye } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -211,7 +204,7 @@ const Products = () => {
                                     color="primary"
                                     sx={{ textDecoration: 'none' }}
                                 >
-                                    Add Product
+                                    Create New Product
                                 </Button>
                             </Grid>
                         )}
@@ -354,6 +347,7 @@ const ProductRow = ({ product }) => {
     const [selectedProduct, setSelectedProduct] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [open, setOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
     const handleOpen = () => {
         setOpen(!open);
     };
@@ -372,6 +366,62 @@ const ProductRow = ({ product }) => {
             ...popup,
             status: false
         });
+    };
+
+    const handleMenuClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleSelectItem = (event) => {
+        handleMenuClick(event);
+    };
+
+    const handleStatusChange = (status, id) => {
+        var Api = Connections.api + Connections.updateproductstatus + id;
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        const data = {
+            product_status: status
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'PUT',
+            headers: headers,
+            body: JSON.stringify(data)
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'success',
+                        message: response.message
+                    });
+                    setAnchorEl(null);
+                } else {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: response.message
+                    });
+                }
+            })
+            .catch(() => {
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'error',
+                    message: 'There is error updating stock status!'
+                });
+            });
     };
 
     const handleTrashClick = (product) => {
@@ -465,7 +515,7 @@ const ProductRow = ({ product }) => {
                                 : 'bg-danger bg-opacity-10 text-danger px-2 py-1 rounded'
                         }
                     >
-                        {product.item_status}
+                        {product.item_status === 'deactivate' ? product.item_status + 'd' : product.item_status}
                     </span>
                 </TableCell>
 
@@ -496,9 +546,29 @@ const ProductRow = ({ product }) => {
                                 >
                                     <IconEdit />
                                 </IconButton>
-                                {/* <IconButton aria-label="Trash row" size="small" onClick={() => handleTrashClick(product)}>
-                                    <IconTrash />
-                                </IconButton> */}
+                                <IconButton
+                                    aria-controls="row-menu"
+                                    aria-haspopup="true"
+                                    onClick={(event) => handleSelectItem(event, product)}
+                                >
+                                    <MoreVert />
+                                </IconButton>
+                                <Menu
+                                    id="row-menu"
+                                    anchorEl={anchorEl}
+                                    keepMounted
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleMenuClose}
+                                    className="shadow-sm"
+                                >
+                                    <MenuItem
+                                        onClick={() =>
+                                            handleStatusChange(product.item_status === 'deactivate' ? 'active' : 'deactivate', product.id)
+                                        }
+                                    >
+                                        {product.item_status === 'deactivate' ? 'Activate' : 'Deactivate'}
+                                    </MenuItem>
+                                </Menu>
                             </>
                         )}
                     </TableCell>

@@ -41,6 +41,7 @@ const Connections = {
     getItems: '/get-items/',
     updateItems: '/update-items/',
     deleteItems: '/delete-items/',
+    updateproductstatus: '/update-product-status/',
 
     //Stock api's
     stocks: '/stocks',

@@ -1056,7 +1056,7 @@ const Stock = () => {
                                         renderInput={(params) => (
                                             <TextField
                                                 {...params}
-                                                label="Stock"
+                                                label="Product"
                                                 variant="outlined"
                                                 sx={{ backgroundColor: theme.palette.background.default }}
                                             />
@@ -1091,7 +1091,7 @@ const Stock = () => {
                                         borderRadius: 2
                                     }}
                                 >
-                                    <Typography sx={{ fontSize: theme.typography.h5 }}>Current amount</Typography>
+                                    <Typography sx={{ fontSize: theme.typography.h5 }}>Current quantity</Typography>
                                     <Typography sx={{ fontSize: theme.typography.h4 }}>
                                         {selectedStock.stock_quantity} - {selectedStock.stock_unit}
                                     </Typography>
@@ -1104,7 +1104,7 @@ const Stock = () => {
                                         required
                                         fullWidth
                                         type="text"
-                                        label="New Amount"
+                                        label="New quantity"
                                         value={addedAmount}
                                         onChange={(event) => setAddedAmount(event.target.value)}
                                         sx={{ marginTop: 2, backgroundColor: theme.palette.background.default }}
