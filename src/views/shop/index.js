@@ -83,15 +83,59 @@ const Shops = () => {
         setValue(newValue);
     };
 
+    function getDaysInCurrentMonth() {
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1; // Adding 1 to make it 1-indexed
+        const currentYear = currentDate.getFullYear();
+        return new Date(currentYear, currentMonth, 0).getDate();
+    }
+
+    function getDaysInCurrentYear() {
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const isLeapYear = (currentYear % 4 === 0 && currentYear % 100 !== 0) || currentYear % 400 === 0;
+        return isLeapYear ? 366 : 365;
+    }
+
     const handleDailyTarget = (event) => {
-        // var dailytarget = event.target.value;
-        // const numDaysInMonth = getDaysInMonth();
+        var enteredNumber = event.target.value;
+        var monthly = enteredNumber * 12;
+        var annually = enteredNumber * getDaysInCurrentYear();
 
         setTarget({
             ...target,
-            daily: event.target.value
+            daily: event.target.value,
+            monthly: monthly,
+            annually: annually
         });
     };
+
+    const handleMonthlyTarget = (event) => {
+        var enteredNumber = event.target.value;
+        var daily = (enteredNumber / getDaysInCurrentMonth()).toFixed(0);
+        var annually = enteredNumber * getDaysInCurrentYear();
+
+        setTarget({
+            ...target,
+            daily: daily,
+            monthly: event.target.value,
+            annually: annually
+        });
+    };
+
+    const handleAnnualTarget = (event) => {
+        var enteredNumber = event.target.value;
+        var monthly = enteredNumber / 12;
+        var daily = (monthly / getDaysInCurrentMonth()).toFixed(0);
+
+        setTarget({
+            ...target,
+            daily: daily,
+            monthly: monthly,
+            annually: event.target.value
+        });
+    };
+
     const handleSubmit = (event) => {
         event.preventDefault();
         setSpinner(true);
@@ -398,7 +442,9 @@ const Shops = () => {
                         backgroundColor: theme.palette.primary.main
                     }}
                 >
-                    <DialogTitle sx={{ fontSize: theme.typography.h4 }}>Set New Target</DialogTitle>
+                    <DialogTitle sx={{ fontSize: theme.typography.h4, color: theme.palette.background.default }}>
+                        Set New Target
+                    </DialogTitle>
                     <Button variant="text" color="dark" onClick={handleDialogClose}>
                         <IconX />
                     </Button>
@@ -439,7 +485,7 @@ const Shops = () => {
                                     type="text"
                                     label="Monthly"
                                     value={target.monthly}
-                                    onChange={(event) => setTarget({ ...target, monthly: event.target.value })}
+                                    onChange={(event) => handleMonthlyTarget(event)}
                                     sx={{ marginTop: 2, marginLeft: 1, backgroundColor: theme.palette.background.default }}
                                 />
                             </Grid>
@@ -450,7 +496,7 @@ const Shops = () => {
                                     type="text"
                                     label="Annually"
                                     value={target.annually}
-                                    onChange={(event) => setTarget({ ...target, annually: event.target.value })}
+                                    onChange={(event) => handleAnnualTarget(event)}
                                     sx={{ marginTop: 2, marginRight: 1, backgroundColor: theme.palette.background.default }}
                                 />
 
@@ -460,7 +506,7 @@ const Shops = () => {
                                     sx={{
                                         paddingX: 4,
                                         paddingY: 1.6,
-
+                                        marginTop: 1.8,
                                         backgroundColor: theme.palette.primary.main,
                                         color: theme.palette.background.default
                                     }}

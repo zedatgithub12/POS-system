@@ -391,7 +391,6 @@ const AddProduct = () => {
 
                         <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>
                             <Autocomplete
-                                freeSolo
                                 options={SubCategoryData}
                                 getOptionLabel={(option) => option.sub_category}
                                 onChange={(event, value) => {

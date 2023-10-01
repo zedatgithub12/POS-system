@@ -16,11 +16,17 @@ import {
     TextField,
     Button,
     DialogActions,
-    TablePagination,
     Autocomplete,
     FormControl,
     MenuItem,
-    Select
+    Select,
+    TablePagination,
+    TableContainer,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody
 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -63,11 +69,12 @@ const SubCategory = () => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [addCategory, setAddCategory] = useState('');
+    const [mainCatId, setMainCatId] = useState();
     const [addCategoryDesc, setAddCategoryDesc] = useState('');
     const [newCategoryName, setNewCategoryName] = useState('');
     const [newCategoryDesc, setNewCategoryDesc] = useState('');
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(12);
+    const [rowsPerPage, setRowsPerPage] = useState(15);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [spinner, setSpinner] = useState(false);
@@ -105,6 +112,16 @@ const SubCategory = () => {
     const handleAddDialogClose = () => {
         setAddDialogOpen(false);
     };
+
+    const handleMainCategory = (value) => {
+        setAddCategory(value.name);
+        setMainCatId(value.id);
+    };
+
+    const handleMainCategoryUpdate = (value) => {
+        setNewCategoryName(value.name);
+    };
+
     const addNewCategory = () => {
         if (addCategory === '') {
             setPopup({
@@ -129,6 +146,7 @@ const SubCategory = () => {
             };
 
             const data = {
+                category_id: mainCatId,
                 main: addCategory,
                 sub: addCategoryDesc
             };
@@ -137,8 +155,7 @@ const SubCategory = () => {
             fetch(Api, {
                 method: 'POST',
                 headers: headers,
-                body: JSON.stringify(data),
-                cache: 'no-cache'
+                body: JSON.stringify(data)
             })
                 .then((response) => response.json())
                 .then((response) => {
@@ -433,42 +450,47 @@ const SubCategory = () => {
                                 </Select>
                             </FormControl>
 
-                            <List>
-                                {loading ? (
-                                    <Box sx={{ minHeight: 188, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                        <ActivityIndicators />
-                                    </Box>
-                                ) : (
-                                    categoriesToShow.map((category) => (
-                                        <ListItem key={category.id} className="bg-light rounded m-2 py-3">
-                                            <ListItemText
-                                                primary={category.sub_category}
-                                                secondary={
-                                                    <React.Fragment>
-                                                        <Typography
-                                                            sx={{ display: 'inline' }}
-                                                            component="span"
-                                                            variant="body2"
-                                                            color="text.primary"
-                                                        >
-                                                            {category.main_category}
-                                                        </Typography>
-                                                    </React.Fragment>
-                                                }
-                                            />
+                            <TableContainer sx={{ marginTop: 2 }}>
+                                <Table>
+                                    <TableHead className="bg-light">
+                                        <TableRow>
+                                            <TableCell>ID</TableCell>
+                                            <TableCell>Main Category</TableCell>
+                                            <TableCell>Sub Category</TableCell>
+                                            <TableCell>Action</TableCell>
+                                        </TableRow>
+                                    </TableHead>
 
-                                            <ListItemSecondaryAction>
-                                                <IconButton onClick={() => handleEditDialogOpen(category)}>
-                                                    <IconEdit />
-                                                </IconButton>
-                                                <IconButton onClick={() => handleDeleteDialogOpen(category)}>
-                                                    <IconTrash />
-                                                </IconButton>
-                                            </ListItemSecondaryAction>
-                                        </ListItem>
-                                    ))
-                                )}
-                            </List>
+                                    {loading ? (
+                                        <TableBody>
+                                            <TableRow>
+                                                <TableCell colSpan={4} align="center" sx={{ paddingY: 6 }}>
+                                                    <ActivityIndicators />
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    ) : (
+                                        <TableBody>
+                                            {categoriesToShow.map((category) => (
+                                                <TableRow>
+                                                    <TableCell>{category.code}</TableCell>
+                                                    <TableCell>{category.main_category}</TableCell>
+                                                    <TableCell>{category.sub_category}</TableCell>
+                                                    <TableCell>
+                                                        {' '}
+                                                        <IconButton onClick={() => handleEditDialogOpen(category)}>
+                                                            <IconEdit />
+                                                        </IconButton>
+                                                        <IconButton onClick={() => handleDeleteDialogOpen(category)}>
+                                                            <IconTrash />
+                                                        </IconButton>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    )}
+                                </Table>
+                            </TableContainer>
                             <TablePagination
                                 component="div"
                                 count={filteredCategories.length}
@@ -487,11 +509,11 @@ const SubCategory = () => {
 
                 <DialogContent>
                     <Autocomplete
-                        options={uniqueCategoryArray}
-                        getOptionLabel={(option) => option}
+                        options={mainCategories}
+                        getOptionLabel={(option) => option.name}
                         onChange={(event, value) => {
                             if (value) {
-                                setAddCategory(value);
+                                handleMainCategory(value);
                             }
                         }}
                         renderInput={(params) => (
@@ -528,12 +550,12 @@ const SubCategory = () => {
                 <DialogTitle>Edit Sub Category</DialogTitle>
                 <DialogContent>
                     <Autocomplete
-                        options={uniqueCategoryArray}
-                        getOptionLabel={(option) => option}
-                        value={newCategoryName}
+                        options={mainCategories}
+                        getOptionLabel={(option) => option.name}
+                        defaultValue={{ name: newCategoryName }}
                         onChange={(event, value) => {
                             if (value) {
-                                setNewCategoryName(value);
+                                handleMainCategoryUpdate(value);
                             }
                         }}
                         renderInput={(params) => (
