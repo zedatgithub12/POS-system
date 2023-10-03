@@ -36,21 +36,7 @@ import {
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
-import {
-    IconCheck,
-    IconChevronsDown,
-    IconChevronsUp,
-    IconTrash,
-    IconEdit,
-    IconSearch,
-    IconEye,
-    IconPlus,
-    IconTestPipe,
-    IconArrowsTransferDown,
-    IconX,
-    IconChargingPile,
-    IconCoins
-} from '@tabler/icons';
+import { IconEdit, IconSearch, IconEye } from '@tabler/icons';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
@@ -201,8 +187,6 @@ const Products = () => {
         return () => {};
     }, [page, rowsPerPage]);
 
-    // const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
@@ -301,13 +285,14 @@ const Products = () => {
                                 <TableHead className="bg-light">
                                     <TableRow>
                                         <TableCell></TableCell>
-                                        <TableCell>Name</TableCell>
+
                                         <TableCell>Code</TableCell>
                                         <TableCell>Category</TableCell>
                                         <TableCell>Sub Category</TableCell>
                                         <TableCell>Brand</TableCell>
+                                        <TableCell>Unit</TableCell>
                                         <TableCell>SKU</TableCell>
-                                        <TableCell>Price</TableCell>
+                                        <TableCell>Packaging</TableCell>
                                         <TableCell>Status</TableCell>
                                         <TableCell>Actions</TableCell>
                                     </TableRow>
@@ -461,15 +446,17 @@ const ProductRow = ({ product }) => {
                         {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                     </IconButton>
                 </TableCell>
-                <TableCell>{product.item_name}</TableCell>
+
                 <TableCell>{product.item_code}</TableCell>
                 <TableCell>{product.item_category}</TableCell>
                 <TableCell>{product.item_sub_category}</TableCell>
                 <TableCell>{product.item_brand}</TableCell>
+                <TableCell>{product.item_unit}</TableCell>
+
                 <TableCell>
-                    <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded"> {product.item_unit}</span>
+                    <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded"> {product.item_sku}</span>
                 </TableCell>
-                <TableCell>{product.item_price} ETB</TableCell>
+                <TableCell>{product.item_packaging}</TableCell>
                 <TableCell sx={{ textTransform: 'capitalize' }}>
                     <span
                         className={
@@ -481,6 +468,7 @@ const ProductRow = ({ product }) => {
                         {product.item_status}
                     </span>
                 </TableCell>
+
                 <>
                     <TableCell>
                         <IconButton

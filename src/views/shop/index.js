@@ -1,6 +1,25 @@
 import React, { useState, useEffect } from 'react';
 // material-ui
-import { Grid, Box, Typography, Button, Card, CardContent, CardMedia, CardActionArea, MenuItem, FormControl, Select } from '@mui/material';
+import {
+    Grid,
+    Box,
+    Typography,
+    Button,
+    Card,
+    CardContent,
+    CardMedia,
+    CardActionArea,
+    MenuItem,
+    FormControl,
+    Select,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    Divider,
+    Autocomplete,
+    TextField,
+    useTheme
+} from '@mui/material';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -14,6 +33,7 @@ import Connections from 'api';
 import ShopMap from './maps';
 import { ActivityIndicators } from 'ui-component/activityIndicator';
 import ShopTable from './components/tabular';
+import { IconX } from '@tabler/icons';
 
 // ==============================|| SHOP LISTING PAGE ||============================== //
 
@@ -21,7 +41,10 @@ const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 const Shops = () => {
+    const userString = sessionStorage.getItem('user');
+    const user = JSON.parse(userString);
     const navigate = useNavigate();
+    const theme = useTheme();
 
     const [shops, setShops] = useState([]);
     const [category, setCategory] = useState('Category');
@@ -29,6 +52,16 @@ const Shops = () => {
     const [city, setCity] = useState('City');
     const [subcity, setSubsCity] = useState('Subcity');
     const [loading, setLoading] = useState(true);
+    const [openTargetDialog, setOpenTargetDialog] = useState(false);
+    const [shopId, setShopId] = useState(null);
+    const [shopName, setShopsName] = useState();
+    const [spinner, setSpinner] = useState(false);
+    const [target, setTarget] = useState({
+        daily: '',
+        monthly: '',
+        annually: ''
+    });
+
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -37,8 +70,92 @@ const Shops = () => {
 
     const [value, setValue] = React.useState('1');
 
+    const handleDialogClose = () => {
+        setOpenTargetDialog(false);
+    };
+
+    const handleShopSelection = (value) => {
+        setShopId(value.id);
+        setShopsName(value.name);
+    };
+
     const handleChange = (event, newValue) => {
         setValue(newValue);
+    };
+
+    const handleDailyTarget = (event) => {
+        // var dailytarget = event.target.value;
+        // const numDaysInMonth = getDaysInMonth();
+
+        setTarget({
+            ...target,
+            daily: event.target.value
+        });
+    };
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        setSpinner(true);
+        if (!shopName) {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please select shop!'
+            });
+            setSpinner(false);
+        } else {
+            // Handle form submission here
+            // Declare the data to be sent to the API
+            var Api = Connections.api + Connections.addtarget;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            var Data = {
+                userid: user.id,
+                shopid: shopId,
+                shopname: shopName,
+                r_daily: target.daily,
+                r_monthly: target.monthly,
+                r_yearly: target.annually
+            };
+
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(Data)
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error setting target!'
+                    });
+                    setSpinner(false);
+                });
+        }
     };
 
     const handleClose = (event, reason) => {
@@ -136,22 +253,29 @@ const Shops = () => {
     }, []);
     return (
         <MainCard>
-            <Grid item xs={12}>
-                <Grid container alignItems="center" justifyContent="space-between">
-                    <Grid item>
-                        <Grid container direction="column" spacing={1}>
-                            <Grid item>
-                                <Typography variant="h3">Manage Shops</Typography>
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                    <Grid item>
-                        <Button component={Link} to="/create-shop" variant="outlined" color="primary" sx={{ textDecoration: 'none' }}>
-                            Create Shop
-                        </Button>
-                    </Grid>
+            <Grid container alignItems="center" justifyContent="space-between">
+                <Grid item>
+                    <Typography variant="h3">Manage Shops</Typography>
                 </Grid>
             </Grid>
+            <Grid container alignItems="center">
+                <Grid item sx={{ paddingY: 1 }}>
+                    <Button component={Link} to="/create-shop" variant="text" color="primary" sx={{ textDecoration: 'none' }}>
+                        Create Shop
+                    </Button>
+                </Grid>
+                <Grid item>
+                    <Button
+                        onClick={() => setOpenTargetDialog(true)}
+                        variant="text"
+                        color="primary"
+                        sx={{ marginLeft: 1, textDecoration: 'none' }}
+                    >
+                        Add Target
+                    </Button>
+                </Grid>
+            </Grid>
+
             <TabContext value={value}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <TabList onChange={handleChange} aria-label="Shop Tabs">
@@ -264,6 +388,96 @@ const Shops = () => {
                     <ShopMap shopData={shops} />
                 </TabPanel>
             </TabContext>
+
+            <Dialog open={openTargetDialog} onClose={handleDialogClose}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        backgroundColor: theme.palette.primary.main
+                    }}
+                >
+                    <DialogTitle sx={{ fontSize: theme.typography.h4 }}>Set New Target</DialogTitle>
+                    <Button variant="text" color="dark" onClick={handleDialogClose}>
+                        <IconX />
+                    </Button>
+                </Box>
+
+                <Divider />
+                <DialogContent>
+                    <form style={{ marginTop: '1rem', marginBottom: '1rem' }} onSubmit={handleSubmit}>
+                        <Grid container sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 500 }}>
+                            <Grid item xs={12} sm={12}>
+                                <Autocomplete
+                                    required
+                                    options={shops}
+                                    getOptionLabel={(option) => option.name}
+                                    onChange={(event, value) => {
+                                        if (value) {
+                                            handleShopSelection(value);
+                                        }
+                                    }}
+                                    renderInput={(params) => <TextField {...params} label="Shop" variant="outlined" />}
+                                    noOptionsText="Loading..."
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    type="text"
+                                    label="Daily"
+                                    value={target.daily}
+                                    onChange={(event) => handleDailyTarget(event)}
+                                    sx={{ marginTop: 2, marginRight: 1, backgroundColor: theme.palette.background.default }}
+                                />
+                                <TextField
+                                    fullWidth
+                                    required
+                                    type="text"
+                                    label="Monthly"
+                                    value={target.monthly}
+                                    onChange={(event) => setTarget({ ...target, monthly: event.target.value })}
+                                    sx={{ marginTop: 2, marginLeft: 1, backgroundColor: theme.palette.background.default }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    type="text"
+                                    label="Annually"
+                                    value={target.annually}
+                                    onChange={(event) => setTarget({ ...target, annually: event.target.value })}
+                                    sx={{ marginTop: 2, marginRight: 1, backgroundColor: theme.palette.background.default }}
+                                />
+
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    sx={{
+                                        paddingX: 4,
+                                        paddingY: 1.6,
+
+                                        backgroundColor: theme.palette.primary.main,
+                                        color: theme.palette.background.default
+                                    }}
+                                >
+                                    {spinner ? (
+                                        <div className="spinner-border spinner-border-sm text-dark " role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    ) : (
+                                        'Set'
+                                    )}
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </form>
+                </DialogContent>
+            </Dialog>
 
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity={popup.severity} sx={{ width: '100%' }}>

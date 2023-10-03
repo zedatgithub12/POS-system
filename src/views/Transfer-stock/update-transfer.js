@@ -233,19 +233,24 @@ const UpdateStockTransfer = () => {
                                     <Table>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell>Item Name</TableCell>
                                                 <TableCell>Item Code</TableCell>
+                                                <TableCell>Category</TableCell>
+                                                <TableCell>Sub Category</TableCell>
+                                                <TableCell>Brand</TableCell>
+                                                <TableCell>SKU</TableCell>
                                                 <TableCell>Existing</TableCell>
                                                 <TableCell>Quantity</TableCell>
-                                                <TableCell>Unit</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         {Items.length > 0 ? (
                                             <TableBody>
                                                 {JSON.parse(Items).map((item, index) => (
                                                     <TableRow key={index}>
-                                                        <TableCell>{item.item_name}</TableCell>
                                                         <TableCell>{item.item_code}</TableCell>
+                                                        <TableCell>{item.item_category}</TableCell>
+                                                        <TableCell>{item.item_sub_category}</TableCell>
+                                                        <TableCell>{item.item_brand}</TableCell>
+                                                        <TableCell>{item.stock_unit}</TableCell>
                                                         <TableCell>{item.existing}</TableCell>
                                                         <TableCell>
                                                             <Box display="flex" alignItems="center">
@@ -258,7 +263,7 @@ const UpdateStockTransfer = () => {
                                                                 {/* <Button onClick={() => handleIncrement(item.id)}>+</Button> */}
                                                             </Box>
                                                         </TableCell>
-                                                        <TableCell>{item.stock_unit}</TableCell>
+
                                                         {/* 
                                                         <TableCell>
                                                             <IconButton onClick={() => handleRemoveFromCart(item)}>

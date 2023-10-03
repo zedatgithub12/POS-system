@@ -139,6 +139,9 @@ const TransferStock = () => {
                     id: product.id,
                     item_name: product.item_name,
                     item_code: product.item_code,
+                    item_category: product.item_category,
+                    item_sub_category: product.item_sub_category,
+                    item_brand: product.item_brand,
                     stock_unit: product.stock_unit,
                     stock_price: product.stock_price,
                     existing: product.stock_quantity,
@@ -372,15 +375,15 @@ const TransferStock = () => {
                                     <Autocomplete
                                         disabled={shopId ? false : true}
                                         options={productData}
-                                        getOptionLabel={(option) => option.item_name}
+                                        getOptionLabel={(option) => `${option.item_name} - ${option.item_brand} - ${option.stock_unit}`}
                                         onChange={(event, value) => {
                                             if (value) {
                                                 handleAddToCart(value);
                                             }
                                         }}
                                         sx={{ marginTop: 2 }}
-                                        renderInput={(params) => <TextField {...params} label="Select Product" variant="outlined" />}
-                                        noOptionsText={loading ? <CircularProgress size={20} /> : 'No item in this shop'}
+                                        renderInput={(params) => <TextField {...params} label="Select Stock" variant="outlined" />}
+                                        noOptionsText={loading ? <CircularProgress size={20} /> : 'No stock in this shop'}
                                     />
                                 </Grid>
                                 {loading && (
@@ -399,14 +402,16 @@ const TransferStock = () => {
                                     <Table>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell>Item name</TableCell>
                                                 <TableCell>Item code</TableCell>
-
-                                                <TableCell width={260} align="center">
+                                                <TableCell>Category</TableCell>
+                                                <TableCell>Sub Category</TableCell>
+                                                <TableCell> Brand</TableCell>
+                                                <TableCell>SKU</TableCell>
+                                                <TableCell width={240} align="center">
                                                     Transfered amount
                                                 </TableCell>
-                                                <TableCell>SKU</TableCell>
-                                                <TableCell>Item price</TableCell>
+
+                                                <TableCell>Price</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -414,9 +419,11 @@ const TransferStock = () => {
                                             <TableBody>
                                                 {Items.map((item, index) => (
                                                     <TableRow key={index}>
-                                                        <TableCell>{item.item_name}</TableCell>
                                                         <TableCell>{item.item_code}</TableCell>
-
+                                                        <TableCell>{item.item_category}</TableCell>
+                                                        <TableCell>{item.item_sub_category}</TableCell>
+                                                        <TableCell>{item.item_brand}</TableCell>
+                                                        <TableCell>{item.stock_unit}</TableCell>
                                                         <TableCell>
                                                             <Box display="flex" alignItems="center">
                                                                 <Button onClick={() => handleDecrement(item.id)}>-</Button>
@@ -429,7 +436,7 @@ const TransferStock = () => {
                                                                 <Button onClick={() => handleIncrement(item.id)}>+</Button>
                                                             </Box>
                                                         </TableCell>
-                                                        <TableCell>{item.stock_unit}</TableCell>
+
                                                         <TableCell>{item.stock_price} ETB</TableCell>
                                                         <TableCell>
                                                             <IconButton onClick={() => handleRemoveFromCart(item)}>

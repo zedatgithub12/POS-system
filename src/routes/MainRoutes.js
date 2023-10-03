@@ -50,6 +50,8 @@ const Sales = Loadable(lazy(() => import('views/sales')));
 const CreateSale = Loadable(lazy(() => import('views/sales/createSale')));
 const UpdateSale = Loadable(lazy(() => import('views/sales/updateSale')));
 const ViewSale = Loadable(lazy(() => import('views/sales/viewSale')));
+const SoldItems = Loadable(lazy(() => import('views/sold-items')));
+
 //Customers Routing
 const Customers = Loadable(lazy(() => import('views/customers')));
 const AddCustomer = Loadable(lazy(() => import('views/customers/addCustomer')));
@@ -216,6 +218,10 @@ const MainRoutes = {
         {
             path: 'view-sale',
             element: <ViewSale />
+        },
+        {
+            path: 'sold-items',
+            element: <SoldItems />
         },
         {
             path: 'customers',

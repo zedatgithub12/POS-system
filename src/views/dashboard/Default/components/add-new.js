@@ -19,7 +19,7 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
                             marginLeft: 1
                         }}
                     >
-                        Add New
+                        Shortcuts
                     </Typography>
                 </Box>
                 <Divider />
@@ -52,7 +52,7 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
                         }}
                     >
                         <Typography variant="h4" sx={{ color: theme.palette.primary.dark, fontWeight: theme.typography.fontWeightMedium }}>
-                            Target
+                            Add Target
                         </Typography>
                     </Button>
                 </Grid>
@@ -65,7 +65,7 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
                         }}
                     >
                         <Typography variant="h4" sx={{ color: theme.palette.primary.dark, fontWeight: theme.typography.fontWeightMedium }}>
-                            Stock
+                            Add Stock
                         </Typography>
                     </Button>
                 </Grid>
@@ -79,7 +79,7 @@ const AddNew = ({ stockbtn, packagebtn, targetbtn }) => {
                         }}
                     >
                         <Typography variant="h4" sx={{ color: theme.palette.primary.dark, fontWeight: theme.typography.fontWeightMedium }}>
-                            Package
+                            Add Package
                         </Typography>
                     </Button>
                 </Grid>

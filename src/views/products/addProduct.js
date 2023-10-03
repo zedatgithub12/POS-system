@@ -59,13 +59,13 @@ const AddProduct = () => {
     const [shops, setShops] = useState([]);
     const [productPicture, setProductPicture] = useState(null);
     const [picturePreview, setPicturePreview] = useState(null);
-    const [productName, setProductName] = useState('');
     const [productCategory, setProductCategory] = useState('Main Category');
     const [categoryId, setCategoryId] = useState(null);
     const [productSubCategory, setProductSubCategory] = useState('Sub Category');
     const [brand, setBrand] = useState('');
     const [productUnit, setProductUnit] = useState('');
-    const [productPrice, setProductPrice] = useState('');
+    const [productpackaging, setProductPackaging] = useState('');
+    const [productsku, setProductSKU] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [spinner, setSpinner] = useState(false);
 
@@ -80,8 +80,12 @@ const AddProduct = () => {
         }
     };
 
-    const handleSubCategoryChange = (event) => {
-        setProductSubCategory(event.target.value);
+    const handleSubCategoryChange = (value) => {
+        setProductSubCategory(value.name);
+    };
+
+    const handleSubCategoryInput = (sub_category) => {
+        setProductSubCategory(sub_category);
     };
 
     const handleUnitChange = (value) => {
@@ -208,57 +212,89 @@ const AddProduct = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        setSpinner(true);
-        // Handle form submission here
-        // Declare the data to be sent to the API
-        var Api = Connections.api + Connections.addItems;
+        if (productCategory === 'Main Category') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Select Category'
+            });
+        } else if (brand === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Select Brand'
+            });
+        } else if (productUnit === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Select Item Unit'
+            });
+        } else if (productsku === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Select Item SKU'
+            });
+        } else {
+            setSpinner(true);
+            // Handle form submission here
+            // Declare the data to be sent to the API
+            var Api = Connections.api + Connections.addItems;
 
-        const data = new FormData();
-        data.append('item_image', productPicture);
-        data.append('item_name', productName);
-        data.append('item_category', productCategory);
-        data.append('category_id', categoryId);
-        data.append('item_sub_category', productSubCategory);
-        data.append('item_brand', brand);
-        data.append('item_unit', productUnit);
-        data.append('item_price', productPrice);
-        data.append('item_description', productDescription);
+            const data = new FormData();
+            data.append('item_image', productPicture);
+            data.append('item_name', productSubCategory);
+            data.append('item_category', productCategory);
+            data.append('category_id', categoryId);
+            data.append('item_sub_category', productSubCategory);
+            data.append('item_brand', brand);
+            data.append('item_unit', productUnit);
+            data.append('item_sku', productsku);
+            data.append('item_packaging', productpackaging);
+            data.append('item_price', 1);
+            data.append('item_description', productDescription);
 
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'POST',
-            body: data,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'success',
-                        message: response.message
-                    });
-                    setSpinner(false);
-                } else {
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'POST',
+                body: data,
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    }
+                })
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: response.message
+                        message: 'There is error adding  product!'
                     });
                     setSpinner(false);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error adding  product!'
                 });
-                setSpinner(false);
-            });
+        }
     };
     return (
         <MainCard>
@@ -341,16 +377,6 @@ const AddProduct = () => {
                         </Grid>
 
                         <Grid item xs={12} sm={6}>
-                            <TextField
-                                color="primary"
-                                fullWidth
-                                label="Item Name"
-                                value={productName}
-                                onChange={(event) => setProductName(event.target.value)}
-                                required
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
                             <FormControl fullWidth required>
                                 <Select value={productCategory} onChange={handleCategoryChange}>
                                     <MenuItem value="Main Category">Main Category</MenuItem>
@@ -363,19 +389,29 @@ const AddProduct = () => {
                             </FormControl>
                         </Grid>
 
-                        <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth>
-                                <Select value={productSubCategory} onChange={handleSubCategoryChange}>
-                                    <MenuItem value="Sub Category">Sub Category</MenuItem>
-                                    {Array.from(new Set(SubCategoryData.map((product) => product.sub_category))).map((category) => (
-                                        <MenuItem key={category} value={category}>
-                                            {category}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                        <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>
+                            <Autocomplete
+                                freeSolo
+                                options={SubCategoryData}
+                                getOptionLabel={(option) => option.sub_category}
+                                onChange={(event, value) => {
+                                    if (value) {
+                                        handleSubCategoryChange(value);
+                                    }
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        required
+                                        label="Sub Category"
+                                        variant="outlined"
+                                        value={productSubCategory}
+                                        onChange={(event) => handleSubCategoryInput(event.target.value)}
+                                    />
+                                )}
+                            />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>
                             <TextField
                                 fullWidth
                                 label="Item Brand"
@@ -386,7 +422,7 @@ const AddProduct = () => {
                             />
                         </Grid>
 
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>
                             <Autocomplete
                                 freeSolo
                                 options={Item_Sku}
@@ -399,6 +435,7 @@ const AddProduct = () => {
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
+                                        required
                                         label="Item Unit"
                                         variant="outlined"
                                         value={productUnit}
@@ -407,21 +444,30 @@ const AddProduct = () => {
                                 )}
                             />
                         </Grid>
-
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>
                             <TextField
                                 fullWidth
-                                label="Item Price"
+                                label="Item SKU"
                                 color="primary"
-                                value={productPrice}
-                                onChange={(event) => setProductPrice(event.target.value)}
+                                value={productsku}
+                                onChange={(event) => setProductSKU(event.target.value)}
                                 required
                             />
                         </Grid>
-
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>
                             <TextField
                                 fullWidth
+                                label="Item Packaging"
+                                color="primary"
+                                value={productpackaging}
+                                onChange={(event) => setProductPackaging(event.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sx={{ marginTop: 1 }}>
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={4}
                                 label="Item Description"
                                 color="primary"
                                 value={productDescription}

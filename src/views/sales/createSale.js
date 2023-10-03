@@ -157,10 +157,10 @@ const CreateSale = () => {
     const items = useSelector((state) => state.cart.items);
     const grandTotal = useSelector((state) => state.cart.grandTotal);
     const [isScanning, setIsScanning] = useState(false);
-    const [paymentStatus, setPaymentStatus] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState('');
+    const [paymentStatus, setPaymentStatus] = useState('Paid');
+    const [paymentMethod, setPaymentMethod] = useState('Cash');
     const [shopName, setShopsName] = useState(user.role === 'Admin' ? '' : user.store_name);
-    const [customerName, setCustomerName] = useState('');
+    const [customerName, setCustomerName] = useState('Walking Customer');
     const [note, setNote] = useState('');
     const [spinner, setSpinner] = useState(false);
     const [loading, setLoading] = useState();
@@ -516,11 +516,13 @@ const CreateSale = () => {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <Autocomplete
+                                freeSolo
                                 options={CustomersData}
                                 getOptionLabel={(option) => option.name}
                                 onInputChange={(event, value) => {
                                     setCustomerName(value);
                                 }}
+                                defaultValue={{ name: customerName }}
                                 renderInput={(params) => <TextField {...params} label="Customer" variant="outlined" />}
                                 noOptionsText="Loading..."
                             />
@@ -548,7 +550,7 @@ const CreateSale = () => {
                             <Grid item xs={8}>
                                 <Autocomplete
                                     options={productData}
-                                    getOptionLabel={(option) => option.item_name}
+                                    getOptionLabel={(option) => `${option.item_name} - ${option.item_brand} - ${option.stock_unit}`}
                                     onChange={(event, value) => {
                                         if (value) {
                                             handleAddToCart(value);
@@ -567,8 +569,8 @@ const CreateSale = () => {
                                             <TableCell>Item Name</TableCell>
                                             <TableCell>Item Code</TableCell>
                                             <TableCell>Brand</TableCell>
+                                            <TableCell>SKU</TableCell>
                                             <TableCell>Quantity</TableCell>
-                                            <TableCell>Unit</TableCell>
                                             <TableCell>Unit Price</TableCell>
                                             <TableCell>Subtotal</TableCell>
                                             <TableCell>Action</TableCell>
@@ -581,6 +583,7 @@ const CreateSale = () => {
                                                 <TableCell>{item.itemCode}</TableCell>
 
                                                 <TableCell>{item.brand}</TableCell>
+                                                <TableCell>{item.unit}</TableCell>
                                                 <TableCell>
                                                     <Box display="flex" alignItems="center">
                                                         <Button onClick={() => handleDecrement(item.id)}>-</Button>
@@ -588,7 +591,7 @@ const CreateSale = () => {
                                                         <Button onClick={() => handleIncrement(item.id)}>+</Button>
                                                     </Box>
                                                 </TableCell>
-                                                <TableCell>{item.unit}</TableCell>
+
                                                 <TableCell>{item.unitPrice}</TableCell>
                                                 <TableCell>
                                                     <span className="bg-primary bg-opacity-10 text-primary px-4 py-1 rounded text-capitalize">
@@ -610,21 +613,6 @@ const CreateSale = () => {
                                     <div id="barcode" style={isScanning ? { height: 140 } : {}}></div>
                                 </Grid>
                             </Grid>
-                        </Grid>
-
-                        <Grid item xs={12} md={6} className="m-auto">
-                            <Box mt={2} className="border rounded mx-5">
-                                <TableContainer component={Paper}>
-                                    <Table>
-                                        <TableBody>
-                                            <TableRow>
-                                                <TableCell>Grand Total</TableCell>
-                                                <TableCell className="fw-semibold fs-4">{parseInt(grandTotal).toFixed(2)} ETB</TableCell>
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            </Box>
                         </Grid>
 
                         <Grid item xs={12} md={6}>
@@ -654,7 +642,7 @@ const CreateSale = () => {
                                                     value={paymentMethod}
                                                     onChange={handleMethodChange}
                                                 >
-                                                    <MenuItem value="Cash">With Cash</MenuItem>
+                                                    <MenuItem value="Cash">Cash</MenuItem>
                                                     <MenuItem value="Mobile Banking">Mobile Banking</MenuItem>
                                                     <MenuItem value="POS">POS</MenuItem>
                                                 </Select>
@@ -667,7 +655,7 @@ const CreateSale = () => {
                                             id="outlined-multiline-static"
                                             label="Additional Note"
                                             multiline
-                                            rows={4}
+                                            rows={5}
                                             variant="outlined"
                                             fullWidth
                                             value={note}
@@ -678,6 +666,30 @@ const CreateSale = () => {
                             </Box>
                         </Grid>
 
+                        <Grid item xs={12} md={6}>
+                            <Box mt={2} className="border rounded mx-1 p-3">
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <Typography>Customer</Typography>
+                                    <Typography className="p-2">{customerName}</Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <Typography>Quantity</Typography>
+                                    <Typography className="p-2">{items.length}</Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <Typography>Payment status</Typography>
+                                    <Typography className="p-2">{paymentStatus}</Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <Typography>Payment Method</Typography>
+                                    <Typography className="p-2"> {paymentMethod}</Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <Typography>Grand Total</Typography>
+                                    <Typography className="p-2 fw-semibold fs-5">{parseInt(grandTotal).toFixed(2)} ETB</Typography>
+                                </Box>
+                            </Box>
+                        </Grid>
                         <Grid item xs={12}>
                             <Box mt={2} display="flex" justifyContent="flex-end">
                                 <Box ml={1}>

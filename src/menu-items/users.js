@@ -12,7 +12,7 @@ const Users = {
     children: [
         {
             id: 'users',
-            title: 'Users',
+            title: 'System Users',
             type: 'item',
             url: '/users',
             icon: icons.IconUser,

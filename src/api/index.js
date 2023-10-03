@@ -1,8 +1,8 @@
 const Connections = {
-    // api: 'http://localhost:8000/api',
-    // images: 'http://localhost:8000/api/images/',
-    api: 'https://addischircharo.com/backend/api',
-    images: 'https://addischircharo.com/backend/api/images/',
+    api: 'http://localhost:8000/api',
+    images: 'http://localhost:8000/api/images/',
+    // api: 'https://addischircharo.com/backend/api',
+    // images: 'https://addischircharo.com/backend/api/images/',
     login: '/login',
     forgotpassword: '/forgotpassword',
     resetpassword: '/resetpassword',
@@ -12,6 +12,7 @@ const Connections = {
     shopstat: '/shopstat',
     againsttarget: '/againsttarget/',
     monthlytarget: '/monthlytarget/',
+    eachShops: '/shopstarget',
     // admin dashboard sidebar
     lowstock: '/lowstock/',
     customercount: '/customercount',

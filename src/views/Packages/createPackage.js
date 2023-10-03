@@ -125,6 +125,9 @@ const CreatePackage = () => {
                     id: product.id,
                     item_name: product.item_name,
                     item_code: product.item_code,
+                    item_category: product.item_category,
+                    item_sub_category: product.item_sub_category,
+                    item_brand: product.item_brand,
                     item_sku: product.stock_unit,
                     item_quantity: 1
                 }
@@ -174,7 +177,7 @@ const CreatePackage = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
         setSpinner(true);
-        if (shopName && shopId != null) {
+        if (shopName && shopId !== null) {
             setPopup({
                 ...popup,
                 status: true,
@@ -329,14 +332,14 @@ const CreatePackage = () => {
                                     <Autocomplete
                                         disabled={shopId ? false : true}
                                         options={productData}
-                                        getOptionLabel={(option) => option.item_name}
+                                        getOptionLabel={(option) => `${option.item_name} - ${option.item_brand} - ${option.stock_unit}`}
                                         onChange={(event, value) => {
                                             if (value) {
                                                 handleAddToCart(value);
                                             }
                                         }}
                                         sx={{ marginTop: 2 }}
-                                        renderInput={(params) => <TextField {...params} label="Select Product" variant="outlined" />}
+                                        renderInput={(params) => <TextField {...params} label="Select Stock" variant="outlined" />}
                                         noOptionsText={loading ? <CircularProgress size={20} /> : 'No item in this shop'}
                                     />
                                 </Grid>
@@ -356,11 +359,12 @@ const CreatePackage = () => {
                                     <Table>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell>Item Name</TableCell>
                                                 <TableCell>Item Code</TableCell>
-
-                                                <TableCell align="center">Quantity</TableCell>
+                                                <TableCell>Category</TableCell>
+                                                <TableCell>Sub Category</TableCell>
+                                                <TableCell>Brand</TableCell>
                                                 <TableCell>SKU</TableCell>
+                                                <TableCell align="center">Quantity</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -368,9 +372,11 @@ const CreatePackage = () => {
                                             <TableBody>
                                                 {Items.map((item, index) => (
                                                     <TableRow key={index}>
-                                                        <TableCell>{item.item_name}</TableCell>
                                                         <TableCell>{item.item_code}</TableCell>
-
+                                                        <TableCell>{item.item_category}</TableCell>
+                                                        <TableCell>{item.item_sub_category}</TableCell>
+                                                        <TableCell>{item.item_brand}</TableCell>
+                                                        <TableCell>{item.item_sku}</TableCell>
                                                         <TableCell
                                                             alignItems="center"
                                                             sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -384,7 +390,6 @@ const CreatePackage = () => {
                                                             />
                                                             <Button onClick={() => handleIncrement(item.id)}>+</Button>
                                                         </TableCell>
-                                                        <TableCell>{item.item_sku}</TableCell>
 
                                                         <TableCell>
                                                             <IconButton onClick={() => handleRemoveFromCart(item)}>
@@ -488,7 +493,6 @@ const CreatePackage = () => {
                                     display: 'flex',
                                     alignSelf: 'center',
                                     alignItems: 'center',
-                                    justifyContent: 'space-between',
                                     padding: 0.5,
                                     paddingTop: 4
                                 }}
