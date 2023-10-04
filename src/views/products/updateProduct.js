@@ -28,7 +28,11 @@ const UpdateProduct = () => {
     const [CategoryData, setCategoryData] = useState([]);
     //shops data
     const [shops, setShops] = useState([]);
-    //
+    const [initialSubCategoryData, setInitialSubCategoryData] = useState([]);
+    const [initialBrandData, setInitialBrandData] = useState([]);
+    const [SubCategoryData, setSubCategoryData] = useState([]);
+    const [brandData, setBrandData] = useState([]);
+    const [sku, setSKU] = useState([]);
 
     const [productPicture, setProductPicture] = useState(null);
     const [picturePreview, setPicturePreview] = useState(state.item_image ? state.item_image : null);
@@ -46,12 +50,36 @@ const UpdateProduct = () => {
         message: ''
     });
 
-    const handleCategoryChange = (event) => {
-        setProductCategory(event.target.value);
+    const handleCategoryChange = (value) => {
+        setProductCategory(value.main_category);
+
+        var selectedCategory = value.name;
+        if (selectedCategory !== 'Main Category') {
+            var cat = CategoryData.find((cat) => cat.name === selectedCategory);
+
+            const subcat = initialSubCategoryData.filter((item) => item.main_category === selectedCategory);
+            const brands = initialBrandData.filter((item) => item.main_category === selectedCategory);
+
+            setSubCategoryData(subcat);
+            setBrandData(brands);
+        }
     };
 
     const handleSubCategoryChange = (value) => {
-        setProductSubCategory(value);
+        setProductSubCategory(value.sub_category);
+
+        var selectedSubcategory = value.sub_category;
+        const filteredBrand = initialBrandData.filter((item) => item.sub_category === selectedSubcategory);
+        setBrandData(filteredBrand);
+    };
+
+    const handleBrandChange = (value) => {
+        setBrand(value.brand);
+    };
+
+    const handleSKUChange = (value) => {
+        setSKU(value.item_sku);
+        setProductSKU(value.item_sku);
     };
 
     const handleSubCategoryInput = (sub_category) => {
@@ -146,7 +174,7 @@ const UpdateProduct = () => {
     };
     useEffect(() => {
         const getCatgeory = () => {
-            var Api = Connections.api + Connections.viewsubcategory;
+            var Api = Connections.api + Connections.viewcategory;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -161,6 +189,12 @@ const UpdateProduct = () => {
                 .then((response) => {
                     if (response.success) {
                         setCategoryData(response.data);
+                        setInitialSubCategoryData(response.subcategory);
+                        setInitialBrandData(response.brand);
+                        setSubCategoryData(response.subcategory);
+                        setBrandData(response.brand);
+
+                        setSKU(response.skus);
                     }
                 })
                 .catch(() => {
@@ -281,32 +315,35 @@ const UpdateProduct = () => {
                         </Grid>
 
                         <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth required>
-                                <Select value={productCategory} onChange={handleCategoryChange}>
-                                    <MenuItem value={productCategory}>{productCategory}</MenuItem>
-                                    {Array.from(new Set(CategoryData.map((product) => product.main_category))).map((category) => (
-                                        <MenuItem key={category} value={category}>
-                                            {category}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            <Autocomplete
+                                options={CategoryData}
+                                getOptionLabel={(option) => option.name}
+                                onChange={(event, value) => {
+                                    if (value) {
+                                        handleCategoryChange(value);
+                                    }
+                                }}
+                                defaultValue={{ name: state.item_category }}
+                                renderInput={(params) => (
+                                    <TextField {...params} required label="Main Category" variant="outlined" value={productCategory} />
+                                )}
+                            />
                         </Grid>
 
                         <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>
                             <Autocomplete
-                                options={CategoryData}
+                                options={SubCategoryData}
                                 getOptionLabel={(option) => option.sub_category}
                                 onChange={(event, value) => {
                                     if (value) {
                                         handleSubCategoryChange(value);
                                     }
                                 }}
+                                defaultValue={{ sub_category: productSubCategory }}
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
                                         required
-                                        fullWidth
                                         label="Sub Category"
                                         variant="outlined"
                                         value={productSubCategory}
@@ -317,13 +354,16 @@ const UpdateProduct = () => {
                         </Grid>
 
                         <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Brand"
-                                color="primary"
-                                value={brand}
-                                onChange={(event) => setBrand(event.target.value)}
-                                required
+                            <Autocomplete
+                                options={brandData}
+                                getOptionLabel={(option) => option.brand}
+                                defaultValue={{ brand: brand }}
+                                onChange={(event, value) => {
+                                    if (value) {
+                                        handleBrandChange(value);
+                                    }
+                                }}
+                                renderInput={(params) => <TextField {...params} required label="Brand" variant="outlined" value={brand} />}
                             />
                         </Grid>
 
@@ -349,13 +389,26 @@ const UpdateProduct = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Item SKU"
-                                color="primary"
-                                value={productSKU}
-                                onChange={(event) => setProductSKU(event.target.value)}
-                                required
+                            <Autocomplete
+                                freeSolo
+                                options={sku}
+                                getOptionLabel={(option) => option.item_sku}
+                                defaultValue={{ item_sku: productSKU }}
+                                onChange={(event, value) => {
+                                    if (value) {
+                                        handleSKUChange(value);
+                                    }
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        required
+                                        label="SKU"
+                                        variant="outlined"
+                                        value={productSKU}
+                                        onChange={(event) => setProductSKU(event.target.value)}
+                                    />
+                                )}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>

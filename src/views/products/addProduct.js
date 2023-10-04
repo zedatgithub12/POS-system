@@ -1,18 +1,5 @@
 // material-ui
-import {
-    Grid,
-    Box,
-    Typography,
-    Button,
-    Divider,
-    TextField,
-    Container,
-    FormControl,
-    MenuItem,
-    Select,
-    InputLabel,
-    Autocomplete
-} from '@mui/material';
+import { Grid, Box, Typography, Button, Divider, TextField, Container, Autocomplete } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { useTheme } from '@mui/material/styles';
@@ -52,9 +39,15 @@ const AddProduct = () => {
             status: false
         });
     };
-    //category data
+
+    // data
     const [CategoryData, setCategoryData] = useState([]);
+    const [initialSubCategoryData, setInitialSubCategoryData] = useState([]);
+    const [initialBrandData, setInitialBrandData] = useState([]);
     const [SubCategoryData, setSubCategoryData] = useState([]);
+    const [brandData, setBrandData] = useState([]);
+    const [sku, setSKU] = useState([]);
+
     //shops data
     const [shops, setShops] = useState([]);
     const [productPicture, setProductPicture] = useState(null);
@@ -69,19 +62,36 @@ const AddProduct = () => {
     const [productDescription, setProductDescription] = useState('');
     const [spinner, setSpinner] = useState(false);
 
-    const handleCategoryChange = (event) => {
-        setProductCategory(event.target.value);
-        var selectedName = event.target.value;
-        if (selectedName !== 'Main Category') {
-            var cat = CategoryData.find((cat) => cat.name === selectedName);
+    const handleCategoryChange = (value) => {
+        setProductCategory(value.name);
+        var selectedCategory = value.name;
+        if (selectedCategory !== 'Main Category') {
+            var cat = CategoryData.find((cat) => cat.name === selectedCategory);
             setCategoryId(cat.id);
 
-            getSubCatgeory(event.target.value);
+            const subcat = initialSubCategoryData.filter((item) => item.main_category === selectedCategory);
+            const brands = initialBrandData.filter((item) => item.main_category === selectedCategory);
+
+            setSubCategoryData(subcat);
+            setBrandData(brands);
         }
     };
 
     const handleSubCategoryChange = (value) => {
-        setProductSubCategory(value.name);
+        setProductSubCategory(value.sub_category);
+
+        var selectedSubcategory = value.sub_category;
+        const filteredBrand = initialBrandData.filter((item) => item.sub_category === selectedSubcategory);
+        setBrandData(filteredBrand);
+    };
+
+    const handleBrandChange = (value) => {
+        setBrand(value.brand);
+    };
+
+    const handleSKUChange = (value) => {
+        setSKU(value.item_sku);
+        setProductSKU(value.item_sku);
     };
 
     const handleSubCategoryInput = (sub_category) => {
@@ -108,36 +118,6 @@ const AddProduct = () => {
         }
     };
 
-    const getSubCatgeory = (name) => {
-        var Api = Connections.api + Connections.subcategory + name;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'GET',
-            headers: headers,
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setSubCategoryData((prevCat) => {
-                        // Combine the previous shops with the new ones from the API
-                        return [...prevCat, ...response.data];
-                    });
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error fetching sub categories!'
-                });
-            });
-    };
     useEffect(() => {
         const getCatgeory = () => {
             var Api = Connections.api + Connections.viewcategory;
@@ -154,10 +134,13 @@ const AddProduct = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     if (response.success) {
-                        setCategoryData((prevCat) => {
-                            // Combine the previous shops with the new ones from the API
-                            return [...prevCat, ...response.data];
-                        });
+                        setCategoryData(response.data);
+                        setInitialSubCategoryData(response.subcategory);
+                        setInitialBrandData(response.brand);
+                        setSubCategoryData(response.subcategory);
+                        setBrandData(response.brand);
+
+                        setSKU(response.skus);
                     }
                 })
                 .catch(() => {
@@ -377,16 +360,18 @@ const AddProduct = () => {
                         </Grid>
 
                         <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth required>
-                                <Select value={productCategory} onChange={handleCategoryChange}>
-                                    <MenuItem value="Main Category">Main Category</MenuItem>
-                                    {Array.from(new Set(CategoryData.map((product) => product.name))).map((category) => (
-                                        <MenuItem key={category} value={category}>
-                                            {category}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            <Autocomplete
+                                options={CategoryData}
+                                getOptionLabel={(option) => option.name}
+                                onChange={(event, value) => {
+                                    if (value) {
+                                        handleCategoryChange(value);
+                                    }
+                                }}
+                                renderInput={(params) => (
+                                    <TextField {...params} required label="Main Category" variant="outlined" value={productCategory} />
+                                )}
+                            />
                         </Grid>
 
                         <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>
@@ -411,13 +396,15 @@ const AddProduct = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>
-                            <TextField
-                                fullWidth
-                                label="Item Brand"
-                                color="primary"
-                                value={brand}
-                                onChange={(event) => setBrand(event.target.value)}
-                                required
+                            <Autocomplete
+                                options={brandData}
+                                getOptionLabel={(option) => option.brand}
+                                onChange={(event, value) => {
+                                    if (value) {
+                                        handleBrandChange(value);
+                                    }
+                                }}
+                                renderInput={(params) => <TextField {...params} required label="Brand" variant="outlined" value={brand} />}
                             />
                         </Grid>
 
@@ -444,13 +431,25 @@ const AddProduct = () => {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>
-                            <TextField
-                                fullWidth
-                                label="Item SKU"
-                                color="primary"
-                                value={productsku}
-                                onChange={(event) => setProductSKU(event.target.value)}
-                                required
+                            <Autocomplete
+                                freeSolo
+                                options={sku}
+                                getOptionLabel={(option) => option.item_sku}
+                                onChange={(event, value) => {
+                                    if (value) {
+                                        handleSKUChange(value);
+                                    }
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        required
+                                        label="SKU"
+                                        variant="outlined"
+                                        value={productsku}
+                                        onChange={(event) => setProductSKU(event.target.value)}
+                                    />
+                                )}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} sx={{ marginTop: 1 }}>

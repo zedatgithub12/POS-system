@@ -414,7 +414,7 @@ const SubCategory = () => {
                                     sx={{ textDecoration: 'none' }}
                                     onClick={() => handleAddDialogOpen()}
                                 >
-                                    Add Sub Category
+                                    Create Sub Category
                                 </Button>
                             </Grid>
                         </Grid>
@@ -454,9 +454,9 @@ const SubCategory = () => {
                                 <Table>
                                     <TableHead className="bg-light">
                                         <TableRow>
-                                            <TableCell>ID</TableCell>
-                                            <TableCell>Main Category</TableCell>
+                                            <TableCell>Code</TableCell>
                                             <TableCell>Sub Category</TableCell>
+                                            <TableCell>Main Category</TableCell>
                                             <TableCell>Action</TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -474,8 +474,9 @@ const SubCategory = () => {
                                             {categoriesToShow.map((category) => (
                                                 <TableRow>
                                                     <TableCell>{category.code}</TableCell>
-                                                    <TableCell>{category.main_category}</TableCell>
                                                     <TableCell>{category.sub_category}</TableCell>
+                                                    <TableCell>{category.main_category}</TableCell>
+
                                                     <TableCell>
                                                         {' '}
                                                         <IconButton onClick={() => handleEditDialogOpen(category)}>
@@ -505,7 +506,7 @@ const SubCategory = () => {
             </MainCard>
 
             <Dialog open={addDialogOpen} onClose={handleAddDialogClose}>
-                <DialogTitle>Add Sub Category</DialogTitle>
+                <DialogTitle>Create Sub Category</DialogTitle>
 
                 <DialogContent>
                     <Autocomplete

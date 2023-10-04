@@ -60,6 +60,13 @@ const getDashboardItems = (role) => {
                     type: 'item',
                     url: '/sub-categories',
                     breadcrumbs: false
+                },
+                {
+                    id: 'brands',
+                    title: 'Brand',
+                    type: 'item',
+                    url: '/brands',
+                    breadcrumbs: false
                 }
             ]
         },

@@ -42,9 +42,9 @@ const UpdateStock = Loadable(lazy(() => import('views/stocks/updateStock')));
 
 // Category routing
 const Category = Loadable(lazy(() => import('views/category')));
-
-//sub category
 const SubCategory = Loadable(lazy(() => import('views/sub-category')));
+const Brands = Loadable(lazy(() => import('views/brands')));
+
 //sales routing
 const Sales = Loadable(lazy(() => import('views/sales')));
 const CreateSale = Loadable(lazy(() => import('views/sales/createSale')));
@@ -203,6 +203,11 @@ const MainRoutes = {
             path: 'sub-categories',
             element: <SubCategory />
         },
+        {
+            path: 'brands',
+            element: <Brands />
+        },
+
         {
             path: 'sales',
             element: <Sales />

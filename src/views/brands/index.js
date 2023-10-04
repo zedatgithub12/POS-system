@@ -6,6 +6,9 @@ import {
     Box,
     Divider,
     List,
+    ListItem,
+    ListItemText,
+    ListItemSecondaryAction,
     IconButton,
     Dialog,
     DialogTitle,
@@ -13,6 +16,10 @@ import {
     TextField,
     Button,
     DialogActions,
+    Autocomplete,
+    FormControl,
+    MenuItem,
+    Select,
     TablePagination,
     TableContainer,
     Table,
@@ -37,7 +44,7 @@ import { ActivityIndicators } from 'ui-component/activityIndicator';
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-const Category = () => {
+const Brands = () => {
     const [popup, setPopup] = useState({
         status: false,
         severity: 'info',
@@ -53,20 +60,56 @@ const Category = () => {
             status: false
         });
     };
+
+    //category data
+    const [brand, setBrand] = useState([]);
     const [CategoryData, setCategoryData] = useState([]);
     const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [addCategory, setAddCategory] = useState('');
+    const [newBrand, setNewBrand] = useState('');
+    const [parentCode, setParentCode] = useState();
     const [addCategoryDesc, setAddCategoryDesc] = useState('');
-    const [newCategoryName, setNewCategoryName] = useState('');
-    const [newCategoryDesc, setNewCategoryDesc] = useState('');
+
+    const [editCategory, setEditCategory] = useState();
+    const [editSubCategory, setEditSubCategory] = useState();
+    const [editBrand, setEditBrand] = useState();
+
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(12);
+    const [rowsPerPage, setRowsPerPage] = useState(15);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [spinner, setSpinner] = useState(false);
+
+    const [categoryFilter, setCategoryFilter] = useState('Sub Category');
+
+    const handleCategoryFilterChange = (event) => {
+        setCategoryFilter(event.target.value);
+    };
+
+    const filteredData = brand.filter((category) => {
+        let isMatch = true;
+
+        if (searchTerm) {
+            const searchRegex = new RegExp(searchTerm, 'i');
+            isMatch = isMatch && searchRegex.test(category.brand);
+        }
+
+        if (categoryFilter !== 'Sub Category') {
+            isMatch = isMatch && category.sub_category === categoryFilter;
+        }
+
+        return isMatch;
+    });
+
+    const uniqueCategories = new Set();
+
+    // Loop through the CategoryData array and add each main_category value to the Set
+    CategoryData.forEach((category) => {
+        uniqueCategories.add(category.name);
+    });
 
     const handleAddDialogOpen = () => {
         setAddDialogOpen(true);
@@ -75,69 +118,93 @@ const Category = () => {
     const handleAddDialogClose = () => {
         setAddDialogOpen(false);
     };
-    const addNewCategory = () => {
-        setSpinner(true);
-        var Api = Connections.api + Connections.addcategory;
-        var headers = {
-            accept: 'application/json',
-            'Content-Type': 'application/json'
-        };
 
-        const data = {
-            name: addCategory,
-            description: addCategoryDesc
-        };
+    const handlesubcategory = (value) => {
+        setAddCategory(value.main_category);
+        setAddCategoryDesc(value.sub_category);
+        setParentCode(value.code);
+    };
 
-        // Make the API call using fetch()
-        fetch(Api, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(data),
-            cache: 'no-cache'
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.success) {
-                    setPopup({
-                        ...popup,
-                        status: true,
-                        severity: 'success',
-                        message: response.message
-                    });
-                    setSpinner(false);
-                    setCategoryData(CategoryData);
-                    handleAddDialogClose();
-                } else {
+    const handlesubcategoryUpdate = (value) => {
+        setEditCategory(value.main_category);
+        setEditSubCategory(value.sub_category);
+    };
+
+    const CreateBrand = () => {
+        if (addCategoryDesc === '') {
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'error',
+                message: 'Please select sub category name'
+            });
+        } else {
+            setSpinner(true);
+            var Api = Connections.api + Connections.createbrand;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+
+            const data = {
+                subcatcode: parentCode,
+                main: addCategory,
+                sub: addCategoryDesc,
+                brand: newBrand
+            };
+
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(data)
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'success',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                        setCategoryData(CategoryData);
+                        handleAddDialogClose();
+                    } else {
+                        setPopup({
+                            ...popup,
+                            status: true,
+                            severity: 'error',
+                            message: response.message
+                        });
+                        setSpinner(false);
+                    }
+                })
+                .catch(() => {
                     setPopup({
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: response.message
+                        message: 'There is error adding category!'
                     });
                     setSpinner(false);
-                }
-            })
-            .catch(() => {
-                setPopup({
-                    ...popup,
-                    status: true,
-                    severity: 'error',
-                    message: 'There is error adding category!'
                 });
-                setSpinner(false);
-            });
+        }
     };
     const handleEditDialogOpen = (category) => {
         setSelectedCategory(category);
-        setNewCategoryName(category.name);
-        setNewCategoryDesc(category.description);
+        setEditCategory(category.main_category);
+        setEditSubCategory(category.sub_category);
+        setEditBrand(category.brand);
         setEditDialogOpen(true);
     };
 
     const handleEditDialogClose = () => {
         setSelectedCategory(null);
-        setNewCategoryName('');
-        setNewCategoryDesc('');
+        setEditCategory('');
+        setEditSubCategory('');
+        setEditBrand('');
         setEditDialogOpen(false);
     };
 
@@ -153,15 +220,16 @@ const Category = () => {
 
     const handleEditCategory = () => {
         setSpinner(true);
-        var Api = Connections.api + Connections.editcategory + selectedCategory.id;
+        var Api = Connections.api + Connections.editbrand + selectedCategory.id;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
         };
 
         const data = {
-            name: newCategoryName,
-            description: newCategoryDesc
+            main: editCategory,
+            sub: editSubCategory,
+            brand: editBrand
         };
 
         // Make the API call using fetch()
@@ -202,10 +270,15 @@ const Category = () => {
             });
     };
 
+    const removeDeletedBrand = async () => {
+        const Leftover = brand.filter((item) => item.id != selectedCategory.id);
+        setCategoryData(Leftover);
+    };
+
     const handleDeleteCategory = () => {
         // Do something with the deleted category
         setSpinner(true);
-        var Api = Connections.api + Connections.deletecategory + selectedCategory.id;
+        var Api = Connections.api + Connections.deletebrand + selectedCategory.id;
         var headers = {
             accept: 'application/json',
             'Content-Type': 'application/json'
@@ -225,7 +298,7 @@ const Category = () => {
                         severity: 'success',
                         message: response.message
                     });
-                    setCategoryData(CategoryData);
+                    removeDeletedBrand();
                     setSpinner(false);
                     handleDeleteDialogClose();
                 } else {
@@ -263,11 +336,10 @@ const Category = () => {
     };
 
     //useffect which fetches list of categories when component get mounted
-
     useEffect(() => {
-        const getCatgeory = () => {
+        const getSubCatgeory = () => {
             setLoading(true);
-            var Api = Connections.api + Connections.viewcategory;
+            var Api = Connections.api + Connections.viewsubcategory;
             var headers = {
                 accept: 'application/json',
                 'Content-Type': 'application/json'
@@ -290,18 +362,49 @@ const Category = () => {
                         ...popup,
                         status: true,
                         severity: 'error',
-                        message: 'There is error featching category!'
+                        message: 'There is error featching sub category!'
                     });
                     setLoading(false);
                 });
         };
-        getCatgeory();
-        return () => {};
-    }, [popup]);
 
-    const filteredCategories = CategoryData.filter(
-        (category) => category.name.toLowerCase().includes(searchTerm.toLowerCase()) || category.id == searchTerm
-    );
+        const getBrands = () => {
+            setLoading(true);
+            var Api = Connections.api + Connections.viewbrand;
+            var headers = {
+                accept: 'application/json',
+                'Content-Type': 'application/json'
+            };
+            // Make the API call using fetch()
+            fetch(Api, {
+                method: 'GET',
+                headers: headers,
+                cache: 'no-cache'
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    if (response.success) {
+                        setBrand(response.data);
+                        setLoading(false);
+                    }
+                })
+                .catch(() => {
+                    setPopup({
+                        ...popup,
+                        status: true,
+                        severity: 'error',
+                        message: 'There is error featching brands!'
+                    });
+                    setLoading(false);
+                });
+        };
+
+        getSubCatgeory();
+        getBrands();
+        return () => {};
+    }, []);
+
+    const filteredCategories = filteredData.filter((category) => category.sub_category.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const categoriesToShow = filteredCategories.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
@@ -314,7 +417,7 @@ const Category = () => {
                             <Grid item>
                                 <Grid container direction="column" spacing={1}>
                                     <Grid item>
-                                        <Typography variant="h3">Main Category</Typography>
+                                        <Typography variant="h3">Brands</Typography>
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -325,7 +428,7 @@ const Category = () => {
                                     sx={{ textDecoration: 'none' }}
                                     onClick={() => handleAddDialogOpen()}
                                 >
-                                    Create Category
+                                    Create Brand
                                 </Button>
                             </Grid>
                         </Grid>
@@ -337,8 +440,9 @@ const Category = () => {
                     <Grid item xs={12}>
                         <Box className="shadow-1 p-4 pt-1 rounded ">
                             <TextField
-                                label="Search Categories"
+                                label="Search brand"
                                 color="primary"
+                                className="ms-2 mt-2 "
                                 value={searchTerm}
                                 onChange={handleSearchTermChange}
                                 InputProps={{
@@ -349,13 +453,25 @@ const Category = () => {
                                     )
                                 }}
                             />
+                            <FormControl className="ms-2 mt-2 ">
+                                <Select value={categoryFilter} onChange={handleCategoryFilterChange}>
+                                    <MenuItem value="Sub Category">Sub Category</MenuItem>
+                                    {Array.from(new Set(CategoryData.map((product) => product.sub_category))).map((category) => (
+                                        <MenuItem key={category} value={category}>
+                                            {category}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
                             <TableContainer sx={{ marginTop: 2 }}>
                                 <Table>
                                     <TableHead className="bg-light">
                                         <TableRow>
-                                            <TableCell>ID</TableCell>
-                                            <TableCell>Name</TableCell>
-                                            <TableCell>Description</TableCell>
+                                            <TableCell>Code</TableCell>
+                                            <TableCell>Brand</TableCell>
+                                            <TableCell>Sub Category</TableCell>
+                                            <TableCell>Main Category</TableCell>
                                             <TableCell>Action</TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -372,9 +488,11 @@ const Category = () => {
                                         <TableBody>
                                             {categoriesToShow.map((category) => (
                                                 <TableRow>
-                                                    <TableCell>{category.id}</TableCell>
-                                                    <TableCell>{category.name}</TableCell>
-                                                    <TableCell>{category.description}</TableCell>
+                                                    <TableCell>{category.code}</TableCell>
+                                                    <TableCell>{category.brand}</TableCell>
+                                                    <TableCell>{category.sub_category}</TableCell>
+                                                    <TableCell>{category.main_category}</TableCell>
+
                                                     <TableCell>
                                                         {' '}
                                                         <IconButton onClick={() => handleEditDialogOpen(category)}>
@@ -404,32 +522,36 @@ const Category = () => {
             </MainCard>
 
             <Dialog open={addDialogOpen} onClose={handleAddDialogClose}>
-                <DialogTitle>Create Category</DialogTitle>
+                <DialogTitle>Create Brand</DialogTitle>
 
                 <DialogContent>
-                    <TextField
-                        margin="dense"
-                        label="Category Name"
-                        color="primary"
-                        value={addCategory}
-                        onChange={(e) => setAddCategory(e.target.value)}
-                        fullWidth
-                        required
+                    <Autocomplete
+                        options={CategoryData}
+                        getOptionLabel={(option) => option.sub_category}
+                        onChange={(event, value) => {
+                            if (value) {
+                                handlesubcategory(value);
+                            }
+                        }}
+                        renderInput={(params) => (
+                            <TextField {...params} margin="dense" label="Sub Category" variant="outlined" fullWidth required />
+                        )}
                     />
                     <TextField
                         margin="dense"
-                        label="Category Description"
+                        label="Brand name"
                         color="primary"
-                        value={addCategoryDesc}
-                        onChange={(e) => setAddCategoryDesc(e.target.value)}
+                        value={newBrand}
+                        onChange={(e) => setNewBrand(e.target.value)}
                         fullWidth
+                        required
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleAddDialogClose} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={() => addNewCategory()} color="primary" variant="container">
+                    <Button onClick={() => CreateBrand()} color="primary" variant="container">
                         {spinner ? (
                             <div className="spinner-border spinner-border-sm text-dark " role="status">
                                 <span className="visually-hidden">Loading...</span>
@@ -442,22 +564,27 @@ const Category = () => {
             </Dialog>
 
             <Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
-                <DialogTitle>Edit Category</DialogTitle>
+                <DialogTitle>Edit Brand</DialogTitle>
                 <DialogContent>
-                    <TextField
-                        margin="dense"
-                        label="Category Name"
-                        color="primary"
-                        value={newCategoryName}
-                        onChange={(e) => setNewCategoryName(e.target.value)}
-                        fullWidth
+                    <Autocomplete
+                        options={CategoryData}
+                        getOptionLabel={(option) => option.sub_category}
+                        defaultValue={{ sub_category: editSubCategory }}
+                        onChange={(event, value) => {
+                            if (value) {
+                                handlesubcategoryUpdate(value);
+                            }
+                        }}
+                        renderInput={(params) => (
+                            <TextField {...params} margin="dense" label="Sub Category" variant="outlined" fullWidth required />
+                        )}
                     />
                     <TextField
                         margin="dense"
-                        label="Category Description"
+                        label="Brand"
                         color="primary"
-                        value={newCategoryDesc}
-                        onChange={(e) => setNewCategoryDesc(e.target.value)}
+                        value={editBrand}
+                        onChange={(e) => setEditBrand(e.target.value)}
                         fullWidth
                     />
                 </DialogContent>
@@ -478,9 +605,9 @@ const Category = () => {
             </Dialog>
 
             <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
-                <DialogTitle>Delete Category</DialogTitle>
+                <DialogTitle>Delete Brand</DialogTitle>
                 <DialogContent>
-                    <p>Are you sure you want to delete the category '{selectedCategory?.name}'?</p>
+                    <p>Are you sure you want to delete the brand '{selectedCategory?.brand}'?</p>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleDeleteDialogClose} color="primary">
@@ -506,4 +633,4 @@ const Category = () => {
     );
 };
 
-export default Category;
+export default Brands;

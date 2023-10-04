@@ -87,6 +87,20 @@ const Connections = {
     editsubcategory: '/editsubcategory/',
     deletesubcategory: '/deletesubcategory/',
 
+    //brand endpoints
+    createbrand: '/createbrand',
+    brand: '/brand/',
+    viewbrand: '/viewbrand',
+    editbrand: '/editbrand/',
+    deletebrand: '/deletebrand/',
+
+    //sku endpoints
+    createsku: '/createbrand',
+    sku: '/sku/',
+    viewsku: '/viewsku',
+    editsku: '/editsku/',
+    deletesku: '/deletesku/',
+
     //sales api
     createsale: '/createsale',
     viewsale: '/viewsale',
