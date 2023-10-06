@@ -63,7 +63,7 @@ const EachShops = ({ lists, loading, period, children }) => {
                                 lists.map((item, index) => (
                                     <TableRow key={index}>
                                         <TableCell>{item.shopname}</TableCell>
-                                        <TableCell>{PeriodSelector(item)}</TableCell>
+                                        <TableCell>{PeriodSelector(item).toLocaleString()}</TableCell>
                                         <TableCell>
                                             <Typography
                                                 sx={{
@@ -71,10 +71,10 @@ const EachShops = ({ lists, loading, period, children }) => {
                                                     fontWeight: theme.typography.fontWeightMedium
                                                 }}
                                             >
-                                                {parseFloat(item.sales_sum)}
+                                                {parseFloat(item.sales_sum).toLocaleString()}
                                             </Typography>
                                         </TableCell>
-                                        <TableCell>{parseFloat(item.sales_sum) - PeriodSelector(item)}</TableCell>
+                                        <TableCell>{(PeriodSelector(item) - parseFloat(item.sales_sum)).toLocaleString()}</TableCell>
 
                                         <TableCell>
                                             <Box

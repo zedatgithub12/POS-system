@@ -1,23 +1,7 @@
 import { useEffect, useState, forwardRef } from 'react';
 import './DonutChart.css';
 // material-ui
-import {
-    Grid,
-    Typography,
-    Box,
-    Divider,
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    Autocomplete,
-    TextField,
-    FormControl,
-    Select,
-    MenuItem,
-    ButtonGroup,
-    IconButton
-} from '@mui/material';
+import { Grid, Typography, Box, Divider, Button, TextField, FormControl, Select, MenuItem, ButtonGroup, IconButton } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -26,7 +10,7 @@ import Connections from 'api';
 import { useTheme } from '@mui/material/styles';
 import LowStocks from './components/low-stock';
 import SalesTargets from './components/sales-against-target';
-import { IconX, IconBuildingStore, IconChartInfographic, IconSearch, IconFilter, IconDots, IconDotsVertical } from '@tabler/icons';
+import { IconBuildingStore, IconChartInfographic, IconFilter } from '@tabler/icons';
 import TargetListing from './components/target-listing';
 import { useNavigate } from 'react-router-dom';
 import { Preferences } from 'preferences';
@@ -60,17 +44,11 @@ const Dashboard = () => {
 
     const [filter, setFilter] = useState(false);
     const [shop, setShop] = useState('All');
-    const [startingFrom, setStartingFrom] = useState();
-    const [to, setTo] = useState();
-
+    const [startingFrom, setStartingFrom] = useState('');
+    const [to, setTo] = useState('');
+    const [TotalSales, setTotalSales] = useState(0);
+    const [categoryLoader, setCategoryLoader] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [paginationModel, setPaginationModel] = useState({
-        pageSize: 25,
-        page: 0,
-        pageCount: 0,
-        pageStartIndex: 0,
-        pageEndIndex: 0
-    });
 
     const [popup, setPopup] = useState({
         status: false,
@@ -86,9 +64,7 @@ const Dashboard = () => {
     };
 
     const handleCategoryShop = (event) => {
-        if (event.target.value !== 'All') {
-            setShop(event.target.value);
-        }
+        setShop(event.target.value);
     };
 
     //low stock shop drop down filter
@@ -107,6 +83,8 @@ const Dashboard = () => {
             ...popup,
             status: false
         });
+
+        setFilter(false);
     };
 
     const getShops = () => {
@@ -254,29 +232,33 @@ const Dashboard = () => {
             });
     };
 
-    function getCategorySum(data) {
-        const categorySum = {};
+    //sales filtering panel submission handler
+    const FilterSales = async () => {
+        setFilter(false);
+        setCategoryLoader(true);
+        var Api = Connections.api + Connections.filterSoldItem + `?shop=${shop}&startingfrom=${startingFrom}&to=${to}`;
 
-        data.forEach((item) => {
-            const { item_category, price } = item;
-
-            if (categorySum[item_category]) {
-                categorySum[item_category] += parseFloat(price);
-            } else {
-                categorySum[item_category] = parseFloat(price);
-            }
-        });
-
-        const result = Object.entries(categorySum).map(([category, sum]) => ({
-            category,
-            sum
-        }));
-
-        return result;
-    }
-
-    // Usage example
-    const categorySumArray = getCategorySum(Category);
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'GET',
+            headers: headers
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setCategory(response.data);
+                    setCategoryLoader(false);
+                }
+            })
+            .catch(() => {
+                setLoading(false);
+                setCategoryLoader(false);
+            });
+    };
 
     useEffect(() => {
         user.role === 'Admin' ? getShops() : (getTargets(user.store_name), getLowStocks(user.store_name));
@@ -288,34 +270,15 @@ const Dashboard = () => {
     }, []);
 
     useEffect(() => {
-        const getSoldItems = () => {
-            var Api =
-                Connections.api +
-                Connections.getSoldItem +
-                `?page=${paginationModel.page}&limit=${paginationModel.pageSize}&shop=${shopFilter}`;
-
-            var headers = {
-                accept: 'application/json',
-                'Content-Type': 'application/json'
-            };
-            // Make the API call using fetch()
-            fetch(Api, {
-                method: 'GET',
-                headers: headers
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    if (response.success) {
-                        setCategory(response.data.data);
-                    }
-                })
-                .catch(() => {
-                    setLoading(false);
-                });
+        const categoryCard = async () => {
+            await FilterSales();
+            const totalSales = Category.reduce((total, item) => total + parseFloat(item.sum), 0);
+            setTotalSales(totalSales);
         };
-        getSoldItems();
+        categoryCard();
         return () => {};
-    }, [paginationModel, shopFilter]);
+    }, []);
+
     return (
         <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
@@ -493,7 +456,7 @@ const Dashboard = () => {
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
                                 paddingY: 0.5,
-                                paddingX: 2
+                                paddingX: 1
                             }}
                         >
                             <Typography variant="subtitle1">Categories</Typography>{' '}
@@ -516,7 +479,7 @@ const Dashboard = () => {
                                             minWidth: 360
                                         }}
                                     >
-                                        <Typography variant="subtitle1">Filter</Typography>
+                                        <Typography>Shop</Typography>
 
                                         <FormControl>
                                             <Select
@@ -524,7 +487,6 @@ const Dashboard = () => {
                                                 onChange={handleCategoryShop}
                                                 sx={{ backgroundColor: theme.palette.background.default, marginY: 1 }}
                                             >
-                                                <MenuItem value="Select Shop">Select Shop</MenuItem>
                                                 <MenuItem value="All">All</MenuItem>
                                                 {Array.from(new Set(shops.map((item) => item.name))).map((shop) => (
                                                     <MenuItem
@@ -552,25 +514,76 @@ const Dashboard = () => {
                                         </Box>
 
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginY: 1 }}>
-                                            <Button variant="text">Done</Button>{' '}
+                                            <Button variant="text" onClick={() => FilterSales()}>
+                                                Done
+                                            </Button>
                                         </Box>
                                     </Box>
                                 )}
                             </Box>
                         </Box>
                         <Divider />
-                        <Box sx={{ paddingX: 1 }}>
-                            {categorySumArray.map((item, index) => (
-                                <Box
-                                    key={index}
-                                    sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: 1 }}
-                                >
-                                    <Typography>{item.category}</Typography>
-                                    <Typography>{item.sum}</Typography>
-                                </Box>
-                            ))}
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-around',
+                                alignItems: 'center',
+                                padding: 1,
+                                paddingY: 1.4,
+                                marginBottom: 2,
+                                boxShadow: 0.2,
+                                backgroundColor: theme.palette.warning.dark
+                            }}
+                        >
+                            <Typography>{shop}</Typography>
+
+                            {startingFrom && <Typography>{startingFrom} </Typography>}
+                            {to && <Typography>{to}</Typography>}
                         </Box>
-                        <Box></Box>
+                        <Box>
+                            {categoryLoader ? (
+                                <Box sx={{ minHeight: 205, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                    <ActivityIndicators />
+                                </Box>
+                            ) : (
+                                <>
+                                    <Box sx={{ paddingX: 1 }}>
+                                        {Category.length < 1 ? (
+                                            <Box sx={{ minHeight: 205, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                <Typography>There is no record of sold item!</Typography>
+                                            </Box>
+                                        ) : (
+                                            Category.length > 0 &&
+                                            Category.map((item, index) => (
+                                                <Box
+                                                    key={index}
+                                                    sx={{
+                                                        display: 'flex',
+                                                        flexDirection: 'row',
+                                                        justifyContent: 'space-between',
+                                                        padding: 1.4
+                                                    }}
+                                                >
+                                                    <Typography>{item.category}</Typography>
+                                                    <Typography>{item.sum.toLocaleString()}</Typography>
+                                                </Box>
+                                            ))
+                                        )}
+                                    </Box>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            justifyContent: 'flex-end',
+                                            alignItems: 'center',
+                                            marginRight: 2,
+                                            paddingY: 2
+                                        }}
+                                    >
+                                        <Typography variant="h4">Total {TotalSales ? TotalSales.toLocaleString() : 0}</Typography>
+                                    </Box>
+                                </>
+                            )}
+                        </Box>
                     </Grid>
                 </Grid>
             </Grid>

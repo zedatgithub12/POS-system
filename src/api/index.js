@@ -1,6 +1,8 @@
 const Connections = {
     api: 'http://localhost:8000/api',
     images: 'http://localhost:8000/api/images/',
+    // api: 'http://127.0.0.1:8000/api',
+    // images: 'http://127.0.0.1:8000/api/images/',
     // api: 'https://addischircharo.com/backend/api',
     // images: 'https://addischircharo.com/backend/api/images/',
     login: '/login',
@@ -112,6 +114,7 @@ const Connections = {
     getSoldItem: '/sold_items/',
     updateSoldItem: '/sold_items/',
     deleteSoldItem: '/sold_items/',
+    filterSoldItem: '/filter_sold_item',
 
     //customer api
     addcustomer: '/addcustomer',
