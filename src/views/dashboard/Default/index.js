@@ -17,7 +17,6 @@ import {
 } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-// project imports
 import { gridSpacing } from 'store/constant';
 import Connections from 'api';
 import { useTheme } from '@mui/material/styles';
@@ -25,7 +24,6 @@ import LowStocks from './components/low-stock';
 import SalesTargets from './components/sales-against-target';
 import { IconBuildingStore, IconChartInfographic, IconDotsVertical, IconFilter } from '@tabler/icons';
 import TargetListing from './components/target-listing';
-import { useNavigate } from 'react-router-dom';
 import { Preferences } from 'preferences';
 import { ActivityIndicators } from 'ui-component/activityIndicator';
 import EachShops from './components/eachShops';
@@ -49,8 +47,6 @@ const Dashboard = () => {
     const user = JSON.parse(userString);
 
     const theme = useTheme();
-    const navigate = useNavigate();
-
     const defaultShop = Preferences.defaultshop;
 
     const [shops, setShops] = useState([]);
@@ -556,195 +552,203 @@ const Dashboard = () => {
                         </Grid>
                     </Grid>
                 </Grid>
-
-                <Grid container>
-                    <Grid
-                        item
-                        xs={12}
-                        sm={12}
-                        md={6}
-                        lg={4}
-                        xl={4}
-                        sx={{ backgroundColor: theme.palette.background.default, paddingY: 1, borderRadius: 2 }}
-                    >
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                paddingY: 0.5,
-                                paddingX: 1
-                            }}
+                {user.role === 'Admin' && (
+                    <Grid container>
+                        <Grid
+                            item
+                            xs={12}
+                            sm={12}
+                            md={6}
+                            lg={4}
+                            xl={4}
+                            sx={{ backgroundColor: theme.palette.background.default, paddingY: 1, borderRadius: 2 }}
                         >
-                            <Typography variant="subtitle1">Categories</Typography>{' '}
-                            <Box sx={{ position: 'relative' }}>
-                                <IconButton onClick={() => setFilter(!filter)}>
-                                    <IconFilter size={20} />
-                                </IconButton>
-
-                                {filter && (
-                                    <Box
-                                        sx={{
-                                            position: 'absolute',
-                                            top: 40,
-                                            right: 2,
-                                            backgroundColor: theme.palette.background.default,
-                                            borderRadius: 2,
-                                            padding: 2,
-                                            boxShadow: 1,
-                                            flexWrap: 'wrap',
-                                            minWidth: 360
-                                        }}
-                                    >
-                                        <Typography>Shop</Typography>
-
-                                        <FormControl>
-                                            <Select
-                                                value={shop}
-                                                onChange={handleCategoryShop}
-                                                sx={{ backgroundColor: theme.palette.background.default, marginY: 1 }}
-                                            >
-                                                <MenuItem value="All">All</MenuItem>
-                                                {Array.from(new Set(shops.map((item) => item.name))).map((shop) => (
-                                                    <MenuItem
-                                                        key={shop}
-                                                        value={shop}
-                                                        sx={{ backgroundColor: theme.palette.background.default }}
-                                                    >
-                                                        {shop}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-                                        <Box sx={{ marginY: 1.5 }}>
-                                            <Typography>Starting from</Typography>
-                                            <TextField
-                                                fullWidth
-                                                type="date"
-                                                value={startingFrom}
-                                                onChange={(event) => setStartingFrom(event.target.value)}
-                                            />
-                                        </Box>
-                                        <Box sx={{ marginY: 1.5 }}>
-                                            <Typography>To</Typography>
-                                            <TextField fullWidth type="date" value={to} onChange={(event) => setTo(event.target.value)} />
-                                        </Box>
-
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginY: 1 }}>
-                                            <Button variant="text" onClick={() => FilterSales()}>
-                                                Done
-                                            </Button>
-                                        </Box>
-                                    </Box>
-                                )}
-
-                                {Category.length > 0 && (
-                                    <IconButton
-                                        aria-label="more"
-                                        id="long-button"
-                                        aria-controls={expand ? 'long-menu' : undefined}
-                                        aria-expanded={expand ? 'true' : undefined}
-                                        aria-haspopup="true"
-                                        onClick={handleClick}
-                                    >
-                                        <IconDotsVertical size={20} />
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    paddingY: 0.5,
+                                    paddingX: 1
+                                }}
+                            >
+                                <Typography variant="subtitle1">Sale</Typography>{' '}
+                                <Box sx={{ position: 'relative' }}>
+                                    <IconButton onClick={() => setFilter(!filter)}>
+                                        <IconFilter size={20} />
                                     </IconButton>
-                                )}
 
-                                <Menu
-                                    id="long-menu"
-                                    MenuListProps={{
-                                        'aria-labelledby': 'long-button'
-                                    }}
-                                    anchorEl={exportExcel}
-                                    open={expand}
-                                    onClose={handleClose}
-                                    PaperProps={{
-                                        style: {
-                                            maxHeight: ITEM_HEIGHT * 4.5,
-                                            width: '20ch'
-                                        }
-                                    }}
-                                >
-                                    <MenuItem onClick={handleDownloadExcel} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <Typography> Export Excel </Typography>
-                                        {exporting && <ActivityIndicators size={16} />}{' '}
-                                    </MenuItem>
-                                    <MenuItem>
-                                        <CSVLink data={csvData} filename={'SoldItems.csv'} className="text-decoration-none text-dark">
-                                            Export CSV
-                                        </CSVLink>
-                                    </MenuItem>
-                                </Menu>
-                            </Box>
-                        </Box>
-                        <Divider />
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'space-around',
-                                alignItems: 'center',
-                                padding: 1,
-                                paddingY: 1.4,
-                                marginBottom: 2,
-                                boxShadow: 0.2,
-                                backgroundColor: theme.palette.warning.dark
-                            }}
-                        >
-                            <Typography>{shop}</Typography>
+                                    {filter && (
+                                        <Box
+                                            sx={{
+                                                position: 'absolute',
+                                                top: 40,
+                                                right: 2,
+                                                backgroundColor: theme.palette.background.default,
+                                                borderRadius: 2,
+                                                padding: 2,
+                                                boxShadow: 1,
+                                                flexWrap: 'wrap',
+                                                minWidth: 360
+                                            }}
+                                        >
+                                            <Typography>Shop</Typography>
 
-                            {startingFrom && <Typography>{startingFrom} </Typography>}
-                            {to && <Typography>{to}</Typography>}
-                        </Box>
-                        <Box>
-                            {categoryLoader ? (
-                                <Box sx={{ minHeight: 205, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                    <ActivityIndicators />
-                                </Box>
-                            ) : (
-                                <>
-                                    <Box sx={{ paddingX: 1 }}>
-                                        {Category.length < 1 ? (
-                                            <Box sx={{ minHeight: 205, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                                <Typography>There is no record of sold item!</Typography>
-                                            </Box>
-                                        ) : (
-                                            Category.length > 0 &&
-                                            Category.map((item, index) => (
-                                                <Box
-                                                    key={index}
-                                                    sx={{
-                                                        display: 'flex',
-                                                        flexDirection: 'row',
-                                                        justifyContent: 'space-between',
-                                                        padding: 1.4
-                                                    }}
+                                            <FormControl>
+                                                <Select
+                                                    value={shop}
+                                                    onChange={handleCategoryShop}
+                                                    sx={{ backgroundColor: theme.palette.background.default, marginY: 1 }}
                                                 >
-                                                    <Typography>{item.category}</Typography>
-                                                    <Typography>{item.sum.toLocaleString()}</Typography>
-                                                </Box>
-                                            ))
-                                        )}
-                                    </Box>
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            justifyContent: 'flex-end',
-                                            alignItems: 'center',
-                                            marginRight: 2,
-                                            paddingY: 2
+                                                    <MenuItem value="All">All</MenuItem>
+                                                    {Array.from(new Set(shops.map((item) => item.name))).map((shop) => (
+                                                        <MenuItem
+                                                            key={shop}
+                                                            value={shop}
+                                                            sx={{ backgroundColor: theme.palette.background.default }}
+                                                        >
+                                                            {shop}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                            <Box sx={{ marginY: 1.5 }}>
+                                                <Typography>Starting from</Typography>
+                                                <TextField
+                                                    fullWidth
+                                                    type="date"
+                                                    value={startingFrom}
+                                                    onChange={(event) => setStartingFrom(event.target.value)}
+                                                />
+                                            </Box>
+                                            <Box sx={{ marginY: 1.5 }}>
+                                                <Typography>To</Typography>
+                                                <TextField
+                                                    fullWidth
+                                                    type="date"
+                                                    value={to}
+                                                    onChange={(event) => setTo(event.target.value)}
+                                                />
+                                            </Box>
+
+                                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginY: 1 }}>
+                                                <Button variant="text" onClick={() => FilterSales()}>
+                                                    Done
+                                                </Button>
+                                            </Box>
+                                        </Box>
+                                    )}
+
+                                    {Category.length > 0 && (
+                                        <IconButton
+                                            aria-label="more"
+                                            id="long-button"
+                                            aria-controls={expand ? 'long-menu' : undefined}
+                                            aria-expanded={expand ? 'true' : undefined}
+                                            aria-haspopup="true"
+                                            onClick={handleClick}
+                                        >
+                                            <IconDotsVertical size={20} />
+                                        </IconButton>
+                                    )}
+
+                                    <Menu
+                                        id="long-menu"
+                                        MenuListProps={{
+                                            'aria-labelledby': 'long-button'
+                                        }}
+                                        anchorEl={exportExcel}
+                                        open={expand}
+                                        onClose={handleClose}
+                                        PaperProps={{
+                                            style: {
+                                                maxHeight: ITEM_HEIGHT * 4.5,
+                                                width: '20ch'
+                                            }
                                         }}
                                     >
-                                        {Category.length > 0 && (
-                                            <Typography variant="h4">Total {TotalSales ? TotalSales.toLocaleString() : 0}</Typography>
-                                        )}
+                                        <MenuItem onClick={handleDownloadExcel} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <Typography> Export Excel </Typography>
+                                            {exporting && <ActivityIndicators size={16} />}{' '}
+                                        </MenuItem>
+                                        <MenuItem>
+                                            <CSVLink data={csvData} filename={'SoldItems.csv'} className="text-decoration-none text-dark">
+                                                Export CSV
+                                            </CSVLink>
+                                        </MenuItem>
+                                    </Menu>
+                                </Box>
+                            </Box>
+                            <Divider />
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-around',
+                                    alignItems: 'center',
+                                    padding: 1,
+                                    paddingY: 1.4,
+                                    marginBottom: 2,
+                                    boxShadow: 0.2,
+                                    backgroundColor: theme.palette.warning.dark
+                                }}
+                            >
+                                <Typography>{shop}</Typography>
+
+                                {startingFrom && <Typography>{startingFrom} </Typography>}
+                                {to && <Typography>{to}</Typography>}
+                            </Box>
+                            <Box>
+                                {categoryLoader ? (
+                                    <Box sx={{ minHeight: 205, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        <ActivityIndicators />
                                     </Box>
-                                </>
-                            )}
-                        </Box>
+                                ) : (
+                                    <>
+                                        <Box sx={{ paddingX: 1 }}>
+                                            {Category.length < 1 ? (
+                                                <Box
+                                                    sx={{ minHeight: 205, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                                                >
+                                                    <Typography>There is no record of sold item!</Typography>
+                                                </Box>
+                                            ) : (
+                                                Category.length > 0 &&
+                                                Category.map((item, index) => (
+                                                    <Box
+                                                        key={index}
+                                                        sx={{
+                                                            display: 'flex',
+                                                            flexDirection: 'row',
+                                                            justifyContent: 'space-between',
+                                                            padding: 1.4
+                                                        }}
+                                                    >
+                                                        <Typography>{item.category}</Typography>
+                                                        <Typography>{item.sum.toLocaleString()}</Typography>
+                                                    </Box>
+                                                ))
+                                            )}
+                                        </Box>
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: 'flex-end',
+                                                alignItems: 'center',
+                                                marginRight: 2,
+                                                paddingY: 2
+                                            }}
+                                        >
+                                            {Category.length > 0 && (
+                                                <Typography variant="h4">Total {TotalSales ? TotalSales.toLocaleString() : 0}</Typography>
+                                            )}
+                                        </Box>
+                                    </>
+                                )}
+                            </Box>
+                        </Grid>
                     </Grid>
-                </Grid>
+                )}
             </Grid>
 
             <Snackbar open={popup.status} autoHideDuration={6000} onClose={handleClose}>
