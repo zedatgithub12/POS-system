@@ -1,7 +1,20 @@
 import { useEffect, useState, forwardRef } from 'react';
 import './DonutChart.css';
 // material-ui
-import { Grid, Typography, Box, Divider, Button, TextField, FormControl, Select, MenuItem, ButtonGroup, IconButton } from '@mui/material';
+import {
+    Grid,
+    Typography,
+    Box,
+    Divider,
+    Button,
+    TextField,
+    FormControl,
+    Select,
+    Menu,
+    MenuItem,
+    ButtonGroup,
+    IconButton
+} from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 // project imports
@@ -10,24 +23,34 @@ import Connections from 'api';
 import { useTheme } from '@mui/material/styles';
 import LowStocks from './components/low-stock';
 import SalesTargets from './components/sales-against-target';
-import { IconBuildingStore, IconChartInfographic, IconFilter } from '@tabler/icons';
+import { IconBuildingStore, IconChartInfographic, IconDotsVertical, IconFilter } from '@tabler/icons';
 import TargetListing from './components/target-listing';
 import { useNavigate } from 'react-router-dom';
 import { Preferences } from 'preferences';
 import { ActivityIndicators } from 'ui-component/activityIndicator';
 import EachShops from './components/eachShops';
 
+//import extraction packages
+import { saveAs } from 'file-saver';
+import * as XLSX from 'xlsx';
+import { CSVLink } from 'react-csv';
+import { formatDate } from 'utils/functions';
+
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
+
+const ITEM_HEIGHT = 20;
+
 const Dashboard = () => {
     const userString = sessionStorage.getItem('user');
     const user = JSON.parse(userString);
-    const theme = useTheme();
 
+    const theme = useTheme();
     const navigate = useNavigate();
+
     const defaultShop = Preferences.defaultshop;
 
     const [shops, setShops] = useState([]);
@@ -35,6 +58,7 @@ const Dashboard = () => {
     const [revenueTarget, setRevenueTarget] = useState([]);
     const [eachShopsAchievement, setEachShopsAchievement] = useState([]);
     const [Category, setCategory] = useState([]);
+    const [soldItemExport, setSolItemExport] = useState([]);
 
     const [shopFilter, setShopFilter] = useState('Select Shop');
     const [targetShopFilter, setTargetShopFilter] = useState('Select Shop');
@@ -47,8 +71,11 @@ const Dashboard = () => {
     const [startingFrom, setStartingFrom] = useState('');
     const [to, setTo] = useState('');
     const [TotalSales, setTotalSales] = useState(0);
-    const [categoryLoader, setCategoryLoader] = useState(false);
+
     const [loading, setLoading] = useState(true);
+    const [categoryLoader, setCategoryLoader] = useState(false);
+    const [exporting, setExporting] = useState(false);
+    const [exportExcel, setexportExcel] = useState(null);
 
     const [popup, setPopup] = useState({
         status: false,
@@ -85,6 +112,7 @@ const Dashboard = () => {
         });
 
         setFilter(false);
+        setexportExcel(null);
     };
 
     const getShops = () => {
@@ -252,12 +280,102 @@ const Dashboard = () => {
                 if (response.success) {
                     setCategory(response.data);
                     setCategoryLoader(false);
+                    const totalSales = response.data.reduce((total, item) => total + parseFloat(item.sum), 0);
+                    setTotalSales(totalSales);
                 }
             })
             .catch(() => {
-                setLoading(false);
                 setCategoryLoader(false);
             });
+    };
+
+    //export sales filtered sales
+    const expand = Boolean(exportExcel);
+    const handleClick = (event) => {
+        setexportExcel(event.currentTarget);
+    };
+
+    const ExportSoldItems = async () => {
+        setFilter(false);
+        setExporting(true);
+        var Api = Connections.api + Connections.ExportSoldItems + `?shop=${shop}&startingfrom=${startingFrom}&to=${to}`;
+
+        var headers = {
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        };
+        // Make the API call using fetch()
+        fetch(Api, {
+            method: 'GET',
+            headers: headers
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    setSolItemExport(response.data);
+                    setExporting(false);
+                }
+            })
+            .catch(() => {
+                setExporting(false);
+            });
+    };
+
+    const csvData = soldItemExport.map((item) => ({
+        Shop: item.stock_shop,
+        Month: formatDate(item.created_at).monthName,
+        Date: formatDate(item.created_at).formattedDate,
+        Item: item.item_name,
+        Code: item.item_code,
+        Category: item.item_category,
+        Brand: item.item_brand,
+        UOM: item.item_unit,
+        SKU: item.item_sku,
+        Count: item.quantity,
+        Price: item.price
+    }));
+
+    const handleExtractExcel = async () => {
+        const worksheet = XLSX.utils.json_to_sheet(csvData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'soldItem');
+        const excelBuffer = XLSX.write(workbook, {
+            bookType: 'xlsx',
+            type: 'array'
+        });
+        const fileData = new Blob([excelBuffer], {
+            type: 'application/octet-stream'
+        });
+        saveAs(fileData, 'soldItem.xlsx');
+    };
+
+    const handleDownloadExcel = async () => {
+        try {
+            await ExportSoldItems(); // Fetch data from the database
+
+            // Check if data is fetched successfully
+            if (soldItemExport.length > 0) {
+                await handleExtractExcel(); // Prepare and download the Excel file
+            } else {
+                // Handle case when no data is fetched
+
+                setPopup({
+                    ...popup,
+                    status: true,
+                    severity: 'warning',
+                    message: 'Press Again'
+                });
+            }
+        } catch (error) {
+            // Handle any errors that occur during the process
+
+            setPopup({
+                ...popup,
+                status: true,
+                severity: 'warning',
+                message: `Error fetching data or preparing Excel file, ${error}`
+            });
+        }
     };
 
     useEffect(() => {
@@ -272,9 +390,9 @@ const Dashboard = () => {
     useEffect(() => {
         const categoryCard = async () => {
             await FilterSales();
-            const totalSales = Category.reduce((total, item) => total + parseFloat(item.sum), 0);
-            setTotalSales(totalSales);
         };
+        const totalSales = Category.reduce((total, item) => total + parseFloat(item.sum), 0);
+        setTotalSales(totalSales);
         categoryCard();
         return () => {};
     }, []);
@@ -462,7 +580,7 @@ const Dashboard = () => {
                             <Typography variant="subtitle1">Categories</Typography>{' '}
                             <Box sx={{ position: 'relative' }}>
                                 <IconButton onClick={() => setFilter(!filter)}>
-                                    <IconFilter />
+                                    <IconFilter size={20} />
                                 </IconButton>
 
                                 {filter && (
@@ -520,6 +638,45 @@ const Dashboard = () => {
                                         </Box>
                                     </Box>
                                 )}
+
+                                {Category.length > 0 && (
+                                    <IconButton
+                                        aria-label="more"
+                                        id="long-button"
+                                        aria-controls={expand ? 'long-menu' : undefined}
+                                        aria-expanded={expand ? 'true' : undefined}
+                                        aria-haspopup="true"
+                                        onClick={handleClick}
+                                    >
+                                        <IconDotsVertical size={20} />
+                                    </IconButton>
+                                )}
+
+                                <Menu
+                                    id="long-menu"
+                                    MenuListProps={{
+                                        'aria-labelledby': 'long-button'
+                                    }}
+                                    anchorEl={exportExcel}
+                                    open={expand}
+                                    onClose={handleClose}
+                                    PaperProps={{
+                                        style: {
+                                            maxHeight: ITEM_HEIGHT * 4.5,
+                                            width: '20ch'
+                                        }
+                                    }}
+                                >
+                                    <MenuItem onClick={handleDownloadExcel} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <Typography> Export Excel </Typography>
+                                        {exporting && <ActivityIndicators size={16} />}{' '}
+                                    </MenuItem>
+                                    <MenuItem>
+                                        <CSVLink data={csvData} filename={'SoldItems.csv'} className="text-decoration-none text-dark">
+                                            Export CSV
+                                        </CSVLink>
+                                    </MenuItem>
+                                </Menu>
                             </Box>
                         </Box>
                         <Divider />
@@ -579,7 +736,9 @@ const Dashboard = () => {
                                             paddingY: 2
                                         }}
                                     >
-                                        <Typography variant="h4">Total {TotalSales ? TotalSales.toLocaleString() : 0}</Typography>
+                                        {Category.length > 0 && (
+                                            <Typography variant="h4">Total {TotalSales ? TotalSales.toLocaleString() : 0}</Typography>
+                                        )}
                                     </Box>
                                 </>
                             )}

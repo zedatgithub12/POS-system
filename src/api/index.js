@@ -115,6 +115,7 @@ const Connections = {
     updateSoldItem: '/sold_items/',
     deleteSoldItem: '/sold_items/',
     filterSoldItem: '/filter_sold_item',
+    ExportSoldItems: '/export_sold_item',
 
     //customer api
     addcustomer: '/addcustomer',
